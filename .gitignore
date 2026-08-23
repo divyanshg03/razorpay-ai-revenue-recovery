@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Node
+node_modules/
+.next/
+dist/
+build/
+
+# Secrets — Razorpay test keys live here, never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Data & artifacts
+data/raw/
+data/interim/
+*.pkl
+*.joblib
+*.ckpt
+*.pt
+*.onnx
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local scratch
+scratch/
+*.log
+
+# Agent instructions — local-only, references paths outside this repo
+CLAUDE.md
