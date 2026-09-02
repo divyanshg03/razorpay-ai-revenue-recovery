@@ -1,7 +1,31 @@
 # Phase 3 — Run the batch and measure
 
-**Branch:** `feat/phase-2-decision-engine` (continues; Phase 3 is measurement of Phase 2).
-**Status:** planned. Working deadline for the whole build is **3 September 2026**.
+**Branch:** `feat/phase-3-measurement`.
+**Status: RUN, 2 September 2026.** `results/metrics.json` exists. 108 tests green.
+
+## Result
+
+| | Net incremental (net of contact cost) | 95% CI |
+|---|---|---|
+| **Headline — 21d, engine vs Razorpay's ladder** | **Rs 736,114** | Rs 590,970 – Rs 874,219 |
+| Secondary — 14d window | Rs 532,261 | Rs 391,124 – Rs 666,657 |
+| Shifted-parameter cohort | Rs 435,762 | Rs 288,101 – Rs 579,210 |
+
+Rs 263.09 per treated customer. Arm A 2.00%, arm B 25.25%, arm C 58.15% — a 32.9 pp lift over
+the incumbent, at a cost of **Rs 0.0033 per incremental rupee recovered**. All three intervals
+exclude zero.
+
+The prediction written into this plan before the run held: the number came in below the
+Phase 2 sanity figure, and the shifted cohort — built to be harder, with fewer
+insufficient-funds cases and more dead instruments — is lower again but still clearly
+positive. Arm B rises to 34.54% there while arm C rises only to 54.43%, which is exactly the
+shape you would expect if the engine's edge comes from timing rather than from having
+memorised the generator.
+
+**And it reports what it failed to recover:** 1,171 of 2,798 customers (41.9%), Rs 943,979 left
+on the table — 974 where the escalation ladder ran out, 423 where the cause was not
+actionable at all, and 210 where a stopping rule (opt-out, dispute, hardship) correctly ended
+contact.
 
 ## Where this sits
 

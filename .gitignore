@@ -58,3 +58,9 @@ tools/
 
 # Daemon logs and local runtime state
 runtime/
+
+# Phase 3 audit ledgers: ~27MB each, 40k records. NOT committed - they are fully
+# REPRODUCIBLE (the batch is deterministic from the seed), so what goes in the repo is the
+# chain-head hash plus a replayable extract, and `python scripts/run_batch.py` regenerates
+# the rest byte-for-byte. Ignored by name, per the rule above.
+results/phase3/*.jsonl
