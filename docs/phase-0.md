@@ -1,7 +1,8 @@
 # Phase 0 — De-risk and freeze the contract
 
-**Status: awaiting approval.** Nothing in Phase 1 begins until the go/no-go at the foot of
-this document is signed. Budget: half a day of real work, 24–25 Aug 2026.
+**Status: CLOSED — GO signed 2 September 2026.** All eight gates resolved; see the results
+table and sign-off at the foot of this document. Ran 24 Aug – 2 Sept 2026 (the blocker in 0.1
+fired on day 0 and reshaped the schedule).
 
 ## Where this sits
 
@@ -10,8 +11,12 @@ this document is signed. Budget: half a day of real work, 24–25 Aug 2026.
 | **0** | De-risk and freeze the contract | 24–25 Aug | Go/no-go signed, metric frozen, feasibility evidenced |
 | 1 | Ingest, taxonomy, ledger | 26–28 Aug | Webhooks land verified and deduped; diagnosis runs; audit trail exists before the first decision |
 | 2 | Decision engine and guardrails | 29–31 Aug | State machine owns every action; stopping rules in code; LLM behind a tested copy gate |
-| 3 | Run the batch and measure | 1–3 Sept | `results/metrics.json` exists, against both baselines |
-| 4 | Package and defend | 4–5 Sept | README generated from the artifact, limitations written, video cut, repo public |
+| 3 | Run the batch and measure | 3 Sept | `results/metrics.json` exists, against both baselines |
+| 4 | Package and defend | 3 Sept | README generated from the artifact, limitations written, video cut, repo public |
+
+**Revised 2 Sept 2026:** 5 Sept confirmed as the submission deadline, with the build to be
+complete by **3 Sept**. Phases 1–4 compress into the remaining time. Recorded here as a
+deliberate decision rather than something discovered late.
 
 ## Why this phase exists
 
@@ -141,18 +146,47 @@ No product code. No state machine, no LLM integration, no message composition, n
 generation beyond what a gate needs to answer its own question. Work begun before 0.1
 resolves is work that may be discarded.
 
-## Assumption needing your confirmation
+## Assumption — CONFIRMED 2 September 2026
 
-`CLAUDE.md` states *"Applications close 5 September 2026."* This plan reads that as the
-**submission** deadline and budgets 12 days accordingly. If 5 Sept is only the deadline to
-*enter*, with the build due later, every phase after 0 stretches and the compression in
-Phases 3 and 4 is unnecessary. **Confirm which before Phase 1 starts** — it changes how much
-can safely be scoped.
+`CLAUDE.md` states *"Applications close 5 September 2026."* ~~This plan reads that as the
+**submission** deadline...~~ **Confirmed by Divyansh, 2 Sept 2026: 5 September is the
+SUBMISSION deadline**, and the build is to be complete by **3 September** to leave two days
+of buffer. The plan's original reading was correct; no phase stretches.
+
+**Working deadline: 3 Sept 2026.** Phases 1–4 must therefore compress into the remaining time,
+and that compression is a deliberate, recorded decision rather than something discovered late.
+
+## Gate results — all eight resolved, 2 September 2026
+
+Full detail in [`docs/phase-0-findings.md`](phase-0-findings.md); every claim points at an
+artifact in `results/phase0/`.
+
+| Gate | Result |
+|---|---|
+| 0.0 activation + cap raise | **PASS** — ticket #20706328 filed and acknowledged |
+| 0.1 Subscriptions blocker | **FAIL** — gated; fallback (seeded simulator) declared and taken |
+| 0.2 error-field shape | **PARTIAL PASS** — shape observed; reason vocabulary must be documentation-derived |
+| 0.3 halt ladder | **VOID** by 0.1 — reimplemented as baseline arm B |
+| 0.4 webhook receive path | **PASS** — Razorpay-signed event received, verified, logged |
+| 0.5 `notify_by` delivery | **PASS with caveat** — returns success; delivery unverified |
+| 0.6 RBI primary sources | **PASS** — 3 citations corrected, 1 claim withdrawn |
+| 0.7 metric + holdout | **FROZEN** — committed at `8d14dbe`, before any result existed |
 
 ## Approval
 
-- [ ] Phase 0 approved as written
-- [ ] 5 Sept interpretation confirmed (submission deadline / entry deadline — strike one)
-- [ ] Go/no-go recorded after gates run: **GO** / **NO-GO, pivot to:** ______
+- [x] Phase 0 approved as written
+- [x] **5 Sept interpretation confirmed — SUBMISSION deadline.** Build complete by 3 Sept.
+- [x] Go/no-go recorded after gates run: **GO** — given by Divyansh, 2 September 2026.
 
-Approved by: ____________________  Date: ____________
+**Recommendation: GO.** The premise as originally written is dead — Subscriptions is gated,
+so the mandate lifecycle cannot be observed. But the pivot was taken on day 0 and everything
+above the cohort interface is unaffected: the decisioning layer, the guardrails, the audit
+trail and the holdout measurement never touched the Subscriptions API. The metric is frozen,
+the compliance base is verified against the regulator, the receive path is proven against real
+Razorpay traffic, and the model is chosen on evidence. What remains is building, not
+de-risking.
+
+Approved by: **Divyansh Gupta**    Date: **2 September 2026**
+
+**Phase 0 is CLOSED.** All eight gates resolved, evidence committed, metric frozen
+at `8d14dbe` before any result existed. Phase 1 begins — see `docs/phase-1.md`.
