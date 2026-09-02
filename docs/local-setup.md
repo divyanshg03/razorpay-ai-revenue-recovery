@@ -98,6 +98,34 @@ silently rejected while the endpoint reported perfectly healthy.
 Razorpay retries a failing webhook with exponential backoff for 24 hours and then
 **auto-disables it**. An endpoint that fails silently is worse than none at all.
 
+### The share name was rotated on 2 Sept 2026
+
+The original name reached GitHub before the placeholder work landed — the branch had already
+been pushed twice, so scrubbing the working tree and rewriting history could not un-publish
+it. A force-push removes the branch pointer but GitHub keeps unreachable objects addressable
+by SHA, so the old value stayed reachable to anyone holding the hash.
+
+The repo was private and the name was never a credential (unsigned requests get a 400 and
+never reach the queue), so the exposure was small. Rotating was still the cheaper and
+strictly safer fix than trying to erase it: the old name and its share were **deleted**, so
+whatever survives in any object store now resolves to nothing. Verified: the old URL returns
+404, the new one returns 400 unsigned and 200 to a signed event.
+
+**No code changed.** That is the point of keeping the name in `.env` — a rotation is an env
+edit plus a Dashboard update, not a commit. If it has to be rotated again, the steps are:
+
+```powershell
+tools\zrok\zrok2.exe create name rzp-wh-<new>      # reserve the new name
+# edit RAZORPAY_WEBHOOK_ZROK_NAME in .env
+tools\zrok\zrok2.exe delete share <old-token>      # tear the old one down
+tools\zrok\zrok2.exe delete name <old-name>
+powershell -ExecutionPolicy Bypass -File scripts\webhook_daemon.ps1   # rebuild on the new name
+```
+
+Then update the URL in the Razorpay Dashboard (Test mode → Account & Settings → Webhooks,
+OTP `754081`). **The secret does not change**, and until the Dashboard is updated every
+delivery 404s — which starts the 24-hour auto-disable clock.
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\webhook_status.ps1              # health
 powershell -ExecutionPolicy Bypass -File scripts\webhook_daemon.ps1              # force a repair
