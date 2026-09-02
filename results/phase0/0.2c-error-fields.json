@@ -1,0 +1,49 @@
+{
+  "gate": "0.2 - do the five error fields populate in test mode?",
+  "captured_at": "2026-09-02T11:09:03+0530",
+  "verdict": "PARTIAL PASS - field SHAPE confirmed, reason VOCABULARY not exercisable",
+  "what_passed": {
+    "all_five_fields_populate": true,
+    "error_code_matches_docs": "BAD_REQUEST_ERROR carries a customer-side decline, exactly as docs/razorpay-api-notes.md warned - which is why classification must NOT key on error_code",
+    "error_source_varies_meaningfully": "gateway (card) vs issuer (wallet) - the field does discriminate, so it is worth keying on",
+    "error_step_present": "payment_authorization on both"
+  },
+  "what_failed": {
+    "error_reason_is_generic": "Both payments returned 'payment_failed'. Test card 4100 2800 0008 0001 is documented to map to 'insufficient_fund'; driving the success/failure screen to FAILURE overrides the card mapping and yields the generic reason instead.",
+    "spelling_question_unresolved": "The docs use both 'insufficient_fund' and 'insufficient_funds'. Neither spelling was observed, so this stays unanswered.",
+    "consequence": "The ~121-value error_reason taxonomy CANNOT be observed from test mode via this route. The diagnosis layer must seed its reason vocabulary from Razorpay's published enumeration and declare it documentation-derived, not observed. The field SHAPE above is observed and can be claimed as such."
+  },
+  "observed_payments": [
+    {
+      "id": "pay_TX3NafmwcgWyGe",
+      "status": "failed",
+      "method": "card",
+      "fields": {
+        "error_code": "BAD_REQUEST_ERROR",
+        "error_description": "Payment failed",
+        "error_source": "gateway",
+        "error_step": "payment_authorization",
+        "error_reason": "payment_failed"
+      },
+      "all_five_populated": true
+    },
+    {
+      "id": "pay_TX3MaZ3PayjMeQ",
+      "status": "failed",
+      "method": "wallet",
+      "fields": {
+        "error_code": "BAD_REQUEST_ERROR",
+        "error_description": "Your payment didn't go through due to a temporary issue. Any debited amount will be refunded in 4-5 business days.",
+        "error_source": "issuer",
+        "error_step": "payment_authorization",
+        "error_reason": "payment_failed"
+      },
+      "all_five_populated": true
+    }
+  ],
+  "gate_0_4_status_at_capture": {
+    "razorpay_originated_events": 0,
+    "rejections_from_non_local_peers": 0,
+    "note": "Two payments FAILED at 10:59:41 and 11:00:39 with the webhook active and subscribed to payment.failed, and the endpoint verified healthy. Neither a delivery nor a rejected delivery was seen, so Razorpay did not call the endpoint."
+  }
+}

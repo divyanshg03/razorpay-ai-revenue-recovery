@@ -1,0 +1,65 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/payment_links",
+    "body": {
+      "amount": 49900,
+      "currency": "INR",
+      "description": "Gate 0.2/0.4 - recovery retry probe",
+      "customer": {
+        "name": "Gate Probe",
+        "contact": "+919812345670",
+        "email": "gate-probe@example.com"
+      },
+      "notify": {
+        "sms": false,
+        "email": false
+      },
+      "reminder_enable": false,
+      "notes": {
+        "gate": "0.2+0.4",
+        "purpose": "observe error fields and fire a webhook"
+      }
+    }
+  },
+  "status": 200,
+  "response": {
+    "accept_partial": false,
+    "allow_full_payment": false,
+    "amount": 49900,
+    "amount_paid": 0,
+    "cancelled_at": 0,
+    "created_at": 1788328430,
+    "currency": "INR",
+    "customer": {
+      "contact": "+919812345670",
+      "email": "gate-probe@example.com",
+      "name": "Gate Probe"
+    },
+    "description": "Gate 0.2/0.4 - recovery retry probe",
+    "expire_by": 0,
+    "expired_at": 0,
+    "first_min_partial_amount": 0,
+    "id": "plink_TX3m6sMWQ1aqUq",
+    "notes": {
+      "gate": "0.2+0.4",
+      "purpose": "observe error fields and fire a webhook"
+    },
+    "notify": {
+      "email": false,
+      "sms": false,
+      "whatsapp": false
+    },
+    "payment_plan": false,
+    "payments": null,
+    "reference_id": "",
+    "reminder_enable": false,
+    "reminders": [],
+    "short_url": "https://rzp.io/rzp/DPtGxyI0",
+    "status": "created",
+    "updated_at": 1788328430,
+    "upi_link": false,
+    "user_id": "",
+    "whatsapp_link": false
+  }
+}
