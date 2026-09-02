@@ -6,7 +6,7 @@
     "note": "The freeze is only meaningful if that commit precedes this result. Ancestry is checked, not asserted."
   },
   "generated_by": "scripts/run_batch.py -> recovery.evaluation.batch.run()",
-  "head_commit": "bf4a2fb",
+  "head_commit": "46986d5",
   "policy_version": "2026-09-02.2",
   "n_customers": 5000,
   "bootstrap": {
@@ -16,12 +16,12 @@
   },
   "headline": {
     "comparison": "engine (C) vs Razorpay's T+0..T+3 ladder (B)",
-    "net_incremental_rupees": 736113.77,
+    "net_incremental_rupees": 935664.07,
     "ci95_rupees": [
-      590969.58,
-      874218.9
+      786950.97,
+      1074095.45
     ],
-    "per_customer_rupees": 263.09,
+    "per_customer_rupees": 334.4,
     "note": "Net of contact cost. C vs A is context only and is NOT the headline."
   },
   "primary_cohort_21d": {
@@ -67,52 +67,52 @@
       },
       "C": {
         "n": 2798,
-        "recovered_paise": 134292300,
-        "contact_cost_paise": 242872,
-        "recovery_rate": 0.5815,
-        "mean_recovered_paise": 47995.8184417441,
-        "mean_cost_paise": 86.80200142959256
+        "recovered_paise": 154253900,
+        "contact_cost_paise": 249442,
+        "recovery_rate": 0.6651,
+        "mean_recovered_paise": 55130.057183702644,
+        "mean_cost_paise": 89.15010721944246
       }
     },
     "primary": {
       "label": "engine vs incumbent ladder (PRIMARY)",
       "treat_arm": "C",
       "control_arm": "B",
-      "net_incremental_per_customer_rupees": 263.09,
-      "net_incremental_total_rupees": 736113.77,
+      "net_incremental_per_customer_rupees": 334.4,
+      "net_incremental_total_rupees": 935664.07,
       "ci95_per_customer_rupees": [
-        211.21,
-        312.44
+        281.25,
+        383.88
       ],
       "ci95_total_rupees": [
-        590969.58,
-        874218.9
+        786950.97,
+        1074095.45
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.5815,
+      "treat_recovery_rate": 0.6651,
       "control_recovery_rate": 0.2525,
-      "lift_pp": 32.9
+      "lift_pp": 41.26
     },
     "secondary_vs_do_nothing": {
       "label": "engine vs do-nothing (context only)",
       "treat_arm": "C",
       "control_arm": "A",
-      "net_incremental_per_customer_rupees": 459.65,
-      "net_incremental_total_rupees": 1286095.61,
+      "net_incremental_per_customer_rupees": 530.97,
+      "net_incremental_total_rupees": 1485645.91,
       "ci95_per_customer_rupees": [
-        428.09,
-        492.45
+        497.82,
+        564.9
       ],
       "ci95_total_rupees": [
-        1197800.21,
-        1377879.57
+        1392896.15,
+        1580602.7
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.5815,
+      "treat_recovery_rate": 0.6651,
       "control_recovery_rate": 0.02,
-      "lift_pp": 56.15
+      "lift_pp": 64.51
     },
-    "cost_per_incremental_rupee": 0.0033,
+    "cost_per_incremental_rupee": 0.0027,
     "guardrail_invariants": {
       "contact_outside_window": 0,
       "action_without_state_recheck": 0,
@@ -125,19 +125,19 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 45156,
-      "decisions": 20135,
-      "actions_taken": 4056,
-      "decisions_declined": 6393,
+      "records": 43303,
+      "decisions": 18455,
+      "actions_taken": 4011,
+      "decisions_declined": 6068,
       "stop_reasons": {
-        "escalation_ladder_exhausted": 1675,
-        "cause_not_actionable": 1642,
-        "opt_out": 1089,
-        "dispute_raised": 777,
-        "promise_to_pay_active": 727,
-        "bereavement_or_hardship": 483
+        "escalation_ladder_exhausted": 1564,
+        "cause_not_actionable": 1507,
+        "opt_out": 1048,
+        "dispute_raised": 761,
+        "promise_to_pay_active": 724,
+        "bereavement_or_hardship": 464
       },
-      "total_contact_cost_paise": 242872,
+      "total_contact_cost_paise": 249442,
       "chain_intact": true,
       "chain_broken_at": null
     },
@@ -149,25 +149,25 @@
       },
       "needs_funds": {
         "n": 1523,
-        "recovery_rate": 0.6724,
-        "recovered_rupees": 847276.0
+        "recovery_rate": 0.7748,
+        "recovered_rupees": 974220.0
       },
       "needs_new_instrument": {
         "n": 277,
-        "recovery_rate": 0.3285,
-        "recovered_rupees": 69509.0
+        "recovery_rate": 0.3502,
+        "recovered_rupees": 74453.0
       },
       "retry_later": {
         "n": 709,
-        "recovery_rate": 0.6488,
-        "recovered_rupees": 383190.0
+        "recovery_rate": 0.7504,
+        "recovered_rupees": 450918.0
       }
     },
     "subgroup_by_debt_size_tercile": {
       "low": {
         "n": 975,
-        "recovery_rate": 0.5651,
-        "recovered_rupees": 131299.0,
+        "recovery_rate": 0.6533,
+        "recovered_rupees": 151463.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -175,8 +175,8 @@
       },
       "mid": {
         "n": 1005,
-        "recovery_rate": 0.594,
-        "recovered_rupees": 368103.0,
+        "recovery_rate": 0.6697,
+        "recovered_rupees": 414127.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -184,8 +184,8 @@
       },
       "high": {
         "n": 818,
-        "recovery_rate": 0.5856,
-        "recovered_rupees": 843521.0,
+        "recovery_rate": 0.6736,
+        "recovered_rupees": 976949.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -193,22 +193,22 @@
       }
     },
     "failure_list": {
-      "n_not_recovered": 1171,
-      "share_not_recovered": 0.4185,
-      "unrecovered_rupees": 943979.0,
+      "n_not_recovered": 937,
+      "share_not_recovered": 0.3349,
+      "unrecovered_rupees": 744363.0,
       "by_diagnosed_cause": {
-        "needs_funds": 499,
-        "retry_later": 249,
+        "needs_funds": 343,
         "needs_customer_action": 237,
-        "needs_new_instrument": 186
+        "needs_new_instrument": 180,
+        "retry_later": 177
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 974,
-        "cause_not_actionable": 423,
+        "escalation_ladder_exhausted": 757,
+        "cause_not_actionable": 417,
         "opt_out": 105,
         "dispute_raised": 63,
-        "bereavement_or_hardship": 42,
-        "promise_to_pay_active": 18
+        "bereavement_or_hardship": 40,
+        "promise_to_pay_active": 17
       }
     }
   },
@@ -255,52 +255,52 @@
       },
       "C": {
         "n": 2798,
-        "recovered_paise": 112579800,
-        "contact_cost_paise": 242784,
-        "recovery_rate": 0.4832,
-        "mean_recovered_paise": 40235.81129378127,
-        "mean_cost_paise": 86.77055039313795
+        "recovered_paise": 107674900,
+        "contact_cost_paise": 249420,
+        "recovery_rate": 0.465,
+        "mean_recovered_paise": 38482.80914939242,
+        "mean_cost_paise": 89.14224446032881
       }
     },
     "primary": {
       "label": "engine vs incumbent ladder (PRIMARY)",
       "treat_arm": "C",
       "control_arm": "B",
-      "net_incremental_per_customer_rupees": 190.23,
-      "net_incremental_total_rupees": 532260.62,
+      "net_incremental_per_customer_rupees": 172.68,
+      "net_incremental_total_rupees": 483145.26,
       "ci95_per_customer_rupees": [
-        139.79,
-        238.26
+        122.01,
+        220.63
       ],
       "ci95_total_rupees": [
-        391123.75,
-        666657.29
+        341385.31,
+        617310.72
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.4832,
+      "treat_recovery_rate": 0.465,
       "control_recovery_rate": 0.2469,
-      "lift_pp": 23.63
+      "lift_pp": 21.81
     },
     "secondary_vs_do_nothing": {
       "label": "engine vs do-nothing (context only)",
       "treat_arm": "C",
       "control_arm": "A",
-      "net_incremental_per_customer_rupees": 384.94,
-      "net_incremental_total_rupees": 1077073.3,
+      "net_incremental_per_customer_rupees": 367.39,
+      "net_incremental_total_rupees": 1027957.94,
       "ci95_per_customer_rupees": [
-        354.7,
-        415.97
+        337.38,
+        398.21
       ],
       "ci95_total_rupees": [
-        992446.04,
-        1163889.58
+        943987.43,
+        1114180.25
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.4832,
+      "treat_recovery_rate": 0.465,
       "control_recovery_rate": 0.0148,
-      "lift_pp": 46.84
+      "lift_pp": 45.02
     },
-    "cost_per_incremental_rupee": 0.0045,
+    "cost_per_incremental_rupee": 0.0051,
     "guardrail_invariants": {
       "contact_outside_window": 0,
       "action_without_state_recheck": 0,
@@ -313,19 +313,19 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 40248,
-      "decisions": 17801,
-      "actions_taken": 4052,
-      "decisions_declined": 5058,
+      "records": 36633,
+      "decisions": 15377,
+      "actions_taken": 4010,
+      "decisions_declined": 4549,
       "stop_reasons": {
-        "escalation_ladder_exhausted": 1640,
-        "cause_not_actionable": 1438,
-        "opt_out": 671,
+        "escalation_ladder_exhausted": 1551,
+        "cause_not_actionable": 1156,
+        "opt_out": 596,
         "promise_to_pay_active": 532,
-        "dispute_raised": 474,
-        "bereavement_or_hardship": 303
+        "dispute_raised": 439,
+        "bereavement_or_hardship": 275
       },
-      "total_contact_cost_paise": 242784,
+      "total_contact_cost_paise": 249420,
       "chain_intact": true,
       "chain_broken_at": null
     },
@@ -337,25 +337,25 @@
       },
       "needs_funds": {
         "n": 1523,
-        "recovery_rate": 0.5627,
-        "recovered_rupees": 717443.0
+        "recovery_rate": 0.5404,
+        "recovered_rupees": 680977.0
       },
       "needs_new_instrument": {
         "n": 277,
-        "recovery_rate": 0.2744,
-        "recovered_rupees": 59424.0
+        "recovery_rate": 0.2274,
+        "recovered_rupees": 49937.0
       },
       "retry_later": {
         "n": 709,
-        "recovery_rate": 0.5205,
-        "recovered_rupees": 306781.0
+        "recovery_rate": 0.5148,
+        "recovered_rupees": 303685.0
       }
     },
     "subgroup_by_debt_size_tercile": {
       "low": {
         "n": 975,
-        "recovery_rate": 0.4738,
-        "recovered_rupees": 109188.0,
+        "recovery_rate": 0.4605,
+        "recovered_rupees": 105901.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -363,8 +363,8 @@
       },
       "mid": {
         "n": 1005,
-        "recovery_rate": 0.4866,
-        "recovered_rupees": 301011.0,
+        "recovery_rate": 0.4617,
+        "recovered_rupees": 283736.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -372,8 +372,8 @@
       },
       "high": {
         "n": 818,
-        "recovery_rate": 0.4902,
-        "recovered_rupees": 715599.0,
+        "recovery_rate": 0.4743,
+        "recovered_rupees": 687112.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -381,22 +381,22 @@
       }
     },
     "failure_list": {
-      "n_not_recovered": 1446,
-      "share_not_recovered": 0.5168,
-      "unrecovered_rupees": 1161104.0,
+      "n_not_recovered": 1497,
+      "share_not_recovered": 0.535,
+      "unrecovered_rupees": 1210153.0,
       "by_diagnosed_cause": {
-        "needs_funds": 666,
-        "retry_later": 340,
+        "needs_funds": 700,
+        "retry_later": 344,
         "needs_customer_action": 239,
-        "needs_new_instrument": 201
+        "needs_new_instrument": 214
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 1206,
-        "cause_not_actionable": 440,
-        "opt_out": 106,
+        "escalation_ladder_exhausted": 1251,
+        "cause_not_actionable": 453,
+        "opt_out": 105,
         "dispute_raised": 63,
-        "bereavement_or_hardship": 42,
-        "promise_to_pay_active": 40
+        "promise_to_pay_active": 40,
+        "bereavement_or_hardship": 40
       }
     }
   },
@@ -443,52 +443,52 @@
       },
       "C": {
         "n": 2813,
-        "recovered_paise": 126111900,
-        "contact_cost_paise": 232306,
-        "recovery_rate": 0.5443,
-        "mean_recovered_paise": 44831.81656594383,
-        "mean_cost_paise": 82.58300746533949
+        "recovered_paise": 124339900,
+        "contact_cost_paise": 229914,
+        "recovery_rate": 0.5336,
+        "mean_recovered_paise": 44201.88410949164,
+        "mean_cost_paise": 81.73266974760043
       }
     },
     "primary": {
       "label": "engine vs incumbent ladder (PRIMARY)",
       "treat_arm": "C",
       "control_arm": "B",
-      "net_incremental_per_customer_rupees": 154.91,
-      "net_incremental_total_rupees": 435762.11,
+      "net_incremental_per_customer_rupees": 148.62,
+      "net_incremental_total_rupees": 418066.03,
       "ci95_per_customer_rupees": [
-        102.42,
-        205.9
+        96.12,
+        199.56
       ],
       "ci95_total_rupees": [
-        288101.3,
-        579209.91
+        270374.61,
+        561353.35
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.5443,
+      "treat_recovery_rate": 0.5336,
       "control_recovery_rate": 0.3454,
-      "lift_pp": 19.89
+      "lift_pp": 18.82
     },
     "secondary_vs_do_nothing": {
       "label": "engine vs do-nothing (context only)",
       "treat_arm": "C",
       "control_arm": "A",
-      "net_incremental_per_customer_rupees": 434.63,
-      "net_incremental_total_rupees": 1222615.75,
+      "net_incremental_per_customer_rupees": 428.34,
+      "net_incremental_total_rupees": 1204919.67,
       "ci95_per_customer_rupees": [
-        404.45,
-        465.49
+        398.19,
+        459.12
       ],
       "ci95_total_rupees": [
-        1137719.15,
-        1309431.55
+        1120100.86,
+        1291499.45
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.5443,
+      "treat_recovery_rate": 0.5336,
       "control_recovery_rate": 0.0178,
-      "lift_pp": 52.65
+      "lift_pp": 51.58
     },
-    "cost_per_incremental_rupee": 0.0053,
+    "cost_per_incremental_rupee": 0.0055,
     "guardrail_invariants": {
       "contact_outside_window": 0,
       "action_without_state_recheck": 0,
@@ -501,19 +501,19 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 38861,
-      "decisions": 17382,
-      "actions_taken": 3303,
-      "decisions_declined": 6216,
+      "records": 37748,
+      "decisions": 16321,
+      "actions_taken": 3263,
+      "decisions_declined": 6003,
       "stop_reasons": {
-        "cause_not_actionable": 2243,
-        "escalation_ladder_exhausted": 1367,
+        "cause_not_actionable": 2082,
+        "escalation_ladder_exhausted": 1377,
         "promise_to_pay_active": 903,
-        "opt_out": 796,
-        "dispute_raised": 533,
-        "bereavement_or_hardship": 374
+        "opt_out": 767,
+        "dispute_raised": 514,
+        "bereavement_or_hardship": 360
       },
-      "total_contact_cost_paise": 232306,
+      "total_contact_cost_paise": 229914,
       "chain_intact": true,
       "chain_broken_at": null
     },
@@ -525,25 +525,25 @@
       },
       "needs_funds": {
         "n": 984,
-        "recovery_rate": 0.7205,
-        "recovered_rupees": 592191.0
+        "recovery_rate": 0.7215,
+        "recovered_rupees": 593190.0
       },
       "needs_new_instrument": {
         "n": 692,
-        "recovery_rate": 0.2471,
-        "recovered_rupees": 128879.0
+        "recovery_rate": 0.1994,
+        "recovered_rupees": 109162.0
       },
       "retry_later": {
         "n": 797,
-        "recovery_rate": 0.7277,
-        "recovered_rupees": 496570.0
+        "recovery_rate": 0.7302,
+        "recovered_rupees": 497568.0
       }
     },
     "subgroup_by_debt_size_tercile": {
       "low": {
         "n": 967,
-        "recovery_rate": 0.5564,
-        "recovered_rupees": 123212.0,
+        "recovery_rate": 0.5429,
+        "recovered_rupees": 120375.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -551,8 +551,8 @@
       },
       "mid": {
         "n": 1042,
-        "recovery_rate": 0.5432,
-        "recovered_rupees": 340334.0,
+        "recovery_rate": 0.5317,
+        "recovered_rupees": 333446.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -560,8 +560,8 @@
       },
       "high": {
         "n": 804,
-        "recovery_rate": 0.5311,
-        "recovered_rupees": 797573.0,
+        "recovery_rate": 0.5249,
+        "recovered_rupees": 789578.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -569,22 +569,22 @@
       }
     },
     "failure_list": {
-      "n_not_recovered": 1282,
-      "share_not_recovered": 0.4557,
-      "unrecovered_rupees": 1081118.0,
+      "n_not_recovered": 1312,
+      "share_not_recovered": 0.4664,
+      "unrecovered_rupees": 1098838.0,
       "by_diagnosed_cause": {
-        "needs_new_instrument": 521,
-        "needs_funds": 275,
+        "needs_new_instrument": 554,
+        "needs_funds": 274,
         "needs_customer_action": 269,
-        "retry_later": 217
+        "retry_later": 215
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 1076,
-        "cause_not_actionable": 790,
-        "opt_out": 79,
-        "dispute_raised": 52,
+        "escalation_ladder_exhausted": 1105,
+        "cause_not_actionable": 823,
+        "opt_out": 77,
+        "dispute_raised": 51,
         "promise_to_pay_active": 51,
-        "bereavement_or_hardship": 36
+        "bereavement_or_hardship": 35
       }
     }
   },

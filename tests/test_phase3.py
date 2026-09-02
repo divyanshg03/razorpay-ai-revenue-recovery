@@ -27,8 +27,10 @@ from recovery.evaluation.assignment import SEED, arm_for, assign, is_excluded
 from recovery.evaluation.baselines import ArmOutcome
 from recovery.evaluation.batch import (METRIC_DEFINITION_COMMIT, GuardrailViolation,
                                        run_arms)
+from recovery.evaluation.invariants import check_ledger
 from recovery.evaluation.metrics import (bootstrap_ci, by_debt_size_tercile, compare,
                                          cost_per_incremental_rupee, failure_list, summarise)
+from recovery.ledger.audit import AuditLedger
 from recovery.models import Arm, Customer
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
@@ -192,6 +194,54 @@ def test_batch_run_is_deterministic(tmp_path):
     for arm in ("A", "B", "C"):
         assert [(o.debt_id, o.recovered_paise, o.contact_cost_paise) for o in r1[arm]] == \
                [(o.debt_id, o.recovered_paise, o.contact_cost_paise) for o in r2[arm]]
+
+
+def test_a_rerun_does_not_append_onto_the_previous_runs_ledger(tmp_path):
+    """Regression, 2 Sept 2026. `AuditLedger` opens its file in append mode - correctly, it is
+    an append-only structure - and the batch reused a fixed path, so the second run's records
+    landed on top of the first run's.
+
+    That does not merely produce a large file. It produces two chains over the SAME debt ids
+    interleaved in one stream, and the ledger-replay invariants read it as one history: the
+    invariant asking "was this debt contacted after it settled" took the newer run's
+    settlement timestamp and compared it against the OLDER run's contacts, which of course
+    come later. 56 phantom `contact_after_payment` violations, and the batch refused to write
+    metrics.json - the right call on corrupt input, but the input should never have been
+    corrupt.
+
+    Two runs into the same path must therefore be indistinguishable from one run into a clean
+    path, and must report clean invariants.
+    """
+    path = tmp_path / "reused.jsonl"
+    p = Policy()
+    run_arms(SEED, 500, START, 21, p, path)
+    first_size = path.stat().st_size
+    _, ledger, _ = run_arms(SEED, 500, START, 21, p, path)
+
+    assert path.stat().st_size == first_size, (
+        "the second run appended to the first instead of starting a new chain")
+    intact, broken_at = ledger.verify_chain()
+    assert intact, f"chain broken at {broken_at}"
+    violations = check_ledger(ledger, p.max_contacts_per_debt_7d)
+    assert not any(violations.values()), violations
+
+
+def test_ledger_still_appends_by_default(tmp_path):
+    """The fix must not turn an append-only ledger into a truncating one. Only a caller that
+    explicitly asks for a new chain gets one; everyone else appends, including anything
+    reopening a ledger to read or extend it."""
+    path = tmp_path / "l.jsonl"
+    a = AuditLedger(path, "v1")
+    a.record_outcome("d1", "c1", 100, note="first")
+    n_after_first = len(a.read())
+
+    b = AuditLedger(path, "v1")                      # default: continue the chain
+    b.record_outcome("d2", "c2", 100, note="second")
+    assert len(b.read()) == n_after_first + 1
+    assert b.verify_chain()[0], "appending must extend the hash chain, not break it"
+
+    c = AuditLedger(path, "v1", fresh=True)          # explicit: start over
+    assert c.read() == []
 
 
 def test_batch_refuses_to_write_when_a_guardrail_fired(tmp_path, monkeypatch):

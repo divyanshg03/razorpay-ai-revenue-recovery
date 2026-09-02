@@ -377,6 +377,61 @@ worse than the design it documents.
 
 **One batch run follows this amendment.** Not a search over variants.
 
+**Result.** Rs 935,664.07 net incremental, 95% CI [Rs 786,950.97 - Rs 1,074,095.45], Rs 334.40
+per customer; cost per incremental rupee Rs 0.0027. Arm C recovery 58.15% -> 66.51%.
+
+Two things in that result are worth more than the headline, because they are what makes it
+checkable rather than merely larger:
+
+* **Arms A and B did not move at all** - 2.00% and 25.25%, identical to the pre-fix run. A1
+  predicted exactly this, because neither arm calls `retry_schedule`. Had either shifted, the
+  change would have reached somewhere it was not supposed to.
+* **`needs_customer_action` did not move either** - 17.99% before, 17.99% after, unchanged to
+  four decimals, 237 failures before and 237 after. It is the one cause the engine never
+  silently retries (see A2), so a pure retry-scheduling fix must leave it untouched. Every
+  cause that *does* depend on a retry landing when money is present moved together:
+  `needs_funds` 67.24% -> 77.48%, `retry_later` 64.88% -> 75.04%, and
+  `needs_new_instrument` only 32.85% -> 35.02%, since it needs a contact before a retry can
+  do anything.
+
+The unrecovered share fell from 41.9% to 33.49%, Rs 943,979 to Rs 744,363.
+
+**The secondary cohorts did not all improve, and are reported as they came out.** The
+shifted-parameter cohort went DOWN, Rs 435,762 -> Rs 418,066, and the 14-day readout went down
+too, Rs 532,261 -> Rs 483,145. The shifted cohort deliberately moves the payday distribution,
+so a schedule spread for one distribution is not automatically better against another; the
+14-day window truncates before the new day-17 and day-21 attempts exist, while still carrying
+their cost. Both are the honest behaviour of a change that buys coverage late in a horizon,
+and neither is quietly dropped for undercutting the headline.
+
+### A3 - 2 Sept 2026 - the first invocation of that run refused to write, and why
+
+Disclosed because "one batch run" above would otherwise be false, and because a reader who
+found this later would be right to ask what the discarded invocation was.
+
+The first invocation after the A1 fix **produced no number**. It aborted with 56
+`contact_after_payment` guardrail violations and wrote no `metrics.json`. The violations were
+real in the data and entirely phantom in fact: `AuditLedger` opens its file in append mode -
+correct, it is an append-only structure - and the batch reused a fixed path, so the new run's
+records were appended onto the previous run's. `arm-c-audit.jsonl` stood at 60 MB against 27 MB
+for the ledgers that had only ever been written once.
+
+The invariant then read two chains over the same debt ids as one history: it took each debt's
+*newest* settlement timestamp, from the new run, and compared it against that debt's contacts
+from the *old* run, which naturally came later. `debt_000092` shows the signature plainly -
+retries on 3, 6 and 9 September, the old 0/3/6 spacing, followed by retries on 3 and 7
+September, the new 0/4/8 spacing, in one file.
+
+`AuditLedger` now takes an explicit `fresh` flag; the batch passes it, because a batch run is a
+new experiment producing a new artifact. Appending remains the default, since silently
+truncating an audit trail would be a worse bug than the one being fixed. Both behaviours are
+now covered by tests.
+
+**No engine parameter, policy value, or metric definition changed between the refused
+invocation and the one that produced the number.** The only change was to how the harness
+opens a file. The guardrail did its job on corrupt input, which is the outcome the
+refuse-to-write rule exists to produce.
+
 ### A2 - 2 Sept 2026 - a change deliberately NOT made
 
 Recorded because a rejected change is evidence too, and because the next person to look at the

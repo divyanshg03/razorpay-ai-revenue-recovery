@@ -96,7 +96,10 @@ def run_arms(seed: int, n: int, start: dt.date, window: int, policy: Policy,
     # Arm C - the engine. Only this arm writes a ledger; it is the only one that decides.
     cc = SimulatedCohort(seed=seed, n_customers=n, start=start, shifted=shifted)
     engine_refs = assignment.refs_in(Arm.ENGINE)
-    ledger = AuditLedger(ledger_path, policy.version)
+    # fresh=True: a batch run is a new experiment, not a continuation of the last one. See
+    # AuditLedger.__init__ - appending one run onto another interleaves two chains over the
+    # same debt ids and manufactures invariant violations out of nothing.
+    ledger = AuditLedger(ledger_path, policy.version, fresh=True)
     out_c = run_engine(cc, _partition(cc, engine_refs),
                        [c for c in cc.customers() if c.ref in engine_refs],
                        start, window, policy, ledger)

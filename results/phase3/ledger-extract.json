@@ -3,24 +3,24 @@
   "ledgers": {
     "primary_21d": {
       "source_file": "results/phase3/arm-c-audit.jsonl",
-      "records": 45156,
+      "records": 43303,
       "chain_intact": true,
       "chain_broken_at": null,
-      "chain_head_hash": "2625ecd7d2b390e20a2e109eee82b206a88ad15595cc2067e103006aab44e735",
+      "chain_head_hash": "51945148454b0a2bac77845844864b57db2449e93a24bbc1f555c167a18f60df",
       "summary": {
-        "records": 45156,
-        "decisions": 20135,
-        "actions_taken": 4056,
-        "decisions_declined": 6393,
+        "records": 43303,
+        "decisions": 18455,
+        "actions_taken": 4011,
+        "decisions_declined": 6068,
         "stop_reasons": {
-          "escalation_ladder_exhausted": 1675,
-          "cause_not_actionable": 1642,
-          "opt_out": 1089,
-          "dispute_raised": 777,
-          "promise_to_pay_active": 727,
-          "bereavement_or_hardship": 483
+          "escalation_ladder_exhausted": 1564,
+          "cause_not_actionable": 1507,
+          "opt_out": 1048,
+          "dispute_raised": 761,
+          "promise_to_pay_active": 724,
+          "bereavement_or_hardship": 464
         },
-        "total_contact_cost_paise": 242872,
+        "total_contact_cost_paise": 249442,
         "chain_intact": true,
         "chain_broken_at": null
       },
@@ -32,7 +32,7 @@
               "debt_id": "debt_000016",
               "source": "payment_state_store"
             },
-            "event_id": "d3bb6c16-4018-478f-a371-564578319bce",
+            "event_id": "7915073d-7344-4d36-87c4-e7cb0d0f7a2f",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "227a1f253f6e27c360faf69d895c16b4f78562a15a553dd7a2d32310095b151f",
@@ -64,7 +64,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "6da0fcc4-03a6-4fd8-92fb-3b8ede908a80",
+            "event_id": "bfc0b010-5006-44b3-90d5-67dcfa06d5fc",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "90a73221e677b790fb89886e641202f49b3dcb0c95a3af8def99ea7ada237d18",
@@ -80,7 +80,7 @@
               "note": "retry succeeded",
               "recovered_paise": 79900
             },
-            "event_id": "9830f184-275d-40e2-956e-2fbfac3831d1",
+            "event_id": "b26b515c-ee36-433d-8388-6094351628b2",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "21d582d1d60de5d520222b6849c55f73f5c22e776bbb7ae73fb7fde4685ac6a7",
@@ -96,7 +96,7 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "e9115460-f196-4432-9585-53303bedea14",
+            "event_id": "01e23b9e-44fb-4678-911c-b72f83187f08",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "28ae422a96fe0790cdd7fc57499754a0383f1f41424a4775492772804b4ac7b1",
@@ -128,7 +128,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "45c4ceb6-c392-4cb4-a238-9a08ed3473ec",
+            "event_id": "b5ff23d7-e7eb-4675-a5ed-f9247df4c7dd",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "b0576abbf514bbb009b71dff24d50ecf59d8f242a4475f57e73c30b6829f3623",
@@ -142,7 +142,7 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "d9953eda-f187-4395-bf12-6abd929b1ed8",
+            "event_id": "7548aa85-3798-45e6-a3f4-0145f97d09cb",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "ab9a3b81f155021959960daee76b4a0118b890ad8bc5895ad690d647ff9ed055",
@@ -178,7 +178,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "e0505eef-0425-4303-82a2-43896effa3b2",
+            "event_id": "dfcd76a0-a7cb-46a7-af1b-123afceb8c93",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "654cea9e03d1b6807503968e460689447119e770f41124e9f7c0421cde4f4e3b",
@@ -215,7 +215,7 @@
               ],
               "template_ref": "template:static"
             },
-            "event_id": "19c7b25b-7197-451b-b6cd-8b3af3da954f",
+            "event_id": "e4e9d87f-7482-4e32-8da7-90904606f4a9",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "5c972f1d4ec3b55f7d39ea8369a01f3c53903b1cc94ab3401df9557eafb28834",
@@ -232,7 +232,7 @@
               "promised_date": null,
               "text": "STOP. do not message me again"
             },
-            "event_id": "606df33f-478e-443c-bf0e-11c0fb1591b2",
+            "event_id": "ce85d14e-c6ea-4328-9b8f-830eb6ccc356",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "376eb3ff023bf37980bc0527832d4cb4d984a041fb00dc2da5556a407735892e",
@@ -246,12 +246,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "4be031c6-6ef3-40af-8b33-5889682c7ca0",
+            "event_id": "c9a4617a-079d-4517-bc2c-6432821f0959",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "50ea66764a4a3cb8f948b9857b30d40573fadf36deb6d50b0f60dda9684f635e",
-            "record_hash": "aa2b7f2ae960826518eb7b5d1ea11b458cfe89380a9d6874e8ee49ea4a334c5d",
-            "timestamp_ist": "2026-09-06T10:00:00.000971+05:30",
+            "prev_hash": "78c522ecc24355dfa7c6a731b38722ac4f1074bb7729cc3907f5319af0d3d751",
+            "record_hash": "fcb02e151b5d03b4ab067f813a439f1339ee840fd5128c02f8b198cb62e7c678",
+            "timestamp_ist": "2026-09-07T10:00:00.000388+05:30",
             "type": "state_recheck"
           },
           {
@@ -260,7 +260,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_001161",
-              "day_offset": 3,
+              "day_offset": 4,
               "debt_id": "debt_001161",
               "diagnosis": "needs_funds",
               "expected_value_paise": 0.0,
@@ -273,12 +273,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "b57bef66-ec76-4227-ba34-99be1ce61302",
+            "event_id": "6e931ac2-d1f6-4849-82bb-2f6d1f3b5753",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "aa2b7f2ae960826518eb7b5d1ea11b458cfe89380a9d6874e8ee49ea4a334c5d",
-            "record_hash": "2e5a6e23b097dbf76814590614917efea16325d030ae46ac47b41e92bd99442f",
-            "timestamp_ist": "2026-09-06T10:00:00.000972+05:30",
+            "prev_hash": "fcb02e151b5d03b4ab067f813a439f1339ee840fd5128c02f8b198cb62e7c678",
+            "record_hash": "182bf41b09113f9a22d92428ecf73043e4f8a4f0fbeb7a7b76d95a892d3fe4a2",
+            "timestamp_ist": "2026-09-07T10:00:00.000389+05:30",
             "type": "decision"
           },
           {
@@ -287,12 +287,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "0c5028f8-775a-4832-bd5d-deb3f09dcefa",
+            "event_id": "274bc527-f88c-4e2c-a2d2-f77a21951d24",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "e03d35ec174e2b62f99bb19672bd4a031a36f018f4e27c9086cf3ad72e222694",
-            "record_hash": "d91220f9d5539778ada2f1e62df45aa874a228a44277655844f262f856802476",
-            "timestamp_ist": "2026-09-08T10:00:00.000832+05:30",
+            "prev_hash": "2316797bce7a20cffd1956c6b9d2cede7bf46394b56abe7dee574118701fffb9",
+            "record_hash": "c6fb429087a01e9b9ee6a9e06d97bf9565552af66ead37e5d15fcbbfdfde2a68",
+            "timestamp_ist": "2026-09-08T10:00:00.000839+05:30",
             "type": "state_recheck"
           },
           {
@@ -312,12 +312,12 @@
               "rules_passed": [],
               "stop_reason": "escalation_ladder_exhausted"
             },
-            "event_id": "d7b91708-e682-4d7b-b6ba-7bc247b515fd",
+            "event_id": "401cb8de-e1a7-4ae4-b0f9-1987a77b28b5",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "d91220f9d5539778ada2f1e62df45aa874a228a44277655844f262f856802476",
-            "record_hash": "828ccdb5defe1fe81eedfdab672033118bf2522c35f64fa680776dbb1d4dfe1f",
-            "timestamp_ist": "2026-09-08T10:00:00.000833+05:30",
+            "prev_hash": "c6fb429087a01e9b9ee6a9e06d97bf9565552af66ead37e5d15fcbbfdfde2a68",
+            "record_hash": "05ee62999e0a6ed82fa2f4788b64a5acb302eebe13dacf687f01ce226dae2411",
+            "timestamp_ist": "2026-09-08T10:00:00.000840+05:30",
             "type": "decision"
           },
           {
@@ -326,12 +326,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "e98e5e39-ae4e-4741-8145-62aa4ee9716b",
+            "event_id": "edf53733-dfa6-4149-bf50-defb1ad02232",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "5d35cfc037dab5a21835b2f3f1ca3fc2ede6d032ef0801fa42e0454de19fa2dc",
-            "record_hash": "1fe352ad7824f82fad6f08f17aca6f66530e86649d289852073cc4a7f8ac356d",
-            "timestamp_ist": "2026-09-09T10:00:00.000792+05:30",
+            "prev_hash": "6825c13772264d0b39d5c08f2f8aa984c640dd90626b1ce45f0abf42ed2eea3a",
+            "record_hash": "43a569115d32c744e0bb5e8425ce7ebfb7a4a7f4faa91deb5702750fffd408bd",
+            "timestamp_ist": "2026-09-11T10:00:00.000394+05:30",
             "type": "state_recheck"
           },
           {
@@ -340,7 +340,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_001161",
-              "day_offset": 6,
+              "day_offset": 8,
               "debt_id": "debt_001161",
               "diagnosis": "needs_funds",
               "expected_value_paise": 0.0,
@@ -353,12 +353,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "248e85f1-a534-4317-a9c9-18fc5cebd180",
+            "event_id": "75fb7325-9072-44c3-90b2-37fda3021f84",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "1fe352ad7824f82fad6f08f17aca6f66530e86649d289852073cc4a7f8ac356d",
-            "record_hash": "92f7c73754bdafc958c80c61769aec89a5fcd4fb985ac0cb1ee109feed09250a",
-            "timestamp_ist": "2026-09-09T10:00:00.000793+05:30",
+            "prev_hash": "43a569115d32c744e0bb5e8425ce7ebfb7a4a7f4faa91deb5702750fffd408bd",
+            "record_hash": "49a5872368b8ccf1dfed37a90b0f75006c0f6fdda96c7d326e1bd1d08b8f1a29",
+            "timestamp_ist": "2026-09-11T10:00:00.000395+05:30",
             "type": "decision"
           },
           {
@@ -367,12 +367,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "88171bd8-6fbe-4ae8-8ea5-dd68e284beac",
+            "event_id": "af5375b7-0eba-4563-9f53-68d37241d01a",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "41625082807ee1662207bad8081495a43cd24663e8cb98fdc9ba6eb51ca95695",
-            "record_hash": "ffb0c2ff511f75cc85fcde17dbf2c9b07e71f08f3aea1f1ee6678d71e1baef13",
-            "timestamp_ist": "2026-09-12T10:00:00.000457+05:30",
+            "prev_hash": "8947f797ad35a4057a3771b124be40639de6ce510acd30a2deb310e93136dd99",
+            "record_hash": "ade75ee42c76f88b1eed420f3dc8112f570d666337a4b3c8b2a47d815aef621f",
+            "timestamp_ist": "2026-09-16T10:00:00.000333+05:30",
             "type": "state_recheck"
           },
           {
@@ -381,7 +381,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_001161",
-              "day_offset": 9,
+              "day_offset": 13,
               "debt_id": "debt_001161",
               "diagnosis": "needs_funds",
               "expected_value_paise": 0.0,
@@ -394,12 +394,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "3481b230-beaa-4f12-a848-d4d483dd8b3a",
+            "event_id": "3d3e288f-775e-4a1c-b6d7-15654a9d4191",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "ffb0c2ff511f75cc85fcde17dbf2c9b07e71f08f3aea1f1ee6678d71e1baef13",
-            "record_hash": "5adc80c6fafd0d866faeea67bede9c8d11544039b68d1898d37184982f1972dc",
-            "timestamp_ist": "2026-09-12T10:00:00.000458+05:30",
+            "prev_hash": "ade75ee42c76f88b1eed420f3dc8112f570d666337a4b3c8b2a47d815aef621f",
+            "record_hash": "7b4d222a0eadbb3dc926d50dfe05022a8e640ce726be1ef6d9183bf6b8f954eb",
+            "timestamp_ist": "2026-09-16T10:00:00.000334+05:30",
             "type": "decision"
           },
           {
@@ -408,12 +408,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "c1fcca87-b24b-4574-b72d-d730facaf20b",
+            "event_id": "324453ee-c3c5-4a8e-8261-91a59a1e54e0",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "92ae073388f4df221dcb5c3b7bb704bd2b888aa82cbeac82f3b50e5e81c412cf",
-            "record_hash": "533ac73aef3cfd15179da6f5aaf459ffc993e5e2ca8cb9295c1e1477947ffd49",
-            "timestamp_ist": "2026-09-15T10:00:00.000344+05:30",
+            "prev_hash": "1149d23a33370147f3bd41e6d6c850777357031d4a823598438383122cb4d346",
+            "record_hash": "a1fc927dacbf55ba7fc31a19a016aa56f59ee313a64c4388d80952624b554826",
+            "timestamp_ist": "2026-09-20T10:00:00.000294+05:30",
             "type": "state_recheck"
           },
           {
@@ -422,7 +422,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_001161",
-              "day_offset": 12,
+              "day_offset": 17,
               "debt_id": "debt_001161",
               "diagnosis": "needs_funds",
               "expected_value_paise": 0.0,
@@ -435,12 +435,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "5fa79429-1e80-418d-aa3d-69f5b2a59124",
+            "event_id": "1a656afa-4882-4fe0-8d46-92171c791ce8",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "533ac73aef3cfd15179da6f5aaf459ffc993e5e2ca8cb9295c1e1477947ffd49",
-            "record_hash": "0e35882d5229ea0c73106faaafced61453e547791e196eecd5b390e2ac951a35",
-            "timestamp_ist": "2026-09-15T10:00:00.000345+05:30",
+            "prev_hash": "a1fc927dacbf55ba7fc31a19a016aa56f59ee313a64c4388d80952624b554826",
+            "record_hash": "40d74ccd866d20afeb5316a2b9f3519fd40673b0f5f3b5520c419beedcb3d792",
+            "timestamp_ist": "2026-09-20T10:00:00.000295+05:30",
             "type": "decision"
           },
           {
@@ -449,12 +449,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "07fcab1e-5c13-45d0-8204-1cd5a91a2d4a",
+            "event_id": "b1811015-0f86-4c93-858a-eb3bed78255d",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "e549bf86167e91a9aa7ae1c52359f72dd3533ff3b6c6fdee7fd060b845121f8d",
-            "record_hash": "98e97f3aa4fc1ea09b60c61006defdd0115678e58f5de8a7f139512d49a6efb9",
-            "timestamp_ist": "2026-09-18T10:00:00.000293+05:30",
+            "prev_hash": "6cf1688ec9817b36fadc78b983ecee0669647b4bb0153f8f637bb8c55a924e28",
+            "record_hash": "6796835edbf03649c9e7623e1808fb6f077fe41e1e66d45324bf6ca9ac34479d",
+            "timestamp_ist": "2026-09-24T10:00:00.000222+05:30",
             "type": "state_recheck"
           },
           {
@@ -463,7 +463,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_001161",
-              "day_offset": 15,
+              "day_offset": 21,
               "debt_id": "debt_001161",
               "diagnosis": "needs_funds",
               "expected_value_paise": 0.0,
@@ -476,12 +476,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "82c0971f-d340-4b44-9256-9d2f05859316",
+            "event_id": "52bbf22b-86c7-4638-bce4-2e8f49474ebc",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "98e97f3aa4fc1ea09b60c61006defdd0115678e58f5de8a7f139512d49a6efb9",
-            "record_hash": "9d4ef2b9fe332ec48bbe4c8d2dd5506b540f577ad7aaa44cd848ad4cc0d5bf0c",
-            "timestamp_ist": "2026-09-18T10:00:00.000294+05:30",
+            "prev_hash": "6796835edbf03649c9e7623e1808fb6f077fe41e1e66d45324bf6ca9ac34479d",
+            "record_hash": "9aa1112b7c6d13f0dced64777dab56a3b4fcb6abecbfc2b024e96df2e791f66b",
+            "timestamp_ist": "2026-09-24T10:00:00.000223+05:30",
             "type": "decision"
           }
         ],
@@ -492,7 +492,7 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "734df76e-d02e-4c91-8c67-8aa13fb610ef",
+            "event_id": "f0f226f5-673b-4978-ad01-70154f62652d",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -524,7 +524,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "7573c12a-f92c-42be-8486-3af4abfd7b47",
+            "event_id": "0138b379-4d8e-4cc1-9a7f-f88fe3cee2ab",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "a8d6c458ff6a92a56c5c9f40ba47f5128014a6e75842adeb7a2eabf1fee004a3",
@@ -538,7 +538,7 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "391e0bbc-4cec-4c11-a703-17dbc6c0d44f",
+            "event_id": "4182290d-81d5-4cc0-8b13-3be533c11249",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "c39a1b941cd548bdd57d01e708e3c5589d3e1cf1b83bc24addc3375ae842804d",
@@ -574,7 +574,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "87135e67-2679-444c-baf4-2b72fe93afa9",
+            "event_id": "5c25b236-9dbb-4bb9-b373-845102b207a4",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "cbbff2fe11f8f6af5452109d6609fafa846204cb76ca5f87789d8b4836b862af",
@@ -611,7 +611,7 @@
               ],
               "template_ref": "template:static"
             },
-            "event_id": "a08cabb5-567a-496c-a8bf-b68d9df17cc5",
+            "event_id": "847e872f-779d-49b7-8fd5-11cc3e5eae2b",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "1d42ca644834a0bdf5530bfffb2e4f7b35cd3f9341fced04c68de6eb761c4d13",
@@ -625,12 +625,12 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "9286b3ef-2179-4eae-8faa-ec58256052c4",
+            "event_id": "d6eae0e9-fb97-4fd3-8f2e-2ea08f526c82",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "38265458b32ce4eb10c9560173ba189cd6d25ad4604cbb7b1b11b5147187fcaf",
-            "record_hash": "a99115cd6893a613f247bc2f17decd1798eac68d893365f1ab9f08e648598d67",
-            "timestamp_ist": "2026-09-06T10:00:00.000001+05:30",
+            "prev_hash": "3974e3755ad9ff6f294f42d5db831f47797045d3187439987c442ae21de84cf8",
+            "record_hash": "0dcdb93e4c3af370e8841e7a8cf60a626107ddb9c104cce3b02773b6e8e3df23",
+            "timestamp_ist": "2026-09-07T10:00:00.000001+05:30",
             "type": "state_recheck"
           },
           {
@@ -639,7 +639,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000004",
-              "day_offset": 3,
+              "day_offset": 4,
               "debt_id": "debt_000004",
               "diagnosis": "needs_funds",
               "expected_value_paise": 6237.5,
@@ -657,12 +657,12 @@
               ],
               "stop_reason": null
             },
-            "event_id": "b6672428-0c06-4cde-bb96-350130d39d31",
+            "event_id": "c11a90c1-a69f-4494-850d-558c3f59d65e",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "a99115cd6893a613f247bc2f17decd1798eac68d893365f1ab9f08e648598d67",
-            "record_hash": "39215633038877b097a722a6c1006a4653938c29d157c10707d2e3e49adcf70b",
-            "timestamp_ist": "2026-09-06T10:00:00.000002+05:30",
+            "prev_hash": "0dcdb93e4c3af370e8841e7a8cf60a626107ddb9c104cce3b02773b6e8e3df23",
+            "record_hash": "93e886c1b91b3b839827695a3e38ea2cd9329054c3f7c0466b8d2ba65fdfeab7",
+            "timestamp_ist": "2026-09-07T10:00:00.000002+05:30",
             "type": "decision"
           },
           {
@@ -671,11 +671,11 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "a545aebc-a041-49c2-ba2b-5d9bb07e5617",
+            "event_id": "6f834f98-bb8b-460b-ac31-75acdf88a9cc",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "b4b0f3204fc9db5944793a0761c2606f1f630ba8fda94e00775805d8bb75cf9f",
-            "record_hash": "0241c9e279c6c50af190c3176ebe33a1d00ff7f31d013dc0066c3e589417fa52",
+            "prev_hash": "df54de9846fc4af8f455e2de983d9ad0a01bef2a0bd844d4f2f2f2d55ef3459b",
+            "record_hash": "943657ec43d588c68d388582ab6645deccb34a1f7d3786737f6ada3a92d5fa0b",
             "timestamp_ist": "2026-09-08T10:00:00.000001+05:30",
             "type": "state_recheck"
           },
@@ -696,11 +696,11 @@
               "rules_passed": [],
               "stop_reason": "escalation_ladder_exhausted"
             },
-            "event_id": "f38b5385-3249-4c61-bec2-5e5134a3a246",
+            "event_id": "b0757adb-1be8-43e4-9194-96319dfe772e",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "0241c9e279c6c50af190c3176ebe33a1d00ff7f31d013dc0066c3e589417fa52",
-            "record_hash": "a15d87307b9b7a43dd43ba73fae0330ac20cc5f71933dbc6d158842f43bfccd2",
+            "prev_hash": "943657ec43d588c68d388582ab6645deccb34a1f7d3786737f6ada3a92d5fa0b",
+            "record_hash": "a256c45477916e225101bacaf9c503c674c53de2e3620990579d55236b13191a",
             "timestamp_ist": "2026-09-08T10:00:00.000002+05:30",
             "type": "decision"
           },
@@ -710,12 +710,12 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "b7c06782-28c2-409e-b7b2-543708b2db2e",
+            "event_id": "5fd7a0c5-d072-4120-92d7-716c32ff11b1",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "591f0128281eb329cadbaeb48a48d29f6fb226d234a4cd47f870e07df05ab2b7",
-            "record_hash": "8c4b743e910bc57ea262899fcf496ee8e17180a70df796b461c2506eda755539",
-            "timestamp_ist": "2026-09-09T10:00:00.000001+05:30",
+            "prev_hash": "f39aa6d1f3a73bfd6ddcfaff4627765b88e018b103549badab7410d02ffcb213",
+            "record_hash": "3e70f83d6d6080e61fc4543bf91be0ffc7a7796c7c887a25f56c0516dd1f6331",
+            "timestamp_ist": "2026-09-11T10:00:00.000001+05:30",
             "type": "state_recheck"
           },
           {
@@ -724,7 +724,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000004",
-              "day_offset": 6,
+              "day_offset": 8,
               "debt_id": "debt_000004",
               "diagnosis": "needs_funds",
               "expected_value_paise": 6237.5,
@@ -742,12 +742,12 @@
               ],
               "stop_reason": null
             },
-            "event_id": "73661bd2-9d0d-4ead-9909-f1aee2652f3c",
+            "event_id": "92a9b39e-c8c8-4316-9971-702bab95b624",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "8c4b743e910bc57ea262899fcf496ee8e17180a70df796b461c2506eda755539",
-            "record_hash": "87c395446376997836f789a921e9ea4e10506f22a28e96e221515289e89e9f60",
-            "timestamp_ist": "2026-09-09T10:00:00.000002+05:30",
+            "prev_hash": "3e70f83d6d6080e61fc4543bf91be0ffc7a7796c7c887a25f56c0516dd1f6331",
+            "record_hash": "b9f6b6765623de6fc1cfd43b55fbd520423fb5372806ffe6011ee55277567a6f",
+            "timestamp_ist": "2026-09-11T10:00:00.000002+05:30",
             "type": "decision"
           },
           {
@@ -758,12 +758,12 @@
               "note": "retry succeeded",
               "recovered_paise": 49900
             },
-            "event_id": "7671f875-96fb-4ed6-bb56-2c334f5ba990",
+            "event_id": "bb6870d3-478d-4540-946c-9797ac6ee799",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "87c395446376997836f789a921e9ea4e10506f22a28e96e221515289e89e9f60",
-            "record_hash": "cdf85a24d0a751a52a1e7c9aff8cbf914a2ec649564bf389712da553363747a3",
-            "timestamp_ist": "2026-09-09T10:00:00.000003+05:30",
+            "prev_hash": "b9f6b6765623de6fc1cfd43b55fbd520423fb5372806ffe6011ee55277567a6f",
+            "record_hash": "9ad546022a1a73c87f910352cf279829ce6a03663dafffbebf1542d4b71188eb",
+            "timestamp_ist": "2026-09-11T10:00:00.000003+05:30",
             "type": "outcome"
           }
         ]
@@ -771,24 +771,24 @@
     },
     "secondary_14d": {
       "source_file": "results/phase3/arm-c-audit-14d.jsonl",
-      "records": 40248,
+      "records": 36633,
       "chain_intact": true,
       "chain_broken_at": null,
-      "chain_head_hash": "076102b509f7fb1857e047ba046257e015292a355f6c46c11a629eca8902b99f",
+      "chain_head_hash": "34b4b70f06458c033cea274f22ca7df417121000f6ce706137591a534f9c4d18",
       "summary": {
-        "records": 40248,
-        "decisions": 17801,
-        "actions_taken": 4052,
-        "decisions_declined": 5058,
+        "records": 36633,
+        "decisions": 15377,
+        "actions_taken": 4010,
+        "decisions_declined": 4549,
         "stop_reasons": {
-          "escalation_ladder_exhausted": 1640,
-          "cause_not_actionable": 1438,
-          "opt_out": 671,
+          "escalation_ladder_exhausted": 1551,
+          "cause_not_actionable": 1156,
+          "opt_out": 596,
           "promise_to_pay_active": 532,
-          "dispute_raised": 474,
-          "bereavement_or_hardship": 303
+          "dispute_raised": 439,
+          "bereavement_or_hardship": 275
         },
-        "total_contact_cost_paise": 242784,
+        "total_contact_cost_paise": 249420,
         "chain_intact": true,
         "chain_broken_at": null
       },
@@ -800,7 +800,7 @@
               "debt_id": "debt_000016",
               "source": "payment_state_store"
             },
-            "event_id": "0bd5c070-7d0a-4668-8b4f-8698a517cd7e",
+            "event_id": "ba1d71c1-1eab-4069-91fb-5fdb67bd3cd1",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "227a1f253f6e27c360faf69d895c16b4f78562a15a553dd7a2d32310095b151f",
@@ -832,7 +832,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "79ae29e7-ac7e-468f-b657-5a34df0e96ec",
+            "event_id": "22714e90-b0fb-4c22-9d70-ddcc72a866ea",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "90a73221e677b790fb89886e641202f49b3dcb0c95a3af8def99ea7ada237d18",
@@ -848,7 +848,7 @@
               "note": "retry succeeded",
               "recovered_paise": 79900
             },
-            "event_id": "f798b1fc-ac51-4c7e-a305-cdf6359c6334",
+            "event_id": "24aab556-27c2-4d05-b57f-1dd8caa55afa",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "21d582d1d60de5d520222b6849c55f73f5c22e776bbb7ae73fb7fde4685ac6a7",
@@ -864,7 +864,7 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "62c71f89-6882-44e9-a085-304a8b870c96",
+            "event_id": "5072b388-762f-4227-bb43-8b199c28ce77",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "28ae422a96fe0790cdd7fc57499754a0383f1f41424a4775492772804b4ac7b1",
@@ -896,7 +896,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "49e43f4c-dd22-4b9a-b53a-1047836b112b",
+            "event_id": "465617b7-90e3-4d4d-9906-bda74dd5c6d0",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "b0576abbf514bbb009b71dff24d50ecf59d8f242a4475f57e73c30b6829f3623",
@@ -910,7 +910,7 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "05ee734f-fa3e-4992-8420-cec7a4ede3f7",
+            "event_id": "b8266abb-bf0c-4677-98dc-2b9b24500504",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "ab9a3b81f155021959960daee76b4a0118b890ad8bc5895ad690d647ff9ed055",
@@ -946,7 +946,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "e059a8a1-fa8c-47ce-a99f-f735bde41eff",
+            "event_id": "fa9d8feb-359b-4015-a855-b22cee4aae56",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "654cea9e03d1b6807503968e460689447119e770f41124e9f7c0421cde4f4e3b",
@@ -983,7 +983,7 @@
               ],
               "template_ref": "template:static"
             },
-            "event_id": "47333963-f55c-4600-bff4-b6bc74169262",
+            "event_id": "564db54f-30bd-46ca-ac35-c4267b67ffd9",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "5c972f1d4ec3b55f7d39ea8369a01f3c53903b1cc94ab3401df9557eafb28834",
@@ -1000,7 +1000,7 @@
               "promised_date": null,
               "text": "STOP. do not message me again"
             },
-            "event_id": "6d99530c-f32f-40ee-bc07-54eda5b44a2a",
+            "event_id": "6c3b793d-3794-4fd6-bc61-5debb8fc871c",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "376eb3ff023bf37980bc0527832d4cb4d984a041fb00dc2da5556a407735892e",
@@ -1014,12 +1014,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "a79a36ca-e9a6-4f2c-8f35-f8af9a18d764",
+            "event_id": "39abd24c-3dcf-43e3-8d86-13e158017477",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "50ea66764a4a3cb8f948b9857b30d40573fadf36deb6d50b0f60dda9684f635e",
-            "record_hash": "aa2b7f2ae960826518eb7b5d1ea11b458cfe89380a9d6874e8ee49ea4a334c5d",
-            "timestamp_ist": "2026-09-06T10:00:00.000971+05:30",
+            "prev_hash": "78c522ecc24355dfa7c6a731b38722ac4f1074bb7729cc3907f5319af0d3d751",
+            "record_hash": "fcb02e151b5d03b4ab067f813a439f1339ee840fd5128c02f8b198cb62e7c678",
+            "timestamp_ist": "2026-09-07T10:00:00.000388+05:30",
             "type": "state_recheck"
           },
           {
@@ -1028,7 +1028,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_001161",
-              "day_offset": 3,
+              "day_offset": 4,
               "debt_id": "debt_001161",
               "diagnosis": "needs_funds",
               "expected_value_paise": 0.0,
@@ -1041,12 +1041,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "9667027a-8872-4703-bd0d-53887fe071db",
+            "event_id": "feace210-aed5-4139-b16d-9ab1f272bc14",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "aa2b7f2ae960826518eb7b5d1ea11b458cfe89380a9d6874e8ee49ea4a334c5d",
-            "record_hash": "2e5a6e23b097dbf76814590614917efea16325d030ae46ac47b41e92bd99442f",
-            "timestamp_ist": "2026-09-06T10:00:00.000972+05:30",
+            "prev_hash": "fcb02e151b5d03b4ab067f813a439f1339ee840fd5128c02f8b198cb62e7c678",
+            "record_hash": "182bf41b09113f9a22d92428ecf73043e4f8a4f0fbeb7a7b76d95a892d3fe4a2",
+            "timestamp_ist": "2026-09-07T10:00:00.000389+05:30",
             "type": "decision"
           },
           {
@@ -1055,12 +1055,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "de872bfc-74c0-4356-9898-ac0c51b3f698",
+            "event_id": "73a2faf7-78c8-4e91-8314-f67e5788c507",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "e03d35ec174e2b62f99bb19672bd4a031a36f018f4e27c9086cf3ad72e222694",
-            "record_hash": "d91220f9d5539778ada2f1e62df45aa874a228a44277655844f262f856802476",
-            "timestamp_ist": "2026-09-08T10:00:00.000832+05:30",
+            "prev_hash": "2316797bce7a20cffd1956c6b9d2cede7bf46394b56abe7dee574118701fffb9",
+            "record_hash": "c6fb429087a01e9b9ee6a9e06d97bf9565552af66ead37e5d15fcbbfdfde2a68",
+            "timestamp_ist": "2026-09-08T10:00:00.000839+05:30",
             "type": "state_recheck"
           },
           {
@@ -1080,12 +1080,12 @@
               "rules_passed": [],
               "stop_reason": "escalation_ladder_exhausted"
             },
-            "event_id": "0eff4896-91d6-4579-8135-540749a9d16a",
+            "event_id": "1ee04f59-4726-4672-a963-ef55fca0888c",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "d91220f9d5539778ada2f1e62df45aa874a228a44277655844f262f856802476",
-            "record_hash": "828ccdb5defe1fe81eedfdab672033118bf2522c35f64fa680776dbb1d4dfe1f",
-            "timestamp_ist": "2026-09-08T10:00:00.000833+05:30",
+            "prev_hash": "c6fb429087a01e9b9ee6a9e06d97bf9565552af66ead37e5d15fcbbfdfde2a68",
+            "record_hash": "05ee62999e0a6ed82fa2f4788b64a5acb302eebe13dacf687f01ce226dae2411",
+            "timestamp_ist": "2026-09-08T10:00:00.000840+05:30",
             "type": "decision"
           },
           {
@@ -1094,12 +1094,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "9446aa82-ccda-40d0-9771-1668b6aa235a",
+            "event_id": "89113582-0a19-4040-a089-a285069ac094",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "5d35cfc037dab5a21835b2f3f1ca3fc2ede6d032ef0801fa42e0454de19fa2dc",
-            "record_hash": "1fe352ad7824f82fad6f08f17aca6f66530e86649d289852073cc4a7f8ac356d",
-            "timestamp_ist": "2026-09-09T10:00:00.000792+05:30",
+            "prev_hash": "6825c13772264d0b39d5c08f2f8aa984c640dd90626b1ce45f0abf42ed2eea3a",
+            "record_hash": "43a569115d32c744e0bb5e8425ce7ebfb7a4a7f4faa91deb5702750fffd408bd",
+            "timestamp_ist": "2026-09-11T10:00:00.000394+05:30",
             "type": "state_recheck"
           },
           {
@@ -1108,7 +1108,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_001161",
-              "day_offset": 6,
+              "day_offset": 8,
               "debt_id": "debt_001161",
               "diagnosis": "needs_funds",
               "expected_value_paise": 0.0,
@@ -1121,12 +1121,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "a33753cb-c5a9-4550-bf11-a27ccf27467f",
+            "event_id": "724ebae9-56f0-48c3-b17b-be9c9cbee3d3",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "1fe352ad7824f82fad6f08f17aca6f66530e86649d289852073cc4a7f8ac356d",
-            "record_hash": "92f7c73754bdafc958c80c61769aec89a5fcd4fb985ac0cb1ee109feed09250a",
-            "timestamp_ist": "2026-09-09T10:00:00.000793+05:30",
+            "prev_hash": "43a569115d32c744e0bb5e8425ce7ebfb7a4a7f4faa91deb5702750fffd408bd",
+            "record_hash": "49a5872368b8ccf1dfed37a90b0f75006c0f6fdda96c7d326e1bd1d08b8f1a29",
+            "timestamp_ist": "2026-09-11T10:00:00.000395+05:30",
             "type": "decision"
           },
           {
@@ -1135,12 +1135,12 @@
               "debt_id": "debt_001161",
               "source": "payment_state_store"
             },
-            "event_id": "61a00987-d562-4dfb-8c11-a169df96c73f",
+            "event_id": "bf43a0ba-5f26-4b39-97a4-1ae30544fa01",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "41625082807ee1662207bad8081495a43cd24663e8cb98fdc9ba6eb51ca95695",
-            "record_hash": "ffb0c2ff511f75cc85fcde17dbf2c9b07e71f08f3aea1f1ee6678d71e1baef13",
-            "timestamp_ist": "2026-09-12T10:00:00.000457+05:30",
+            "prev_hash": "8947f797ad35a4057a3771b124be40639de6ce510acd30a2deb310e93136dd99",
+            "record_hash": "ade75ee42c76f88b1eed420f3dc8112f570d666337a4b3c8b2a47d815aef621f",
+            "timestamp_ist": "2026-09-16T10:00:00.000333+05:30",
             "type": "state_recheck"
           },
           {
@@ -1149,7 +1149,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_001161",
-              "day_offset": 9,
+              "day_offset": 13,
               "debt_id": "debt_001161",
               "diagnosis": "needs_funds",
               "expected_value_paise": 0.0,
@@ -1162,53 +1162,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "38c25da7-0569-4748-873f-91bca8cb4c33",
+            "event_id": "c73ada1c-58b3-4ad9-bd43-bf764cc3d27f",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "ffb0c2ff511f75cc85fcde17dbf2c9b07e71f08f3aea1f1ee6678d71e1baef13",
-            "record_hash": "5adc80c6fafd0d866faeea67bede9c8d11544039b68d1898d37184982f1972dc",
-            "timestamp_ist": "2026-09-12T10:00:00.000458+05:30",
-            "type": "decision"
-          },
-          {
-            "body": {
-              "already_paid": false,
-              "debt_id": "debt_001161",
-              "source": "payment_state_store"
-            },
-            "event_id": "11d5f7db-9e82-4835-b426-1cc44426a947",
-            "model_version": "none",
-            "policy_version": "2026-09-02.2",
-            "prev_hash": "92ae073388f4df221dcb5c3b7bb704bd2b888aa82cbeac82f3b50e5e81c412cf",
-            "record_hash": "533ac73aef3cfd15179da6f5aaf459ffc993e5e2ca8cb9295c1e1477947ffd49",
-            "timestamp_ist": "2026-09-15T10:00:00.000344+05:30",
-            "type": "state_recheck"
-          },
-          {
-            "body": {
-              "acted": false,
-              "channel": "retry",
-              "channel_considered": "retry",
-              "customer_ref": "cust_001161",
-              "day_offset": 12,
-              "debt_id": "debt_001161",
-              "diagnosis": "needs_funds",
-              "expected_value_paise": 0.0,
-              "ladder_rung": 3,
-              "rules_fired": [
-                "not_opted_out"
-              ],
-              "rules_passed": [
-                "payment_not_already_received"
-              ],
-              "stop_reason": "opt_out"
-            },
-            "event_id": "12764253-c232-4699-9cc7-f42307bef7e6",
-            "model_version": "none",
-            "policy_version": "2026-09-02.2",
-            "prev_hash": "533ac73aef3cfd15179da6f5aaf459ffc993e5e2ca8cb9295c1e1477947ffd49",
-            "record_hash": "0e35882d5229ea0c73106faaafced61453e547791e196eecd5b390e2ac951a35",
-            "timestamp_ist": "2026-09-15T10:00:00.000345+05:30",
+            "prev_hash": "ade75ee42c76f88b1eed420f3dc8112f570d666337a4b3c8b2a47d815aef621f",
+            "record_hash": "7b4d222a0eadbb3dc926d50dfe05022a8e640ce726be1ef6d9183bf6b8f954eb",
+            "timestamp_ist": "2026-09-16T10:00:00.000334+05:30",
             "type": "decision"
           }
         ],
@@ -1219,7 +1178,7 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "46b51358-b8ab-445d-860f-57a465b72d9a",
+            "event_id": "16b58682-ccae-4328-8073-9e006e7b17df",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -1251,7 +1210,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "683389d0-7a04-4323-bd76-aea1897bd876",
+            "event_id": "37e8d88c-0aa0-4ab0-a106-6a6b18c090eb",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "a8d6c458ff6a92a56c5c9f40ba47f5128014a6e75842adeb7a2eabf1fee004a3",
@@ -1265,7 +1224,7 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "e2466fb2-2993-472e-8d59-fbc82fd702ab",
+            "event_id": "81f51453-6b11-470a-a759-c9c3b92d80f3",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "c39a1b941cd548bdd57d01e708e3c5589d3e1cf1b83bc24addc3375ae842804d",
@@ -1301,7 +1260,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "73b50976-e26f-4479-8e70-f14786c00b37",
+            "event_id": "b5286ab5-2d09-498e-b84e-39e21bb8c819",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "cbbff2fe11f8f6af5452109d6609fafa846204cb76ca5f87789d8b4836b862af",
@@ -1338,7 +1297,7 @@
               ],
               "template_ref": "template:static"
             },
-            "event_id": "5d4cb329-26c2-4e37-8286-189ca93b734c",
+            "event_id": "ede08a68-6b1f-496d-b563-c3abd08d847b",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "1d42ca644834a0bdf5530bfffb2e4f7b35cd3f9341fced04c68de6eb761c4d13",
@@ -1352,12 +1311,12 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "9fce3ecd-68e9-423e-b2cf-d0b2ea587419",
+            "event_id": "ff4504b9-8318-46c1-87c7-f4edf8a48ad2",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "38265458b32ce4eb10c9560173ba189cd6d25ad4604cbb7b1b11b5147187fcaf",
-            "record_hash": "a99115cd6893a613f247bc2f17decd1798eac68d893365f1ab9f08e648598d67",
-            "timestamp_ist": "2026-09-06T10:00:00.000001+05:30",
+            "prev_hash": "3974e3755ad9ff6f294f42d5db831f47797045d3187439987c442ae21de84cf8",
+            "record_hash": "0dcdb93e4c3af370e8841e7a8cf60a626107ddb9c104cce3b02773b6e8e3df23",
+            "timestamp_ist": "2026-09-07T10:00:00.000001+05:30",
             "type": "state_recheck"
           },
           {
@@ -1366,7 +1325,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000004",
-              "day_offset": 3,
+              "day_offset": 4,
               "debt_id": "debt_000004",
               "diagnosis": "needs_funds",
               "expected_value_paise": 6237.5,
@@ -1384,12 +1343,12 @@
               ],
               "stop_reason": null
             },
-            "event_id": "29c6aca9-ef63-4548-866c-4f5b05b42ffa",
+            "event_id": "eb8d763b-293e-4226-916f-5c5ccbde9743",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "a99115cd6893a613f247bc2f17decd1798eac68d893365f1ab9f08e648598d67",
-            "record_hash": "39215633038877b097a722a6c1006a4653938c29d157c10707d2e3e49adcf70b",
-            "timestamp_ist": "2026-09-06T10:00:00.000002+05:30",
+            "prev_hash": "0dcdb93e4c3af370e8841e7a8cf60a626107ddb9c104cce3b02773b6e8e3df23",
+            "record_hash": "93e886c1b91b3b839827695a3e38ea2cd9329054c3f7c0466b8d2ba65fdfeab7",
+            "timestamp_ist": "2026-09-07T10:00:00.000002+05:30",
             "type": "decision"
           },
           {
@@ -1398,11 +1357,11 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "956336ac-cc75-4b57-ad77-7de76b6e029c",
+            "event_id": "653e1fc4-7b10-4d1e-8537-e30287df7900",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "b4b0f3204fc9db5944793a0761c2606f1f630ba8fda94e00775805d8bb75cf9f",
-            "record_hash": "0241c9e279c6c50af190c3176ebe33a1d00ff7f31d013dc0066c3e589417fa52",
+            "prev_hash": "df54de9846fc4af8f455e2de983d9ad0a01bef2a0bd844d4f2f2f2d55ef3459b",
+            "record_hash": "943657ec43d588c68d388582ab6645deccb34a1f7d3786737f6ada3a92d5fa0b",
             "timestamp_ist": "2026-09-08T10:00:00.000001+05:30",
             "type": "state_recheck"
           },
@@ -1423,11 +1382,11 @@
               "rules_passed": [],
               "stop_reason": "escalation_ladder_exhausted"
             },
-            "event_id": "71abc0df-ccec-48ae-a6c4-fb8cee351f58",
+            "event_id": "3f8ee367-49d0-414b-839d-4addc1b4348b",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "0241c9e279c6c50af190c3176ebe33a1d00ff7f31d013dc0066c3e589417fa52",
-            "record_hash": "a15d87307b9b7a43dd43ba73fae0330ac20cc5f71933dbc6d158842f43bfccd2",
+            "prev_hash": "943657ec43d588c68d388582ab6645deccb34a1f7d3786737f6ada3a92d5fa0b",
+            "record_hash": "a256c45477916e225101bacaf9c503c674c53de2e3620990579d55236b13191a",
             "timestamp_ist": "2026-09-08T10:00:00.000002+05:30",
             "type": "decision"
           },
@@ -1437,12 +1396,12 @@
               "debt_id": "debt_000004",
               "source": "payment_state_store"
             },
-            "event_id": "1640be2c-15ed-41c6-9ff0-029f7dc46323",
+            "event_id": "61b6857e-f978-4b8a-9580-c345c98ec69e",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "591f0128281eb329cadbaeb48a48d29f6fb226d234a4cd47f870e07df05ab2b7",
-            "record_hash": "8c4b743e910bc57ea262899fcf496ee8e17180a70df796b461c2506eda755539",
-            "timestamp_ist": "2026-09-09T10:00:00.000001+05:30",
+            "prev_hash": "f39aa6d1f3a73bfd6ddcfaff4627765b88e018b103549badab7410d02ffcb213",
+            "record_hash": "3e70f83d6d6080e61fc4543bf91be0ffc7a7796c7c887a25f56c0516dd1f6331",
+            "timestamp_ist": "2026-09-11T10:00:00.000001+05:30",
             "type": "state_recheck"
           },
           {
@@ -1451,7 +1410,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000004",
-              "day_offset": 6,
+              "day_offset": 8,
               "debt_id": "debt_000004",
               "diagnosis": "needs_funds",
               "expected_value_paise": 6237.5,
@@ -1469,12 +1428,12 @@
               ],
               "stop_reason": null
             },
-            "event_id": "d22c7f30-919e-444a-8d1b-44a7c7fde125",
+            "event_id": "a560bc8f-ac9f-4b2c-88bc-ed6dfb4df2c9",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "8c4b743e910bc57ea262899fcf496ee8e17180a70df796b461c2506eda755539",
-            "record_hash": "87c395446376997836f789a921e9ea4e10506f22a28e96e221515289e89e9f60",
-            "timestamp_ist": "2026-09-09T10:00:00.000002+05:30",
+            "prev_hash": "3e70f83d6d6080e61fc4543bf91be0ffc7a7796c7c887a25f56c0516dd1f6331",
+            "record_hash": "b9f6b6765623de6fc1cfd43b55fbd520423fb5372806ffe6011ee55277567a6f",
+            "timestamp_ist": "2026-09-11T10:00:00.000002+05:30",
             "type": "decision"
           },
           {
@@ -1485,12 +1444,12 @@
               "note": "retry succeeded",
               "recovered_paise": 49900
             },
-            "event_id": "2425536f-ea54-48ca-9af9-30c7462d3f0d",
+            "event_id": "828adc50-97ad-45f4-bab3-73ca688f7437",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "87c395446376997836f789a921e9ea4e10506f22a28e96e221515289e89e9f60",
-            "record_hash": "cdf85a24d0a751a52a1e7c9aff8cbf914a2ec649564bf389712da553363747a3",
-            "timestamp_ist": "2026-09-09T10:00:00.000003+05:30",
+            "prev_hash": "b9f6b6765623de6fc1cfd43b55fbd520423fb5372806ffe6011ee55277567a6f",
+            "record_hash": "9ad546022a1a73c87f910352cf279829ce6a03663dafffbebf1542d4b71188eb",
+            "timestamp_ist": "2026-09-11T10:00:00.000003+05:30",
             "type": "outcome"
           }
         ]
@@ -1498,24 +1457,24 @@
     },
     "shifted": {
       "source_file": "results/phase3/arm-c-audit-shifted.jsonl",
-      "records": 38861,
+      "records": 37748,
       "chain_intact": true,
       "chain_broken_at": null,
-      "chain_head_hash": "e57171c165a80f5658da6842945f475df3e19442a365ea34392c426aa49e0aaa",
+      "chain_head_hash": "73c711e78069ea7c0b436078418670e766ddbd4b5368460c9191f242649350f2",
       "summary": {
-        "records": 38861,
-        "decisions": 17382,
-        "actions_taken": 3303,
-        "decisions_declined": 6216,
+        "records": 37748,
+        "decisions": 16321,
+        "actions_taken": 3263,
+        "decisions_declined": 6003,
         "stop_reasons": {
-          "cause_not_actionable": 2243,
-          "escalation_ladder_exhausted": 1367,
+          "cause_not_actionable": 2082,
+          "escalation_ladder_exhausted": 1377,
           "promise_to_pay_active": 903,
-          "opt_out": 796,
-          "dispute_raised": 533,
-          "bereavement_or_hardship": 374
+          "opt_out": 767,
+          "dispute_raised": 514,
+          "bereavement_or_hardship": 360
         },
-        "total_contact_cost_paise": 232306,
+        "total_contact_cost_paise": 229914,
         "chain_intact": true,
         "chain_broken_at": null
       },
@@ -1527,7 +1486,7 @@
               "debt_id": "debt_000015",
               "source": "payment_state_store"
             },
-            "event_id": "2397b054-f3e3-462f-a6a5-f60e07c21a01",
+            "event_id": "399fe53b-856b-449f-ba57-6e117ffc852f",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "018e3f03083369cbfd4270f0e6a7f60cbfa82be46534562f5aa136b312102327",
@@ -1559,7 +1518,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "d83fafa7-bb6f-4302-9c70-c98fb2fe2579",
+            "event_id": "04b08f01-6c1c-46e5-b4a6-11cda81f5313",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "0cdca343b5b907f08ece0b30a9bc515f8e7d8c27336bb5db2bb35e06d6fa344e",
@@ -1575,7 +1534,7 @@
               "note": "retry succeeded",
               "recovered_paise": 14900
             },
-            "event_id": "1cd7d757-218b-4cd0-b81c-be4cb76ce578",
+            "event_id": "5dcb9d78-c805-47b4-a311-188f193862a7",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "b5832d83ae8aa5afa4221eeb08af883a77cf28ce6a9dabbb72bd88e9e38edb31",
@@ -1591,7 +1550,7 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "b29f1cd9-5dd4-4695-b013-3d1c8df482bd",
+            "event_id": "0e998c92-65a6-4fdb-ac8e-8a3c7802ebd3",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "8f66ad7db14881598da5391b2b1d024b1dfa3b466363cf1facd8874be4824a91",
@@ -1623,7 +1582,7 @@
               ],
               "stop_reason": "cause_not_actionable"
             },
-            "event_id": "055703c4-9a56-448b-9e20-16f8d5795426",
+            "event_id": "bb2fcc30-bfd5-489e-8b45-614031bc1b5c",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "eff7e08cc1bed734dc8e1cb4ca4bbdc3f7342b45cc8643473f6c9791a3c7aa9c",
@@ -1637,7 +1596,7 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "73d9573b-426d-4209-b8de-a3d928144f9a",
+            "event_id": "458a1557-d345-47b1-917b-f9c737c8d3fe",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "203b61360d9165077821a2b48d9e60199abf629b0c41a6ac9349814be0dc45a0",
@@ -1673,7 +1632,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "6fbd8c97-9bbf-4a20-aaf3-dce99af0e0d0",
+            "event_id": "2c42b5f9-fa5d-40ec-9788-c2684cd4f308",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "11ff6051c660188dbb9e0b094518f3e5e293034d4d4a3e199dd7b48a27826406",
@@ -1710,7 +1669,7 @@
               ],
               "template_ref": "template:static"
             },
-            "event_id": "ac27a007-0d7d-4a40-851b-5e15eb9a61e4",
+            "event_id": "a4274e2b-2d4b-4b9c-940a-08ea2f177444",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "cd3f9abca76184a7e1f9b77a4cba36c8207165627ac770692cd531e728770a5f",
@@ -1727,7 +1686,7 @@
               "promised_date": null,
               "text": "STOP. do not message me again"
             },
-            "event_id": "3a23b119-22a0-40f2-8fe9-c915db1623e6",
+            "event_id": "9b0150cd-8984-49b9-ace2-a5e364b4d9b5",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "2032a52391d3b6be0e08aa76f859637a977b1b6b87f8bfef0a331ef980c00a08",
@@ -1741,12 +1700,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "44b54377-7d8f-404f-ae3e-b20113684e14",
+            "event_id": "20c39608-4a3f-4350-9a9d-7b2d28da74b9",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "6bed9fe50c9fa31e4ca316c5c4fe93d7678819ae65eaf8db99703bc89974f8ec",
-            "record_hash": "f1f7334ed2bd45bd4dcb017fbadf2b5d90791b365492c6f4ae8244d5b7d719d0",
-            "timestamp_ist": "2026-09-06T10:00:00.000249+05:30",
+            "prev_hash": "4e496594e6b5f15119ec0ab6c2071b9dd9e170eee447b37962a16f313fa5a606",
+            "record_hash": "4a6e1f3102d2be29cb1cef92721d47da8cc47a05c2d0dd3c35bad861123a5bb0",
+            "timestamp_ist": "2026-09-07T10:00:00.000099+05:30",
             "type": "state_recheck"
           },
           {
@@ -1755,7 +1714,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000394",
-              "day_offset": 3,
+              "day_offset": 4,
               "debt_id": "debt_000394",
               "diagnosis": "needs_customer_action",
               "expected_value_paise": 0.0,
@@ -1768,12 +1727,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "b83f75bd-4523-42ba-a2fe-9dd2e4015f31",
+            "event_id": "7e5fe079-75b2-4855-91fd-c7e0ff26dedb",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "f1f7334ed2bd45bd4dcb017fbadf2b5d90791b365492c6f4ae8244d5b7d719d0",
-            "record_hash": "f6068b9866bbb0490eb2c5773a15e060a9ca6d4654016be81aa1af1821441b67",
-            "timestamp_ist": "2026-09-06T10:00:00.000250+05:30",
+            "prev_hash": "4a6e1f3102d2be29cb1cef92721d47da8cc47a05c2d0dd3c35bad861123a5bb0",
+            "record_hash": "c74d9ee6d2f81cbbc29a39b48845b5abfdff5ece7c3eb0ceb0e14b19219b97e1",
+            "timestamp_ist": "2026-09-07T10:00:00.000100+05:30",
             "type": "decision"
           },
           {
@@ -1782,12 +1741,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "c4b1b2d5-2b1a-4d19-b668-011c6588b50a",
+            "event_id": "1f896d89-7849-48af-b691-87adad2b1851",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "01d7e527debe782a82080b11442d7b3348a41a856eea228362b3aee1e3ea882c",
-            "record_hash": "65bc29df0ae0d633d13987a52b389dd31e8f4326ae5684d1a1bb156a8f85036c",
-            "timestamp_ist": "2026-09-08T10:00:00.000218+05:30",
+            "prev_hash": "4de09cd2ea077717ee307a6a1c3372ff866eabb994c092c6e1ec6a72260d4d4d",
+            "record_hash": "1c58b091086954b3ad13a8ac522302b530d732ddc3d01a9b04687e217d628ce7",
+            "timestamp_ist": "2026-09-08T10:00:00.000183+05:30",
             "type": "state_recheck"
           },
           {
@@ -1809,12 +1768,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "c945b216-f679-487d-8cf4-f99ebdf84fd7",
+            "event_id": "421cbbc2-cc41-4b82-be1a-03e9ec859cd7",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "65bc29df0ae0d633d13987a52b389dd31e8f4326ae5684d1a1bb156a8f85036c",
-            "record_hash": "0b7d1d9d653e050c43e9ead27e039804291371ae8d60d9409bae2afb61d3801e",
-            "timestamp_ist": "2026-09-08T10:00:00.000219+05:30",
+            "prev_hash": "1c58b091086954b3ad13a8ac522302b530d732ddc3d01a9b04687e217d628ce7",
+            "record_hash": "2acb1ef0888f7f7c87502e7ed954e392e1dfa955b5b8b6b211a5fc12e3654005",
+            "timestamp_ist": "2026-09-08T10:00:00.000184+05:30",
             "type": "decision"
           },
           {
@@ -1823,19 +1782,19 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "72b4bf5c-7dfa-45e3-bac9-68f1efe7c3fc",
+            "event_id": "b363dabc-2310-4318-a3d3-ce679164243b",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "cc7334459214988001fec676066a7fccb4d648b9fa2fdd88b91cfc26f9d2cdb5",
-            "record_hash": "2839c3b59c67b99f62ed7dcb4b0d18722d727a1e62489808a6abd2f57e7b5b97",
-            "timestamp_ist": "2026-09-09T10:00:00.000184+05:30",
+            "prev_hash": "9d857afa5b97433d499bdfe60ee178c9393965b751c9114e27dfd1ebc6bb5e3f",
+            "record_hash": "6acf38a9f7e716a339db059e5024a98939166eb8b2640e0ef3e05a9cc148c650",
+            "timestamp_ist": "2026-09-09T10:00:00.000208+05:30",
             "type": "state_recheck"
           },
           {
             "body": {
               "acted": false,
-              "channel": "retry",
-              "channel_considered": "retry",
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
               "customer_ref": "cust_000394",
               "day_offset": 6,
               "debt_id": "debt_000394",
@@ -1850,12 +1809,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "6b40db54-cd42-4ce1-8cbd-246048b2eb0e",
+            "event_id": "123381ae-295a-4d84-8767-7898423848b9",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "2839c3b59c67b99f62ed7dcb4b0d18722d727a1e62489808a6abd2f57e7b5b97",
-            "record_hash": "c7b2d7cd25d67d16951abfacda2fc19a951cfb03c70a347414ce73e87b604b98",
-            "timestamp_ist": "2026-09-09T10:00:00.000185+05:30",
+            "prev_hash": "6acf38a9f7e716a339db059e5024a98939166eb8b2640e0ef3e05a9cc148c650",
+            "record_hash": "8ee5693ca685f68b38c5119d4d343686efa7c310be2d72cad4387ec8bd254ebf",
+            "timestamp_ist": "2026-09-09T10:00:00.000209+05:30",
             "type": "decision"
           },
           {
@@ -1864,12 +1823,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "f44c3c61-63c4-4dbf-8b00-f69fc99cde36",
+            "event_id": "5643cff3-3958-4457-bc87-0b94c35cd1a2",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "69340e87b2ab0b2259d691dd09eba00c0c40d15082ac6174ffa8e3601d26a9aa",
-            "record_hash": "4f744d2aa2b5c1e0c6114e16c40c4a8a2fd90321bfc4ac4f765f9adca5570716",
-            "timestamp_ist": "2026-09-10T10:00:00.000190+05:30",
+            "prev_hash": "2f1e4cc844b2bf301e443bcc2d0a5683c7225b81f832493b71b7b7f82c343a68",
+            "record_hash": "2452d4517d7d74a02cae4242b398f8b58549b0249db835dfe43c420d93736b21",
+            "timestamp_ist": "2026-09-10T10:00:00.000123+05:30",
             "type": "state_recheck"
           },
           {
@@ -1891,12 +1850,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "2be523b3-e1a6-4f02-982b-1d0a83c90b8b",
+            "event_id": "be745743-dfd4-460f-a943-bd60d03bb78e",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "4f744d2aa2b5c1e0c6114e16c40c4a8a2fd90321bfc4ac4f765f9adca5570716",
-            "record_hash": "2c100f84f92f580aaabe8655bbe6db8804d63d38afc437e867f502daa50ec85a",
-            "timestamp_ist": "2026-09-10T10:00:00.000191+05:30",
+            "prev_hash": "2452d4517d7d74a02cae4242b398f8b58549b0249db835dfe43c420d93736b21",
+            "record_hash": "e29342741f595cf10d8be5f0a049654ce73b74847ac7d5efdafe6a3de94809e6",
+            "timestamp_ist": "2026-09-10T10:00:00.000124+05:30",
             "type": "decision"
           },
           {
@@ -1905,19 +1864,19 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "b7c57c73-6c15-4cee-a5ef-e59236f43131",
+            "event_id": "e80f9d75-58de-43cb-af46-4adee17b4d48",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "04530e891b1bef7bcf443e1f373001ae608a81cd56f5e26d8f5bc1d35ae69560",
-            "record_hash": "ef1244a673b3f1573c2593125f0095670cc12eb56619cc31488bd1bb7932ebc8",
-            "timestamp_ist": "2026-09-11T10:00:00.000088+05:30",
+            "prev_hash": "2bc4a4711e463b23152ce8c7a8778c89cb053adaa288abe3aeee5e78f0b4bffb",
+            "record_hash": "129c30da7378d524ecfb676bf6890f3b431a7324d3e7828e2fe850122dcfa0a7",
+            "timestamp_ist": "2026-09-11T10:00:00.000081+05:30",
             "type": "state_recheck"
           },
           {
             "body": {
               "acted": false,
-              "channel": "sms_service",
-              "channel_considered": "sms_service",
+              "channel": "retry",
+              "channel_considered": "retry",
               "customer_ref": "cust_000394",
               "day_offset": 8,
               "debt_id": "debt_000394",
@@ -1932,12 +1891,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "3a1da16e-0e3c-49fb-ab18-3f76d8f3a0dd",
+            "event_id": "d241f185-9fa5-4239-bcf6-5247437331a0",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "ef1244a673b3f1573c2593125f0095670cc12eb56619cc31488bd1bb7932ebc8",
-            "record_hash": "0315f7fa15678f9f1bcb3162b42fc3035db393eec1664b02f2bd8af6d6c16fb4",
-            "timestamp_ist": "2026-09-11T10:00:00.000089+05:30",
+            "prev_hash": "129c30da7378d524ecfb676bf6890f3b431a7324d3e7828e2fe850122dcfa0a7",
+            "record_hash": "9671f21e8a6a56e3e5ff9ec11e5d69396e381e8264295036e3719f0c036ee8d0",
+            "timestamp_ist": "2026-09-11T10:00:00.000082+05:30",
             "type": "decision"
           },
           {
@@ -1946,19 +1905,19 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "cb697c97-3b4d-4fa9-a3ee-b4dbe39ea617",
+            "event_id": "cba8d3f5-3299-42b3-be20-80f5915b9658",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "77933474cc8837123e511a220242f07b917acb0b825e9b328305b6e518202625",
-            "record_hash": "eaa7f543239f197ce0abaeabe5d7ad983836973ed7c5f2a59adfdf7177a1b4e6",
-            "timestamp_ist": "2026-09-12T10:00:00.000100+05:30",
+            "prev_hash": "62d91ea46e46cbfd6b5faa265974acd5623da989abceef766e2807829f5c1e84",
+            "record_hash": "e64e63be5a9163132a20bf6563990a8f4ca6f376097057d773e6661fb8a6f878",
+            "timestamp_ist": "2026-09-12T10:00:00.000130+05:30",
             "type": "state_recheck"
           },
           {
             "body": {
               "acted": false,
-              "channel": "retry",
-              "channel_considered": "retry",
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
               "customer_ref": "cust_000394",
               "day_offset": 9,
               "debt_id": "debt_000394",
@@ -1973,12 +1932,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "1fc228db-9329-421b-8e51-ce3ae64e395a",
+            "event_id": "6c8caabe-db7c-4b1c-a7a0-385136022724",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "eaa7f543239f197ce0abaeabe5d7ad983836973ed7c5f2a59adfdf7177a1b4e6",
-            "record_hash": "b6bc3673623d44c64589502c658cca529b782326694baedae6dc153617a945a6",
-            "timestamp_ist": "2026-09-12T10:00:00.000101+05:30",
+            "prev_hash": "e64e63be5a9163132a20bf6563990a8f4ca6f376097057d773e6661fb8a6f878",
+            "record_hash": "e7bd9471b30262c38129f5e84ce598deced1cc537e8fa6100112989fad5102a9",
+            "timestamp_ist": "2026-09-12T10:00:00.000131+05:30",
             "type": "decision"
           },
           {
@@ -1987,12 +1946,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "939fc764-bf6a-4b7d-9fca-6d5f56a1527d",
+            "event_id": "f8adc910-2ad2-4169-9fa6-1ca8ea7f3937",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "77295569b8a639370933c882f7a3dd723f1757f4ac7d1dc9316f68159e690ad3",
-            "record_hash": "1c7a80bff26401990bf79876c95980992342075b937c69d4f5110b7f2b0ef51e",
-            "timestamp_ist": "2026-09-13T10:00:00.000113+05:30",
+            "prev_hash": "96632c14752a623c495e709362e2cb69d84a3c8dece4d6a7371298d3c2b9e371",
+            "record_hash": "33351e297b7882535650b12058046d66bec49f07c12ff23bf9e320ce11fc8948",
+            "timestamp_ist": "2026-09-13T10:00:00.000140+05:30",
             "type": "state_recheck"
           },
           {
@@ -2014,12 +1973,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "b81c95d4-8892-448e-8d1e-43d675f65ac5",
+            "event_id": "db5facf3-9ae5-4faa-b70d-81949076bf1a",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "1c7a80bff26401990bf79876c95980992342075b937c69d4f5110b7f2b0ef51e",
-            "record_hash": "d775328f4ec32dfb44f322563f8de68ca261e4d7ef308a18434d13c97fbb6e92",
-            "timestamp_ist": "2026-09-13T10:00:00.000114+05:30",
+            "prev_hash": "33351e297b7882535650b12058046d66bec49f07c12ff23bf9e320ce11fc8948",
+            "record_hash": "e267075552520837710cc8ff79c189be9c17c39ae976e455e917bd3c4f3a92f0",
+            "timestamp_ist": "2026-09-13T10:00:00.000141+05:30",
             "type": "decision"
           },
           {
@@ -2028,12 +1987,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "d3852f2e-0110-4da2-94b4-48445509a12c",
+            "event_id": "c5823bd8-d7f1-4f62-b333-dea99590b49f",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "9045a08b8503914c1ae3d4c9aaf86f8df38d30df1ce524c11f40cca9b1b34f28",
-            "record_hash": "ffc24ef7d8190fd037a1fcd50335e4f550a0b753bdd653abf1ff3c15d0861cef",
-            "timestamp_ist": "2026-09-14T10:00:00.000121+05:30",
+            "prev_hash": "a572c58f61d3c7bac94da25cc948ae73137b62608a9594b23d27d79d1d36a0f2",
+            "record_hash": "2c81a32d59e75ff8124b17729b9d182bc5eba18fb6203dca333bd307b64ec35d",
+            "timestamp_ist": "2026-09-14T10:00:00.000075+05:30",
             "type": "state_recheck"
           },
           {
@@ -2055,12 +2014,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "d8e9b3db-fde0-4ef8-b13c-41a83089e32d",
+            "event_id": "aa818064-992d-4b91-8a8d-7f3b8f7f6f7f",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "ffc24ef7d8190fd037a1fcd50335e4f550a0b753bdd653abf1ff3c15d0861cef",
-            "record_hash": "6e3dea54168cb65652ef307899b70dca3313ca1f3286819cfb4627ecd295cd4b",
-            "timestamp_ist": "2026-09-14T10:00:00.000122+05:30",
+            "prev_hash": "2c81a32d59e75ff8124b17729b9d182bc5eba18fb6203dca333bd307b64ec35d",
+            "record_hash": "9c139373f778f4592ec5bbdfe9cb6f0c86f3700d29c119d70fbd474ee68dc016",
+            "timestamp_ist": "2026-09-14T10:00:00.000076+05:30",
             "type": "decision"
           },
           {
@@ -2069,19 +2028,19 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "bfbfbaa1-4d0f-4769-8a73-8440dabc4e7a",
+            "event_id": "785a9767-9841-4c68-a0b9-1ee43d62f396",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "372e65f72ac1d1502e4c10d2c61e3c0061cb9ce1fc2e38225f7e18a1f1b9b0f2",
-            "record_hash": "a1da2ceca309909f18b6f3298d1c0c6964a366bda17a6a57f43a047930a31087",
-            "timestamp_ist": "2026-09-15T10:00:00.000087+05:30",
+            "prev_hash": "486b1de54773563dc77d5e43d9b1ffcec5bbdce0b9c5d568fcd3a26937f81d77",
+            "record_hash": "42f4e007ec90c16994d68372ecda4f085bbf4bf1cc94c2fc6e37760cca1a07f6",
+            "timestamp_ist": "2026-09-15T10:00:00.000017+05:30",
             "type": "state_recheck"
           },
           {
             "body": {
               "acted": false,
-              "channel": "retry",
-              "channel_considered": "retry",
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
               "customer_ref": "cust_000394",
               "day_offset": 12,
               "debt_id": "debt_000394",
@@ -2096,12 +2055,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "fc1e16e9-a33a-45eb-aba9-ef078639d5ff",
+            "event_id": "b893eba9-ae17-4fc7-816f-af73f6ffe804",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "a1da2ceca309909f18b6f3298d1c0c6964a366bda17a6a57f43a047930a31087",
-            "record_hash": "07e572737975c786e06e305788fec7525d9ee33bf718faeb6ace1bd94c48c289",
-            "timestamp_ist": "2026-09-15T10:00:00.000088+05:30",
+            "prev_hash": "42f4e007ec90c16994d68372ecda4f085bbf4bf1cc94c2fc6e37760cca1a07f6",
+            "record_hash": "4ca09b5c20aaefece1d36fab3618e902229de25be8a0dfbf70f8b28c6f59da4b",
+            "timestamp_ist": "2026-09-15T10:00:00.000018+05:30",
             "type": "decision"
           },
           {
@@ -2110,19 +2069,19 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "cd6ebeb1-a83f-4e1c-8400-7401e958cc06",
+            "event_id": "d6fb9cdb-3e25-4eda-ad7a-673031ac09ac",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "35ea38c2cba2673de1735b8832c019931e259a1ff40d3bc1abbc2ff8b0618588",
-            "record_hash": "24bd3200b4548a11963045649a413ba65479373f646745ff7f424f04c1358a79",
-            "timestamp_ist": "2026-09-16T10:00:00.000091+05:30",
+            "prev_hash": "6d638a0696689e36450124dc06275f8ed7d91e90979c85418fbb7c7be04b4845",
+            "record_hash": "d92ea612c87733695e528a0dc20f4a326d97036785dc58d7f1b9ca3ab561eb24",
+            "timestamp_ist": "2026-09-16T10:00:00.000081+05:30",
             "type": "state_recheck"
           },
           {
             "body": {
               "acted": false,
-              "channel": "sms_service",
-              "channel_considered": "sms_service",
+              "channel": "retry",
+              "channel_considered": "retry",
               "customer_ref": "cust_000394",
               "day_offset": 13,
               "debt_id": "debt_000394",
@@ -2137,12 +2096,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "c92b9fdc-5252-41cd-8e17-3b52cd7b2209",
+            "event_id": "ad7ff2c9-4bf2-41d8-95ee-788e16198636",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "24bd3200b4548a11963045649a413ba65479373f646745ff7f424f04c1358a79",
-            "record_hash": "4a20b22c1044c8e2657f65badcfb3f9e0a14ae724f54295b55f9a513988d3716",
-            "timestamp_ist": "2026-09-16T10:00:00.000092+05:30",
+            "prev_hash": "d92ea612c87733695e528a0dc20f4a326d97036785dc58d7f1b9ca3ab561eb24",
+            "record_hash": "6ee9c2494e44f456d284eda5e00f58eaed22e3241a0d876151844660126ae66f",
+            "timestamp_ist": "2026-09-16T10:00:00.000082+05:30",
             "type": "decision"
           },
           {
@@ -2151,12 +2110,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "25285916-ed1a-466a-9b05-384ab82e1235",
+            "event_id": "0251a1d9-13b9-411a-bd0e-6897b2960880",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "5a9ead3781434c215ce0d34e3b511bc86d56d721dd8205b6e904d339e8bb5c4e",
-            "record_hash": "3c43a30424cfb97859606bb235221ed47a737f59a12f01e44ae0663e5e1a3029",
-            "timestamp_ist": "2026-09-17T10:00:00.000094+05:30",
+            "prev_hash": "a1be44c013e714876e17359b8778cf8358df5db6daf0f494612cd8aa3f60fa9f",
+            "record_hash": "cb3ebe5e4f0dc7b6b19cad2806e9e231e8b9759119ad62749b5d5dc7fd848f29",
+            "timestamp_ist": "2026-09-17T10:00:00.000091+05:30",
             "type": "state_recheck"
           },
           {
@@ -2178,12 +2137,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "5df337f7-4e28-40a9-85a0-e8273d67713a",
+            "event_id": "9ee18e1e-c3c1-44d9-9267-a1330cfc4f5c",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "3c43a30424cfb97859606bb235221ed47a737f59a12f01e44ae0663e5e1a3029",
-            "record_hash": "476c5269e066a5cad7348a2e61bf22c7f43bad58bb7a23477f1b444b9d45b94e",
-            "timestamp_ist": "2026-09-17T10:00:00.000095+05:30",
+            "prev_hash": "cb3ebe5e4f0dc7b6b19cad2806e9e231e8b9759119ad62749b5d5dc7fd848f29",
+            "record_hash": "9f24e7def46e88743fc19f4b19a00277b3674345182bf1a97b168bc6b57e6937",
+            "timestamp_ist": "2026-09-17T10:00:00.000092+05:30",
             "type": "decision"
           },
           {
@@ -2192,19 +2151,19 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "2ac9fb91-ed18-4001-b946-c3c6e924b2dc",
+            "event_id": "72af972b-645f-43f4-b29b-f22475eae8fc",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "0b75b3e4dff87b048b60a5ae306c3e91e9e1c48e0ed4d1d0b75151523b35cd16",
-            "record_hash": "5c8dd39dd0218af6608ea7609decdfaf8164852f7b28ed386e862d08988d66eb",
-            "timestamp_ist": "2026-09-18T10:00:00.000069+05:30",
+            "prev_hash": "b8a2ab89ddc3a3460d31f264903a4156d00f4af5e42aa550c9f136cf5e18ae2d",
+            "record_hash": "16f923c4c9245e985c068490a449554fe646ffdc6ae100bab6b12902e0fd917e",
+            "timestamp_ist": "2026-09-18T10:00:00.000096+05:30",
             "type": "state_recheck"
           },
           {
             "body": {
               "acted": false,
-              "channel": "retry",
-              "channel_considered": "retry",
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
               "customer_ref": "cust_000394",
               "day_offset": 15,
               "debt_id": "debt_000394",
@@ -2219,12 +2178,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "a1b96023-16d1-4bef-bd02-5fcf7ce2c6b1",
+            "event_id": "ea885b13-7c96-48c9-b7d1-71ba2c932a9f",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "5c8dd39dd0218af6608ea7609decdfaf8164852f7b28ed386e862d08988d66eb",
-            "record_hash": "222a956d9409762d351e2fa88da677483d6643ccb785845fc1441add7d03be7e",
-            "timestamp_ist": "2026-09-18T10:00:00.000070+05:30",
+            "prev_hash": "16f923c4c9245e985c068490a449554fe646ffdc6ae100bab6b12902e0fd917e",
+            "record_hash": "57d0cc9038ffad291f5bc8fa2f8b6ce70749cf3399323e066784d0791b211b3a",
+            "timestamp_ist": "2026-09-18T10:00:00.000097+05:30",
             "type": "decision"
           },
           {
@@ -2233,12 +2192,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "a2edde29-8ca4-485a-9254-f0d0e1841148",
+            "event_id": "327e8b90-f0fa-43a4-8f09-68f402fa0c3b",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "87638e1e1d4e06ade803e9db306b489e2f2d58e4a3ed521159ada146bdef5dc7",
-            "record_hash": "b633147ea18e97ac0460ae9fcb9e0454e519dc0a7de5eab10cecdcd2bffcca49",
-            "timestamp_ist": "2026-09-19T10:00:00.000073+05:30",
+            "prev_hash": "f94e1ec7e309599f26788b02f2470ed263e3726ab490805bcc9a4d2da35f5af2",
+            "record_hash": "36db5bfca8ab7c7fca42623258b0c33241ab16e1dd4f1342cd32f6a5f386c6e0",
+            "timestamp_ist": "2026-09-19T10:00:00.000013+05:30",
             "type": "state_recheck"
           },
           {
@@ -2260,12 +2219,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "4bc00927-8292-43b1-9969-6897331313c6",
+            "event_id": "c3a5df49-f4d0-4225-8ca7-ee8530787466",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "b633147ea18e97ac0460ae9fcb9e0454e519dc0a7de5eab10cecdcd2bffcca49",
-            "record_hash": "88d7b3db7c149485d2ccdf34fb3407ce81ccd3a28a2dd5643142927a7ea778af",
-            "timestamp_ist": "2026-09-19T10:00:00.000074+05:30",
+            "prev_hash": "36db5bfca8ab7c7fca42623258b0c33241ab16e1dd4f1342cd32f6a5f386c6e0",
+            "record_hash": "b5f96871345a40f3d83e5121cfcb4126ad0dd7d106d65c06a210b324d60736d6",
+            "timestamp_ist": "2026-09-19T10:00:00.000014+05:30",
             "type": "decision"
           },
           {
@@ -2274,19 +2233,19 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "8811a559-9cc2-41fa-855a-cedd809e1106",
+            "event_id": "10a520db-0ecc-4622-a318-fd354312418a",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "3539c3963f0da987ac352bfbc4a64e077eca1499e8688c2dfc19cdc3f10c67d6",
-            "record_hash": "cfaec6b46746542ef8c82b7e3a89a67e2e17b84a6b2dacff474f802c089e994a",
-            "timestamp_ist": "2026-09-20T10:00:00.000061+05:30",
+            "prev_hash": "a6f1ce90f58d689b04a0beb5609155c52745fff2f432833360520759c4927057",
+            "record_hash": "c0ad06c668350bb46a282367d22058f8872960eea3e2def6ebac49e2c30e8894",
+            "timestamp_ist": "2026-09-20T10:00:00.000069+05:30",
             "type": "state_recheck"
           },
           {
             "body": {
               "acted": false,
-              "channel": "sms_service",
-              "channel_considered": "sms_service",
+              "channel": "retry",
+              "channel_considered": "retry",
               "customer_ref": "cust_000394",
               "day_offset": 17,
               "debt_id": "debt_000394",
@@ -2301,12 +2260,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "3d79eb4f-e4b1-46d1-ada1-d9fb2d6479d2",
+            "event_id": "45ba2921-4c7e-4fe4-a7e0-1cdd71db0590",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "cfaec6b46746542ef8c82b7e3a89a67e2e17b84a6b2dacff474f802c089e994a",
-            "record_hash": "e1085125b90e0e51f090c9b4dce73dd63cac2775c3c4e13f2a8573b51fad69e0",
-            "timestamp_ist": "2026-09-20T10:00:00.000062+05:30",
+            "prev_hash": "c0ad06c668350bb46a282367d22058f8872960eea3e2def6ebac49e2c30e8894",
+            "record_hash": "21a26b8f16556599b27da0a3fe917674b4bf3de15210df6359a2f060a5aba684",
+            "timestamp_ist": "2026-09-20T10:00:00.000070+05:30",
             "type": "decision"
           },
           {
@@ -2315,12 +2274,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "3371cd86-268c-41b4-82ef-48a3185639f5",
+            "event_id": "59cbe020-278a-4da6-9734-623746cb739a",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "95dfcec0c6b8ee365d101d5deb455dceec198824898513eee27c6d5239badf56",
-            "record_hash": "9b133b955f037aa050c04151639585dc6b6f59702c06ce838426632209ae756b",
-            "timestamp_ist": "2026-09-21T10:00:00.000013+05:30",
+            "prev_hash": "0ed3d4cc90688d620bc8d9ffb792290ce990c81cf1a9d798fee4a92eb43d5bde",
+            "record_hash": "70a291dda2ebdf6b7863cc5b660a47245ffd2bd85c64f3a725e4920168a499d7",
+            "timestamp_ist": "2026-09-21T10:00:00.000073+05:30",
             "type": "state_recheck"
           },
           {
@@ -2342,12 +2301,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "a4e73ebe-583c-4b51-ad77-6bd66049944c",
+            "event_id": "a07b2fee-c058-4c58-84ae-159186666c0d",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "9b133b955f037aa050c04151639585dc6b6f59702c06ce838426632209ae756b",
-            "record_hash": "9b736998e398fd121ff183050910020ff4ded6373d67619bfacf3cae0da4d18f",
-            "timestamp_ist": "2026-09-21T10:00:00.000014+05:30",
+            "prev_hash": "70a291dda2ebdf6b7863cc5b660a47245ffd2bd85c64f3a725e4920168a499d7",
+            "record_hash": "a571c1e286d549b25bde6c92b3bf6743fef7adcb89bc3221ea8e9309bb345e47",
+            "timestamp_ist": "2026-09-21T10:00:00.000074+05:30",
             "type": "decision"
           },
           {
@@ -2356,12 +2315,12 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "6ca37714-bdd6-4dab-b5cc-d4ddb62b2ea1",
+            "event_id": "22fa6845-6ea4-4f5f-8107-d7d056721139",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "afa4289364a2bed2dcdcf61c4aa21d932e76b92e82fec15d191e74e7f7f104f6",
-            "record_hash": "c3f84f20637a80e0093e985d8358926d0be37d8ce68162403dca42a3db4217e8",
-            "timestamp_ist": "2026-09-22T10:00:00.000013+05:30",
+            "prev_hash": "93b5ee3558c43262886302598e48396feb001d632ba80e6c4fc87770f3d9115a",
+            "record_hash": "e584ed5f8a4a2421472d078121bc9e7b83604aec24cbef89b1f59ae38a0222a4",
+            "timestamp_ist": "2026-09-22T10:00:00.000063+05:30",
             "type": "state_recheck"
           },
           {
@@ -2383,12 +2342,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "a3babc73-1b4d-4a92-9785-9b3a16707c8f",
+            "event_id": "76636a27-f8bc-4a67-b8c3-773dd7b4ef96",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "c3f84f20637a80e0093e985d8358926d0be37d8ce68162403dca42a3db4217e8",
-            "record_hash": "fe8da24e1fc4977a051cfd5b5d0641a91377d7bdc0888cf9d6bbb97d4c708b5c",
-            "timestamp_ist": "2026-09-22T10:00:00.000014+05:30",
+            "prev_hash": "e584ed5f8a4a2421472d078121bc9e7b83604aec24cbef89b1f59ae38a0222a4",
+            "record_hash": "f17c977c21c8c13adcbfc2e1a894ca552afeaccf402021594448aa4aec6e21be",
+            "timestamp_ist": "2026-09-22T10:00:00.000064+05:30",
             "type": "decision"
           },
           {
@@ -2397,11 +2356,11 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "3ecc1ca7-8866-4659-9db5-9a4cde00a6e2",
+            "event_id": "6167cf74-b1ec-4880-b066-35d48ac97ea7",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "c41a8abb2ee4cb32d10862b2f50a55b1d1e3c5bfe6140544db31009437641188",
-            "record_hash": "786f0d96a1466065870f14e1dc224cad7145e3ecd40b2b3fd416be4b3643f6e4",
+            "prev_hash": "abb04a66ea6287c7b9aa7ebc3552e2cd807a7e29424f3162fc8d41d528c39435",
+            "record_hash": "4dfd5cfa798eb56d8d47c499b6cae25e23b5dbfa1ce42617dd3916871b1b0457",
             "timestamp_ist": "2026-09-23T10:00:00.000013+05:30",
             "type": "state_recheck"
           },
@@ -2424,11 +2383,11 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "2dfc0541-1c44-4a5b-9eea-05279deb6019",
+            "event_id": "3927e531-8615-48b0-997b-de70d09e00bc",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "786f0d96a1466065870f14e1dc224cad7145e3ecd40b2b3fd416be4b3643f6e4",
-            "record_hash": "e1e1428cbced927bacf4eda81c188bcb66894bc10e622a7237df0dfa8dea1925",
+            "prev_hash": "4dfd5cfa798eb56d8d47c499b6cae25e23b5dbfa1ce42617dd3916871b1b0457",
+            "record_hash": "73c8f85fc444790f178062c4efdf64f2dc4f212df3566767425f5b1f7f77a04d",
             "timestamp_ist": "2026-09-23T10:00:00.000014+05:30",
             "type": "decision"
           },
@@ -2438,19 +2397,19 @@
               "debt_id": "debt_000394",
               "source": "payment_state_store"
             },
-            "event_id": "59eadb30-8df3-4126-a06e-aae897a92d90",
+            "event_id": "776336fc-7106-40b1-8724-8175a782c0a4",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "36a47453990854192d12154c36e374938fd32614ed57310d36ca174b6763efc0",
-            "record_hash": "975efaf063892f6dd922e2d4041b90aa9bd0d2335fdf0c0d6e097661c875035b",
-            "timestamp_ist": "2026-09-24T10:00:00.000013+05:30",
+            "prev_hash": "cbcd7811feeb5dc1dfc37615cd07ca2f0d8d81f9005e27ea3cef82ac508f136e",
+            "record_hash": "2cbdd830c366cbe27a2448dc20806e09ebe25a65bc8f80d0e983c00ffd6d4c7a",
+            "timestamp_ist": "2026-09-24T10:00:00.000069+05:30",
             "type": "state_recheck"
           },
           {
             "body": {
               "acted": false,
-              "channel": "sms_service",
-              "channel_considered": "sms_service",
+              "channel": "retry",
+              "channel_considered": "retry",
               "customer_ref": "cust_000394",
               "day_offset": 21,
               "debt_id": "debt_000394",
@@ -2465,12 +2424,12 @@
               ],
               "stop_reason": "opt_out"
             },
-            "event_id": "f8298010-5e4c-48c5-87f3-ee348ca8b738",
+            "event_id": "10224184-35c5-46b0-87f7-253f4516b3c4",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "975efaf063892f6dd922e2d4041b90aa9bd0d2335fdf0c0d6e097661c875035b",
-            "record_hash": "9f143ec349b90aac254ba93a740ab324f6eea003e16da06f11887a8002cd0a3d",
-            "timestamp_ist": "2026-09-24T10:00:00.000014+05:30",
+            "prev_hash": "2cbdd830c366cbe27a2448dc20806e09ebe25a65bc8f80d0e983c00ffd6d4c7a",
+            "record_hash": "6fc7e9f19989c5d4a9d82b493329463d544ee5284f38fbb18be21c0fa6b85858",
+            "timestamp_ist": "2026-09-24T10:00:00.000070+05:30",
             "type": "decision"
           }
         ],
@@ -2481,7 +2440,7 @@
               "debt_id": "debt_000038",
               "source": "payment_state_store"
             },
-            "event_id": "72f51e4d-1f78-4ac6-bd31-e23807f2806c",
+            "event_id": "34ebc508-8e1c-4096-b7c1-b45b90871907",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "c8f5321083dd73b517de92afdca95ee64a9224a5387b5a264b83ec4dff81a558",
@@ -2513,7 +2472,7 @@
               ],
               "stop_reason": "cause_not_actionable"
             },
-            "event_id": "1b185354-61e1-4950-846e-92b626926a54",
+            "event_id": "db975d9f-43a9-4d85-af8a-be6bf10b18bc",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "f16241a83bac4b8dd34f89b2068b6ef49c6d53bb8edd5fa785768a416803808c",
@@ -2527,7 +2486,7 @@
               "debt_id": "debt_000038",
               "source": "payment_state_store"
             },
-            "event_id": "8db06e8c-4d4e-45c5-bc9d-f951b1f0b8a2",
+            "event_id": "9fcd6c89-4094-45d4-9184-ed02f131cb52",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "60ffe37d665ace1e3118a21ce7438a517819d9559222945766c2be2829262ddd",
@@ -2563,7 +2522,7 @@
               ],
               "stop_reason": null
             },
-            "event_id": "4b2303be-3778-489c-b6fb-3507b7e642c9",
+            "event_id": "92c3580f-2bd2-4e3f-ae3a-893f40f8ad4d",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "30a89968c18a848493fd247b546e892f7c2b13ac903d79a41072e4caa2832098",
@@ -2600,7 +2559,7 @@
               ],
               "template_ref": "template:static"
             },
-            "event_id": "ad90c487-668f-411e-be3a-c55e29a63f59",
+            "event_id": "b470f660-cd8f-487d-9b21-66409da938d9",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
             "prev_hash": "9aeb74a677e186751b851525c89b5936a5877972c819edf4501bd6f95580a473",
@@ -2614,12 +2573,12 @@
               "debt_id": "debt_000038",
               "source": "payment_state_store"
             },
-            "event_id": "e835723c-b326-41e7-946f-91232daec651",
+            "event_id": "2a93792d-62c0-4e8d-b4ec-7ff8dbc0097c",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "525925adfae136d5f7bd8598102b416c4f47316e84437c3236b5f66bd2e52e38",
-            "record_hash": "0b61147dc54cdc2e97e53dccd6cbd1f96da29b4ea90700c7747eb179397dd7cc",
-            "timestamp_ist": "2026-09-06T10:00:00.000021+05:30",
+            "prev_hash": "4e4285992132595e2b4560cc51a220e1e0a74b0174357cd07ae04810261f4048",
+            "record_hash": "0810615961dc19287daf3ede15256a2fec6a20607d928ff1b076bf880a416e0b",
+            "timestamp_ist": "2026-09-07T10:00:00.000017+05:30",
             "type": "state_recheck"
           },
           {
@@ -2628,7 +2587,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000038",
-              "day_offset": 3,
+              "day_offset": 4,
               "debt_id": "debt_000038",
               "diagnosis": "needs_customer_action",
               "expected_value_paise": 0.0,
@@ -2646,12 +2605,12 @@
               ],
               "stop_reason": "cause_not_actionable"
             },
-            "event_id": "577e208a-037e-4957-91ed-e4ad4147524f",
+            "event_id": "6bdece3a-55d7-4139-be75-4c5b4d634307",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "0b61147dc54cdc2e97e53dccd6cbd1f96da29b4ea90700c7747eb179397dd7cc",
-            "record_hash": "d7dd1694e42b9c60276b00cda85f9eb30cec16371010cd9a21f5eeb9b080792e",
-            "timestamp_ist": "2026-09-06T10:00:00.000022+05:30",
+            "prev_hash": "0810615961dc19287daf3ede15256a2fec6a20607d928ff1b076bf880a416e0b",
+            "record_hash": "ca0cca4e551bf49f440bcebe2347e0f221173a078969bcdef1b8331e38f9bf46",
+            "timestamp_ist": "2026-09-07T10:00:00.000018+05:30",
             "type": "decision"
           },
           {
@@ -2660,12 +2619,12 @@
               "debt_id": "debt_000038",
               "source": "payment_state_store"
             },
-            "event_id": "5c0dfedc-18f2-4a13-80eb-ab5c6fcd4f16",
+            "event_id": "a3e72c60-52aa-400f-9632-eac6d2fa3032",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "4af334e7045deacf4226e5e8717ae44f4e0b29293d5bfa0e1c683c83c150514d",
-            "record_hash": "52e4caf7eb32784239d51a8a6749e7b2df0ec1cf5d4ca2fd0e0b4cdb38f216c4",
-            "timestamp_ist": "2026-09-08T10:00:00.000022+05:30",
+            "prev_hash": "0c1daf217ed6e9f79621ca12808fcb9b48c9ed84a1e45575d3741feba9de50ba",
+            "record_hash": "72f351f902ea2a1b50b2f3f4e50add338e8730a05b97d164243c5ed9982d7df4",
+            "timestamp_ist": "2026-09-08T10:00:00.000016+05:30",
             "type": "state_recheck"
           },
           {
@@ -2685,12 +2644,12 @@
               "rules_passed": [],
               "stop_reason": "escalation_ladder_exhausted"
             },
-            "event_id": "24b2b66e-d957-4c70-bb3b-e7b975f55d4e",
+            "event_id": "c622b2fe-3a53-4e05-a530-2f2bd2d7d516",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "52e4caf7eb32784239d51a8a6749e7b2df0ec1cf5d4ca2fd0e0b4cdb38f216c4",
-            "record_hash": "e1274bb2fee9dc84a107f7ffda4ad36b9d815d15f4eaeb61f834cef3d881adec",
-            "timestamp_ist": "2026-09-08T10:00:00.000023+05:30",
+            "prev_hash": "72f351f902ea2a1b50b2f3f4e50add338e8730a05b97d164243c5ed9982d7df4",
+            "record_hash": "4a07d4f7389faef46dd6a760cb851029dc3691c058fbf58cf3d40e9e9b793988",
+            "timestamp_ist": "2026-09-08T10:00:00.000017+05:30",
             "type": "decision"
           },
           {
@@ -2699,12 +2658,12 @@
               "debt_id": "debt_000038",
               "source": "payment_state_store"
             },
-            "event_id": "7c030556-8c53-41d8-9268-7034728e191d",
+            "event_id": "42f9de28-d026-4219-ac15-7f447684b3f2",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "27e151622c914b0d809f366036155e721c35e431a03fb086825908e5ba7e1d70",
-            "record_hash": "48b8dd5bb30a2c9ee5cd15530258ec3876f91111a792e74ede1d1b7feb167952",
-            "timestamp_ist": "2026-09-09T10:00:00.000024+05:30",
+            "prev_hash": "5c0220ec1b7e88a51f7c304e37e4fd728b3d3cd7358a411fec56a9b03cfacb75",
+            "record_hash": "2d9ab9c5bc2238bffeee4a99fe9f3c4a766027ffdf9c994d118083f2309fbd36",
+            "timestamp_ist": "2026-09-11T10:00:00.000009+05:30",
             "type": "state_recheck"
           },
           {
@@ -2713,7 +2672,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000038",
-              "day_offset": 6,
+              "day_offset": 8,
               "debt_id": "debt_000038",
               "diagnosis": "needs_customer_action",
               "expected_value_paise": 0.0,
@@ -2731,12 +2690,12 @@
               ],
               "stop_reason": "cause_not_actionable"
             },
-            "event_id": "0c842e70-bef1-4d77-aa05-26701901d8e5",
+            "event_id": "39993452-db32-486e-8a59-4f7618478586",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "48b8dd5bb30a2c9ee5cd15530258ec3876f91111a792e74ede1d1b7feb167952",
-            "record_hash": "ab82568bbb16f07b4d2534817a0fcea51a13e80fdda79920b2d191e7fb964bc3",
-            "timestamp_ist": "2026-09-09T10:00:00.000025+05:30",
+            "prev_hash": "2d9ab9c5bc2238bffeee4a99fe9f3c4a766027ffdf9c994d118083f2309fbd36",
+            "record_hash": "eef9ecadfd83ea5876e50e6194901a34d4e0a1f0adbede7e4045c3c384f08d02",
+            "timestamp_ist": "2026-09-11T10:00:00.000010+05:30",
             "type": "decision"
           },
           {
@@ -2745,12 +2704,12 @@
               "debt_id": "debt_000038",
               "source": "payment_state_store"
             },
-            "event_id": "9ea9e22e-ae6d-491b-9298-a3974974fc44",
+            "event_id": "0e692cdf-7ae7-4692-a760-0c54b3589039",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "b055e4313fbbb63f10fc60875465f2592300e4c4213dff78ce2c71e71f80e84f",
-            "record_hash": "b872c2f0c82243ae2776111fea928cd28b005f8a8737192092080a535d60cfa5",
-            "timestamp_ist": "2026-09-12T10:00:00.000012+05:30",
+            "prev_hash": "c4c233c5a2ced337a32ff6df6be6490928221ff35bc4f84825e480699b6d8146",
+            "record_hash": "cf9beb8caa26baa69fc461fd65effb9edcbabbaca861fb9bab8fdeeb74f582d7",
+            "timestamp_ist": "2026-09-16T10:00:00.000008+05:30",
             "type": "state_recheck"
           },
           {
@@ -2759,7 +2718,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000038",
-              "day_offset": 9,
+              "day_offset": 13,
               "debt_id": "debt_000038",
               "diagnosis": "needs_customer_action",
               "expected_value_paise": 0.0,
@@ -2777,12 +2736,12 @@
               ],
               "stop_reason": "cause_not_actionable"
             },
-            "event_id": "8f28ad63-d259-4589-aa33-3971abbbe69a",
+            "event_id": "aa41ed7b-c024-42ef-861e-ce7d01690754",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "b872c2f0c82243ae2776111fea928cd28b005f8a8737192092080a535d60cfa5",
-            "record_hash": "b4d196357cd45beec7e66d7138190769b1498b271051e2bdca9dc1dd4e0b637a",
-            "timestamp_ist": "2026-09-12T10:00:00.000013+05:30",
+            "prev_hash": "cf9beb8caa26baa69fc461fd65effb9edcbabbaca861fb9bab8fdeeb74f582d7",
+            "record_hash": "dc3cb9a26d57add0adfb103eef766af457d695872e9adc4359b2c311d99e29c7",
+            "timestamp_ist": "2026-09-16T10:00:00.000009+05:30",
             "type": "decision"
           },
           {
@@ -2791,12 +2750,12 @@
               "debt_id": "debt_000038",
               "source": "payment_state_store"
             },
-            "event_id": "0d36e0cc-18d8-4cb8-9ad3-e5fc8f649f7e",
+            "event_id": "f8701d6b-1ea3-4f6d-bc27-455853c403f7",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "1b8f40a4c25de27caaf1d5ecc847785b9f80e88ac09c46bbfdd97c618c23510e",
-            "record_hash": "6fbad32fbffb64c826d69c0f3a24dd236473812f9a4832e317049cf847d8a205",
-            "timestamp_ist": "2026-09-15T10:00:00.000009+05:30",
+            "prev_hash": "ec69a19d0aeb3cd95c6a01a8f8074000b0d047272ef98a2654fe88ee21cb8f6d",
+            "record_hash": "329611b22266806094f9fbde1ab8a241cc39bbb941c9fd1018ac6f25b67b8c3f",
+            "timestamp_ist": "2026-09-20T10:00:00.000005+05:30",
             "type": "state_recheck"
           },
           {
@@ -2805,7 +2764,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000038",
-              "day_offset": 12,
+              "day_offset": 17,
               "debt_id": "debt_000038",
               "diagnosis": "needs_customer_action",
               "expected_value_paise": 0.0,
@@ -2823,12 +2782,12 @@
               ],
               "stop_reason": "cause_not_actionable"
             },
-            "event_id": "fa53463c-dc35-4f48-8cd1-3c0bda1f8386",
+            "event_id": "12a3100e-a8c7-4d00-8b71-9c483d69e45b",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "6fbad32fbffb64c826d69c0f3a24dd236473812f9a4832e317049cf847d8a205",
-            "record_hash": "8d17048394759bc561bb69f0a60d93048e6f6b74d724e6584fae2f2a62ba95f9",
-            "timestamp_ist": "2026-09-15T10:00:00.000010+05:30",
+            "prev_hash": "329611b22266806094f9fbde1ab8a241cc39bbb941c9fd1018ac6f25b67b8c3f",
+            "record_hash": "393f5e7924db871b459f5603146ef68f71efd43af182e495a724576d7caef4b7",
+            "timestamp_ist": "2026-09-20T10:00:00.000006+05:30",
             "type": "decision"
           },
           {
@@ -2837,12 +2796,12 @@
               "debt_id": "debt_000038",
               "source": "payment_state_store"
             },
-            "event_id": "f9e56594-1f92-409f-9b06-e427ee60bd00",
+            "event_id": "c7c8e34c-d35d-4037-842a-5ac1cf8ffaf1",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "3a73e9a1c02efcbc8bbd67a56a45e6544db1d30de7f4d3b9ca751761fa5fe07a",
-            "record_hash": "1e0d7c161c2a4cf60f29b327cb9e28fe74dc9ec3f05534429c39e0eb5bfd000f",
-            "timestamp_ist": "2026-09-18T10:00:00.000005+05:30",
+            "prev_hash": "7708e128aba2009d06ec4047e8589f8ede3ef4fa249d7d67f5a4c3a787c723f1",
+            "record_hash": "d150e5e60f155ce68528e9467f21942d1668ba59555849b8f5c61b7627fba6e6",
+            "timestamp_ist": "2026-09-24T10:00:00.000005+05:30",
             "type": "state_recheck"
           },
           {
@@ -2851,7 +2810,7 @@
               "channel": "retry",
               "channel_considered": "retry",
               "customer_ref": "cust_000038",
-              "day_offset": 15,
+              "day_offset": 21,
               "debt_id": "debt_000038",
               "diagnosis": "needs_customer_action",
               "expected_value_paise": 0.0,
@@ -2869,12 +2828,12 @@
               ],
               "stop_reason": "cause_not_actionable"
             },
-            "event_id": "0bd1f552-7eab-40ba-aa72-fd20275d3118",
+            "event_id": "f3634650-9627-4ca1-b0aa-4d3334735e97",
             "model_version": "none",
             "policy_version": "2026-09-02.2",
-            "prev_hash": "1e0d7c161c2a4cf60f29b327cb9e28fe74dc9ec3f05534429c39e0eb5bfd000f",
-            "record_hash": "1a62b0cec9d87973e754b2954a1761fe2c98b3cff9a71b868d11227d9f7f9ebe",
-            "timestamp_ist": "2026-09-18T10:00:00.000006+05:30",
+            "prev_hash": "d150e5e60f155ce68528e9467f21942d1668ba59555849b8f5c61b7627fba6e6",
+            "record_hash": "296cac9e3fa2b448f551a82b458a1a1056cb0213452a4e89a8b5c7a0c16bb1e6",
+            "timestamp_ist": "2026-09-24T10:00:00.000006+05:30",
             "type": "decision"
           }
         ]
