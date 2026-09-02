@@ -283,6 +283,60 @@ class SimulatedCohort:
     def has_paid(self, customer_ref: str) -> bool:
         return self._hidden[customer_ref].paid
 
+    # -- inbound replies: so the stopping rules are exercised, not just implemented --------
+
+    #: What a contacted customer writes back, if anything. Small, so the stopping rules fire
+    #: at realistic-looking rates rather than dominating the batch. These shares are
+    #: assumptions and are labelled as such in PARAMETERS.md section 2.
+    REPLY_MIX: tuple[tuple[str | None, float], ...] = (
+        (None, 0.86),
+        ("will pay on the {payday}th", 0.06),          # promise to pay, a real date
+        ("paying tomorrow", 0.03),                     # promise to pay, relative
+        ("STOP. do not message me again", 0.025),      # opt-out: statutory stop
+        ("I already paid this, check your records", 0.015),  # dispute
+        ("my father passed away last week, I need some time", 0.01),  # hardship
+    )
+
+    def reply_to_contact(self, debt: Debt, day: dt.date) -> str | None:
+        """A contact may draw a reply. The engine must parse it and STOP where required.
+
+        The promise-to-pay reply names the customer's real payday, which is how a
+        well-handled promise turns into money: honour the silence, retry on the date.
+        """
+        state = self._hidden[debt.customer_ref]
+        rng = self._rng(f"reply:{debt.debt_id}:{day.isoformat()}:{state.contacts_received}")
+        texts = [t for t, _ in self.REPLY_MIX]
+        weights = [w for _, w in self.REPLY_MIX]
+        choice = rng.choices(texts, weights=weights, k=1)[0]
+        if choice is None:
+            return None
+        return choice.format(payday=state.payday)
+
+    def apply_reply_side_effects(self, customer: Customer, reply: str) -> None:
+        """A reply changes the customer's state the same way it would in the real world."""
+        low = reply.lower()
+        if "stop" in low or "do not message" in low:
+            customer.opted_out = True
+        elif "already paid" in low or "check your records" in low:
+            customer.disputed = True
+        elif "passed away" in low:
+            customer.bereaved_or_hardship = True
+
+    def honour_promise(self, debt: Debt, day: dt.date, promised: dt.date | None) -> bool:
+        """On the promised date, a funded customer who promised pays. This is the mechanism
+        by which respecting a promise-to-pay - going silent - is worth money rather than
+        merely polite."""
+        state = self._hidden[debt.customer_ref]
+        if state.paid or promised is None or day != promised:
+            return False
+        if not self.funds_available(debt.customer_ref, day):
+            return False
+        rng = self._rng(f"promise:{debt.debt_id}:{day.isoformat()}")
+        if rng.random() < 0.8:
+            state.paid = True
+            return True
+        return False
+
     # -- introspection for tests, NOT for the engine ---------------------------------------
 
     def _payday(self, customer_ref: str) -> int:

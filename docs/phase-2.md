@@ -1,7 +1,21 @@
 # Phase 2 — Decision engine and guardrails
 
 **Branch:** `feat/phase-2-decision-engine`, cut from `feat(v1)` at `890f972`.
-**Status:** planned. Working deadline for the whole build is **3 September 2026**.
+**Status: BUILT, 2 September 2026.** All nine work items done; 77 tests green including the
+five zero-assertions and two real-Ollama tests. Evidence: `results/phase2/2-engine-and-gate.json`.
+
+> **What the LLM does in a batch, stated so it is not an overclaim.** The state machine's
+> decisions are what recovery depends on, and the simulator has no notion of wording — a
+> message either reaches a customer or it does not. So a 5,000-customer batch composes with the
+> deterministic templates and parses replies with the code-level overrides plus keyword
+> fallback; the Ollama path is exercised for real in the test suite, the evidence artifact and
+> the demo, where wording is the point. The three intents that carry legal weight — opt-out,
+> dispute, hardship — are decided by code in every mode regardless. "The LLM is in the loop"
+> is true of the product and would be an overclaim about the *measurement*; the README says so.
+
+> **The guardrail numbers are not self-reported.** `evaluation/invariants.py` never imports
+> the engine. It replays the audit ledger and re-derives every violation count from the
+> records alone — which is also the "every decision reconstructable" claim, executed.
 
 ## Where this sits
 

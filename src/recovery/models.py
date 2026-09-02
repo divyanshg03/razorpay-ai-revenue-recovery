@@ -81,6 +81,7 @@ class StopReason(str, enum.Enum):
     LADDER_EXHAUSTED = "escalation_ladder_exhausted"
     NOT_ACTIONABLE = "cause_not_actionable"
     NO_REACHABLE_CHANNEL = "no_reachable_channel"
+    NOT_WORTH_COST = "negative_expected_value"
 
 
 @dataclass

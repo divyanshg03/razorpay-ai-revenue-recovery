@@ -43,6 +43,7 @@ import json
 import pathlib
 import threading
 import uuid
+from collections.abc import Callable
 from dataclasses import asdict, is_dataclass
 from enum import Enum
 from typing import Any
@@ -58,6 +59,7 @@ class RecordType(str, Enum):
     OUTCOME = "outcome"            # what happened afterwards
     STATE_RECHECK = "state_recheck"  # payment state re-read immediately before acting
     CONSENT = "consent"            # consent given / objection raised / propagated
+    INBOUND = "inbound"            # what the customer wrote back, and how it was read
 
 
 def _jsonable(value: Any) -> Any:
@@ -87,6 +89,11 @@ class AuditLedger:
         self.model_version = model_version
         self._lock = threading.Lock()
         self._fixed_now = now
+        #: Optional clock. A simulation runs on virtual days, and an audit trail stamped with
+        #: the wall-clock time of the machine that replayed it would be useless for replaying
+        #: the ORDER of events - every invariant check compares timestamps. Production leaves
+        #: this None and gets real time.
+        self.clock: Callable[[], dt.datetime] | None = None
         self._last_hash = self._recover_last_hash()
 
     # -- internals ------------------------------------------------------------------
@@ -109,6 +116,8 @@ class AuditLedger:
         return last
 
     def _now(self) -> dt.datetime:
+        if self.clock is not None:
+            return self.clock()
         return self._fixed_now or dt.datetime.now(IST)
 
     @staticmethod
@@ -191,6 +200,16 @@ class AuditLedger:
         return self._append(RecordType.OUTCOME, {
             "debt_id": debt_id, "customer_ref": customer_ref,
             "recovered_paise": recovered_paise, "at": at, "note": note,
+        })
+
+    def record_inbound(self, debt_id: str, customer_ref: str, text: str, intent: str,
+                       promised_date: dt.date | None, source: str) -> dict:
+        """The customer's reply, verbatim, plus how the parser read it and by what means
+        (code override, model, or keyword fallback). The verbatim text is what lets a human
+        later judge whether the machine read it right."""
+        return self._append(RecordType.INBOUND, {
+            "debt_id": debt_id, "customer_ref": customer_ref, "text": text,
+            "intent": intent, "promised_date": promised_date, "parser_source": source,
         })
 
     def record_consent(self, customer_ref: str, event: str, basis: str,
