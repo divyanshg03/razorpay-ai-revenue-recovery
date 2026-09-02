@@ -217,6 +217,28 @@ def test_ladder_escalates_one_rung_per_wait_and_then_stops(tmp_path):
     assert seen == list(P.ladder)  # each rung once, in order, then nothing
 
 
+def test_human_call_floor_is_the_measured_one_not_the_original(tmp_path):
+    """Pins the 2 Sept decision: the floor moved Rs 500 -> Rs 2,000 because the human rung
+    was 91.7% of modelled spend for no measurable recovery.
+
+    A Rs 999 debt would have earned a human call under the old floor and must not now.
+    """
+    assert P.min_amount_for_human_call_paise == 200_000
+    led = AuditLedger(tmp_path / "floor.jsonl", P.version)
+    eng = RecoveryEngine(P, led, is_settled=lambda d: False)
+    d = debt(amount=99900)  # Rs 999: above the OLD floor, below the new one
+    channels = []
+    for off in range(1, 30):
+        now = at(10, day=START + dt.timedelta(days=off))
+        for dec in eng.plan_day(d, customer(), now):
+            if dec.act:
+                if dec.channel is not Channel.RETRY:
+                    channels.append(dec.channel)
+                eng.apply_outcome(d, dec, now, succeeded=False)
+    assert Channel.HUMAN_CALL not in channels
+    assert channels == [Channel.WHATSAPP_UTILITY, Channel.SMS_SERVICE]
+
+
 def test_human_rung_is_skipped_below_the_amount_floor(tmp_path):
     led = AuditLedger(tmp_path / "a.jsonl", P.version)
     eng = RecoveryEngine(P, led, is_settled=lambda d: False)

@@ -31,7 +31,10 @@ from dataclasses import dataclass, field
 from ..models import Actionability, Channel
 
 #: Bump on ANY change below. Format: date.revision.
-POLICY_VERSION = "2026-09-02.1"
+#: .2 — raised the human-call floor Rs 500 -> Rs 2,000 after measuring that the rung was
+#:      91.7% of spend for no measurable recovery. Decisions taken under .1 keep that
+#:      version in the ledger; that is what pinning it at write time is for.
+POLICY_VERSION = "2026-09-02.2"
 
 
 @dataclass(frozen=True)
@@ -87,7 +90,25 @@ class Policy:
     escalation_wait_days: int = 4
     #: Human escalation is the one rung where cost genuinely bites (1.53 pp break-even on a
     #: Rs 1,000 debt). Below this outstanding amount it is never worth it.
-    min_amount_for_human_call_paise: int = 50_000
+    #:
+    #: RAISED Rs 500 -> Rs 2,000 on 2 Sept 2026, from measurement. At the old floor the human
+    #: rung was 12% of sends and **91.7% of all modelled spend** (558 sends, Rs 8,559 of
+    #: Rs 9,339 at n=3,000) while recovery was flat: 53.63% with it, 53.67% without, a
+    #: difference inside noise at that n. Raising the floor cuts modelled cost 77% to
+    #: Rs 2,160 with identical recovery.
+    #:
+    #: WHY THE EV GATE DID NOT CATCH THIS. `contact_uplift_prior` gives a human call 0.25,
+    #: decayed to 0.0625 by the third contact - enough to clear Rs 15.34 on any debt over
+    #: ~Rs 250. The measured incremental value is approximately zero, so the prior is
+    #: uncalibrated for this rung. The floor is a blunt correction for that; a calibrated
+    #: prior would be the principled one.
+    #:
+    #: HONEST CAVEAT, and it should be said aloud to a panel. The simulator treats a human
+    #: call as just another message subject to fatigue decay. A real conversation almost
+    #: certainly converts far better than a third text, so this model UNDERSTATES the human
+    #: rung. "Human calls add nothing" is a finding about the model as much as the policy,
+    #: which is exactly why the rung is kept for larger debts rather than deleted.
+    min_amount_for_human_call_paise: int = 200_000
 
     # -- promise to pay ---------------------------------------------------------------
     #: Silence until the promised date + this many days; broken-promise handling after.

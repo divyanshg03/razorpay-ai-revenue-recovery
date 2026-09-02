@@ -1,6 +1,6 @@
 {
   "phase": 2,
-  "policy_version": "2026-09-02.1",
+  "policy_version": "2026-09-02.2",
   "generated_by": "scripts/phase2_evidence.py; every number regenerates",
   "engine_run": {
     "seed": 20260905,
@@ -21,36 +21,35 @@
   },
   "all_zero": true,
   "ledger": {
-    "records": 28835,
-    "decisions": 13164,
-    "actions_taken": 2221,
-    "decisions_declined": 6213,
+    "records": 27386,
+    "decisions": 12517,
+    "actions_taken": 1999,
+    "decisions_declined": 5777,
     "stop_reasons": {
-      "opt_out": 2041,
-      "dispute_raised": 1120,
-      "cause_not_actionable": 947,
-      "promise_to_pay_active": 890,
-      "escalation_ladder_exhausted": 499,
-      "bereavement_or_hardship": 428,
-      "negative_expected_value": 284,
-      "no_reachable_channel": 4
+      "opt_out": 1885,
+      "dispute_raised": 1087,
+      "cause_not_actionable": 951,
+      "escalation_ladder_exhausted": 817,
+      "promise_to_pay_active": 649,
+      "bereavement_or_hardship": 387,
+      "no_reachable_channel": 1
     },
-    "total_contact_cost_paise": 462130,
+    "total_contact_cost_paise": 121582,
     "chain_intact": true,
     "chain_broken_at": null
   },
   "inbound_replies_parsed": {
-    "promise_to_pay": 215,
-    "opt_out": 68,
-    "dispute": 38,
-    "hardship": 23
+    "promise_to_pay": 195,
+    "opt_out": 60,
+    "dispute": 36,
+    "hardship": 19
   },
   "sanity_not_headline": {
     "arm_B_incumbent_recovery_rate": 0.2553,
     "arm_C_engine_recovery_rate": 0.5233,
-    "arm_C_contacts": 2221,
-    "arm_C_retries": 4705,
-    "arm_C_contact_cost_rupees": 4621.3,
+    "arm_C_contacts": 1999,
+    "arm_C_retries": 4734,
+    "arm_C_contact_cost_rupees": 1215.82,
     "note": "same seed, no holdout, no confidence interval. Phase 3 measures this against the definition frozen in docs/metric-definition.md."
   },
   "copy_gate_on_real_ministral_output": {
@@ -80,7 +79,7 @@
   "live_llama31_composition": {
     "model": "llama3.1:8b",
     "warm_seconds": 0.41,
-    "gen_seconds": 0.53,
+    "gen_seconds": 0.81,
     "llm_wrote": "Your bank declined the payment of Rs 499 for Acme Fitness due to insufficient balance. Please try again.",
     "sent": "Your bank declined the payment of Rs 499 for Acme Fitness due to insufficient balance. Please try again. https://rzp.io/rzp/demo0001",
     "source": "llm",
