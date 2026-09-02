@@ -21,36 +21,36 @@
   },
   "all_zero": true,
   "ledger": {
-    "records": 29694,
-    "decisions": 13594,
-    "actions_taken": 2370,
-    "decisions_declined": 6506,
+    "records": 28835,
+    "decisions": 13164,
+    "actions_taken": 2221,
+    "decisions_declined": 6213,
     "stop_reasons": {
-      "opt_out": 2119,
-      "dispute_raised": 1174,
-      "promise_to_pay_active": 968,
-      "cause_not_actionable": 941,
-      "bereavement_or_hardship": 485,
-      "escalation_ladder_exhausted": 468,
-      "negative_expected_value": 347,
+      "opt_out": 2041,
+      "dispute_raised": 1120,
+      "cause_not_actionable": 947,
+      "promise_to_pay_active": 890,
+      "escalation_ladder_exhausted": 499,
+      "bereavement_or_hardship": 428,
+      "negative_expected_value": 284,
       "no_reachable_channel": 4
     },
-    "total_contact_cost_paise": 413868,
+    "total_contact_cost_paise": 462130,
     "chain_intact": true,
     "chain_broken_at": null
   },
   "inbound_replies_parsed": {
-    "promise_to_pay": 230,
-    "opt_out": 72,
-    "dispute": 39,
-    "hardship": 25
+    "promise_to_pay": 215,
+    "opt_out": 68,
+    "dispute": 38,
+    "hardship": 23
   },
   "sanity_not_headline": {
     "arm_B_incumbent_recovery_rate": 0.2553,
-    "arm_C_engine_recovery_rate": 0.524,
-    "arm_C_contacts": 2370,
-    "arm_C_retries": 4685,
-    "arm_C_contact_cost_rupees": 4138.68,
+    "arm_C_engine_recovery_rate": 0.5233,
+    "arm_C_contacts": 2221,
+    "arm_C_retries": 4705,
+    "arm_C_contact_cost_rupees": 4621.3,
     "note": "same seed, no holdout, no confidence interval. Phase 3 measures this against the definition frozen in docs/metric-definition.md."
   },
   "copy_gate_on_real_ministral_output": {
@@ -79,7 +79,7 @@
   },
   "live_llama31_composition": {
     "model": "llama3.1:8b",
-    "warm_seconds": 0.28,
+    "warm_seconds": 0.41,
     "gen_seconds": 0.53,
     "llm_wrote": "Your bank declined the payment of Rs 499 for Acme Fitness due to insufficient balance. Please try again.",
     "sent": "Your bank declined the payment of Rs 499 for Acme Fitness due to insufficient balance. Please try again. https://rzp.io/rzp/demo0001",

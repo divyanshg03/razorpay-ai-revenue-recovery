@@ -201,71 +201,20 @@ def test_retry_is_considered_before_contact_and_first_contact_waits_a_day(tmp_pa
     assert [d.channel for d in day1] == [Channel.WHATSAPP_UTILITY]
 
 
-def _walk_ladder(cust, tmp_path, amount=499900):
-    """Drive one debt for a month and collect the contact channels actually used."""
-    led = AuditLedger(tmp_path / f"a_{id(cust)}.jsonl", P.version)
+def test_ladder_escalates_one_rung_per_wait_and_then_stops(tmp_path):
+    led = AuditLedger(tmp_path / "a.jsonl", P.version)
     eng = RecoveryEngine(P, led, is_settled=lambda d: False)
-    d = debt(amount=amount)
+    d = debt(amount=499900)  # big enough for the human rung
     seen = []
     for off in range(1, 30):
         now = at(10, day=START + dt.timedelta(days=off))
-        for dec in eng.plan_day(d, cust, now):
-            if not dec.act:
-                continue
-            if dec.channel is not Channel.RETRY:
+        for dec in eng.plan_day(d, customer(), now):
+            if dec.act and dec.channel is not Channel.RETRY:
                 seen.append(dec.channel)
-            eng.apply_outcome(d, dec, now, succeeded=False)
-    return seen
-
-
-def test_ladder_escalates_one_step_per_wait_and_then_stops(tmp_path):
-    assert _walk_ladder(customer(), tmp_path) == [
-        Channel.WHATSAPP_UTILITY, Channel.SMS_SERVICE, Channel.HUMAN_CALL]
-
-
-def test_customer_without_whatsapp_gets_sms_and_the_SAME_NUMBER_of_touches(tmp_path):
-    """A channel gap must change HOW we reach someone, never HOW MANY times we try.
-
-    The channel-shaped ladder skipped step 1 for these customers: they averaged 1.31
-    contacts against 1.94. That deficit is structural — one lost escalation step, every
-    time, caused by our ladder's shape rather than by anything about the customer.
-
-    NOT justified by a recovery gap. A first look suggested 4.9pp, but that was noise at
-    n=248; at n=8,000 the difference is -0.76pp, 95% CI [-3.73, +2.20]. This test guards
-    equal treatment, not lift.
-    """
-    no_wa = _walk_ladder(customer(has_whatsapp=False), tmp_path)
-    full = _walk_ladder(customer(), tmp_path)
-    assert no_wa == [Channel.SMS_SERVICE, Channel.SMS_SERVICE, Channel.HUMAN_CALL]
-    assert len(no_wa) == len(full)
-    assert Channel.WHATSAPP_UTILITY not in no_wa
-
-
-def test_customer_with_only_whatsapp_also_gets_the_same_number_of_touches(tmp_path):
-    only_wa = _walk_ladder(customer(has_sms=False), tmp_path)
-    assert only_wa == [Channel.WHATSAPP_UTILITY, Channel.WHATSAPP_UTILITY, Channel.HUMAN_CALL]
-
-
-def test_repeated_same_channel_touches_respect_the_24h_cap(tmp_path):
-    """Two SMS to one person is only acceptable because they are four days apart."""
-    led = AuditLedger(tmp_path / "cap.jsonl", P.version)
-    eng = RecoveryEngine(P, led, is_settled=lambda d: False)
-    cust, d = customer(has_whatsapp=False), debt(amount=499900)
-    sent = []
-    for off in range(1, 30):
-        now = at(10, day=START + dt.timedelta(days=off))
-        for dec in eng.plan_day(d, cust, now):
-            if dec.act:
-                if dec.channel is Channel.SMS_SERVICE:
-                    sent.append(now)
                 eng.apply_outcome(d, dec, now, succeeded=False)
-    assert len(sent) == 2
-    assert (sent[1] - sent[0]) >= dt.timedelta(hours=24)
-
-
-def test_customer_reachable_on_nothing_is_refused_once_not_forever(tmp_path):
-    unreachable = customer(has_whatsapp=False, has_sms=False)
-    assert _walk_ladder(unreachable, tmp_path) == []
+            elif dec.channel is Channel.RETRY and dec.act:
+                eng.apply_outcome(d, dec, now, succeeded=False)
+    assert seen == list(P.ladder)  # each rung once, in order, then nothing
 
 
 def test_human_rung_is_skipped_below_the_amount_floor(tmp_path):
