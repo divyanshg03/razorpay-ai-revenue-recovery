@@ -26,19 +26,48 @@ one of the strongest arguments for boxing the LLM in.
 
 ## RBI — and who it actually binds
 
-**The 08:00–19:00 contact window is real**, from RBI/2022-23/108 (12 Aug 2022): agents must
-not call *"before 8:00 a.m. and after 7:00 p.m. for recovery of overdue loans."* Also
-prohibited: intimidation, public humiliation, **persistent repeated calling**, anonymous
-calls, false representations.
+> **Verified against the regulator, 31 Aug 2026 (gate 0.6).** Everything in this section is
+> now quoted from rbi.org.in itself and archived in
+> [`results/phase0/0.6-rbi-primary-sources.md`](../results/phase0/0.6-rbi-primary-sources.md).
+> Three paragraph citations below were wrong and are corrected; one claim was unsupported
+> and has been withdrawn. Struck text is kept visible so the correction is auditable.
 
-**New and very current:** nine circulars **RBI/2026-2027/223–231, dated 6 Aug 2026,
-effective 1 Jan 2027**, inserting a new Section L on recovery conduct (paras 454A–454AB).
-Key provisions: contact only 08:00–19:00 (454T.2); **interact only with the borrower or
-guarantor, never other contacts** (454T.1); **a lodged grievance is a hard stop** — the case
-may not be forwarded for recovery until the grievance is disposed of (454J), exception only
-with *evidence* of frivolous filing; mandatory call recording with 6-month retention; IIBF
-certification for agents. **Explicitly no numeric call cap** — only a qualitative
-prohibition on *"excessively calling"* (454U.3).
+**The 08:00–19:00 contact window is real**, and is the rule *currently in force*, from
+RBI/2022-23/108 (12 Aug 2022), paragraph 2. Verbatim, REs shall ensure agents do not resort
+to *"persistently calling the borrower and/ or calling the borrower before 8:00 a.m. and
+after 7:00 p.m."* (The earlier note here appended *"for recovery of overdue loans"* inside
+the quotation marks; that phrase is not in the circular.) Also prohibited, verbatim:
+*"intimidation or harassment of any kind, either verbal or physical"*, acts *"intended to
+humiliate publicly or intrude upon the privacy of the debtors' family members, referees and
+friends"*, *"sending inappropriate messages either on mobile or through social media"*,
+*"making threatening and/ or anonymous calls"*, *"making false and misleading
+representations"*.
+
+**Incoming, not yet in force:** nine circulars **RBI/2026-27/223 – RBI/2026-2027/231, dated
+6 Aug 2026, effective 1 Jan 2027** — one per category of regulated entity, all commencing
+*"from January 1, 2027."* Key provisions, with **corrected** paragraph numbers for
+Commercial Banks (RBI/2026-27/223):
+
+- contact only 08:00–19:00 — **454Y(4)** ~~454T.2~~; the clause binds *contact **or** visit*
+- **interact only with the borrower or guarantor, never other contacts** — **454Y(1)**
+  ~~454T.1~~
+- **Explicitly no numeric call cap** — only a qualitative prohibition on *"excessively
+  calling / messaging"* — **454Z(4)** ~~454U.3~~. Note it covers **messaging**, not just
+  calls, so any self-imposed frequency cap must bind SMS and WhatsApp too
+- mandatory call recording, six-month retention — 100P (NBFC); IIBF certification — 100I
+
+~~**a lodged grievance is a hard stop** — the case may not be forwarded for recovery until
+the grievance is disposed of (454J), exception only with *evidence* of frivolous filing~~
+— **WITHDRAWN, unsupported.** 454J is the *code of conduct* paragraph. No clause in the
+Commercial Banks, SFB or NBFC directions bars recovery while a complaint is pending, and the
+word "frivolous" does not appear at all. Grievance redressal sits at 454AA and governs
+handling complaints during and after recovery. **Our dispute-freeze stopping rule is
+therefore a policy choice, like the 7-in-7 cap — never cite RBI for it.**
+
+**The section numbering is per-entity and does not transfer.** Section L / 454A–454AB applies
+to Commercial Banks and Small Finance Banks only. NBFCs are Section J / 100A–100AB, AIFIs
+Section E / 32.1A–32.1AB, RRBs 437A, UCBs 325A, RCBs 378A, LABs 235A. Citing "454A" at an
+NBFC is simply wrong.
 
 ### Lender vs merchant — state this precisely
 
@@ -138,8 +167,9 @@ conversation. **It has no force in India**, but adopting it voluntarily gives us
 auditable policy that satisfies RBI's qualitative test. Label it as a policy choice, not law.
 
 **Hard stops** — opt-out on any channel (suppress on *all* channels, target < 24h) ·
-dispute raised (freeze, route to human — never let the model adjudicate frivolousness,
-RBI requires *evidence*) · DPDP consent withdrawn · bereavement/medical/hardship signalled ·
+dispute raised (freeze, route to human — never let the model adjudicate frivolousness.
+**Policy choice, not an RBI requirement** — see the withdrawn 454J claim above)
+· DPDP consent withdrawn · bereavement/medical/hardship signalled ·
 **payment received** (see the resurrection problem in the API notes) · dispute resolved for
 the customer.
 
@@ -171,10 +201,13 @@ reconstructed under the rules that applied at the time, not today's.
 
 ## Could not verify — do not assert these
 
-1. **RBI primary sources.** rbi.org.in pages would not load; everything RBI here is verified
-   against taxguru (which reproduces circular text verbatim), TeamLease RegTech, Business
-   Standard and law-firm commentary — multiple independent sources agreeing, but **not RBI
-   itself**. Pull RBI/2026-2027/223–231 directly before citing them anywhere consequential.
+1. ~~**RBI primary sources.** rbi.org.in pages would not load; everything RBI here is verified
+   against taxguru, TeamLease RegTech, Business Standard and law-firm commentary — multiple
+   independent sources agreeing, but **not RBI itself**.~~ **DISCHARGED 31 Aug 2026 by gate
+   0.6.** rbi.org.in loads; all nine 2026 circulars and RBI/2022-23/108 were read at source
+   and archived in `results/phase0/0.6-rbi-primary-sources.md`. The secondhand chain was
+   right on substance and wrong on three paragraph numbers and one whole provision — which
+   is precisely why the gate existed.
 2. **AI-voice disclosure.** Vendor blogs assert outbound AI calls must announce they're AI.
    **No binding Indian instrument was found.** The IT Amendment Rules 2026 require a
    *"prominently prefixed audio disclosure"* for synthetic audio, but they bind
