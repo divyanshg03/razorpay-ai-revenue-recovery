@@ -463,6 +463,39 @@ disclosure and what was deliberately left alone.
 A1/A4 run except `head_commit`. That identity is the whole evidence for calling these fixes
 non-behavioural, which is why the batch was re-run rather than argued about.
 
+### A6 - 3 Sept 2026 - git history rewritten to remove a real phone number
+
+Recorded here because the rewrite changed commit SHAs that this document and the artifact
+depend on, and because the batch was re-run afterwards.
+
+**What was removed.** `results/phase0/0.4c-received-events.jsonl` carried a real-format Indian
+mobile number in the `contact` field of a genuine Razorpay-signed capture - typed into the
+hosted checkout to drive a test payment, not generated. A5 redacted it in the working tree,
+but it survived in history in two commits, and in the message of the commit that redacted it.
+`git filter-repo` replaced it in blobs and in commit messages across every ref. Verified
+afterwards: zero occurrences in any blob, any commit message, or any commit under `-S` search.
+The replacement is `+919812345670`, the synthetic default `scripts/create_payment_link.py`
+already uses.
+
+**The freeze commit survived, and this was checked before the rewrite, not after.**
+`8d14dbe` predates the first tainted commit, so `git filter-repo` left its SHA untouched.
+That matters more than anything else here: `METRIC_DEFINITION_COMMIT` in `batch.py`,
+`frozen_at_commit` in the artifact, and the ancestry test all point at it, and a rewrite that
+moved it would have destroyed the one property this document exists to establish - that the
+definition provably predates the result. `metric_definition_is_ancestor` is still `true`.
+
+**What did move.** The Phase 1 and Phase 2 close commits, referenced in doc prose only:
+`890f972` became `908d336`, `53ae1b4` became `6a17f40`. Both updated. `head_commit` in the
+artifact pointed at a commit that no longer existed, so the batch was re-run; every value is
+byte-identical except that field, which now resolves.
+
+**What this does not undo.** Anyone who cloned or forked before 3 Sept 2026 still has the old
+objects, and GitHub may retain unreferenced objects server-side. The repo was private
+throughout, with a single contributor, which is the only reason this is a complete remedy
+rather than a partial one. A number that reaches a public repo cannot be recalled by rewriting
+history, only by rotating whatever it protects - and the honest framing is that this was
+caught while the window was still closed.
+
 ### A3 - 2 Sept 2026 - the first invocation of that run refused to write, and why
 
 Disclosed because "one batch run" above would otherwise be false, and because a reader who

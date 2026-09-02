@@ -72,8 +72,8 @@ reporting the larger figure against a prediction it failed.
 | | Phase | Ends when |
 |---|---|---|
 | 0 | De-risk and freeze the contract | ✅ CLOSED — metric frozen at `8d14dbe` |
-| 1 | Ingest, taxonomy, ledger | ✅ CLOSED at `890f972` |
-| 2 | Decision engine and guardrails | ✅ CLOSED at `53ae1b4` — 77 tests, all invariants zero |
+| 1 | Ingest, taxonomy, ledger | ✅ CLOSED at `908d336` |
+| 2 | Decision engine and guardrails | ✅ CLOSED at `6a17f40` — 77 tests, all invariants zero |
 | **3** | **Run the batch and measure** | `results/metrics.json` exists: **net incremental rupees, engine vs Razorpay's ladder, against a randomised holdout, net of contact cost, with a confidence interval** — plus the honest list of what it failed to recover |
 | 4 | Package and defend | README generated from the artifact, limitations written, video cut, repo public |
 
