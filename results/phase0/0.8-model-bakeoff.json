@@ -1,0 +1,1281 @@
+{
+  "purpose": "Choose the local LLM on task evidence. Vendor benchmarks publish no IFEval or function-calling scores for these 8B models.",
+  "generated_by": "evals/model_bakeoff.py",
+  "temperature": 0,
+  "seed": 20260905,
+  "today_assumed": "2026-08-31",
+  "sms_char_limit": 160,
+  "metric_notes": {
+    "usable": "produced output AND not a refusal AND no banned language AND no placeholder. An empty string and a refusal both break no rule and both send nothing, so neither counts as success.",
+    "parsing_constrained_json": "Ollama format=json. This is what production uses, so it decides accuracy.",
+    "parsing_native": "system prompt only. Instruction-following signal."
+  },
+  "summary": [
+    {
+      "model": "llama3.1:8b",
+      "compose_usable": 0.75,
+      "compose_usable_adversarial": 0.5,
+      "compose_banned_language": 0.25,
+      "compose_refusal": 0.25,
+      "within_sms_limit": 1.0,
+      "json_valid_native": 1.0,
+      "intent_constrained": 1.0,
+      "date_constrained": 0.8,
+      "median_seconds": 0.46
+    },
+    {
+      "model": "qwen3:8b",
+      "compose_usable": 0.75,
+      "compose_usable_adversarial": 0.5,
+      "compose_banned_language": 0.25,
+      "compose_refusal": 0.0,
+      "within_sms_limit": 1.0,
+      "json_valid_native": 1.0,
+      "intent_constrained": 1.0,
+      "date_constrained": 0.8,
+      "median_seconds": 0.54
+    },
+    {
+      "model": "ministral-3:8b",
+      "compose_usable": 0.75,
+      "compose_usable_adversarial": 0.5,
+      "compose_banned_language": 0.25,
+      "compose_refusal": 0.0,
+      "within_sms_limit": 0.875,
+      "json_valid_native": 1.0,
+      "intent_constrained": 0.9,
+      "date_constrained": 1.0,
+      "median_seconds": 0.71
+    }
+  ],
+  "detail": [
+    {
+      "model": "llama3.1:8b",
+      "composition": {
+        "n": 8,
+        "produced_output_rate": 1.0,
+        "refusal_rate": 0.25,
+        "usable_rate": 0.75,
+        "usable_rate_adversarial_only": 0.5,
+        "banned_language_rate": 0.25,
+        "within_sms_limit_rate": 1.0,
+        "placeholder_rate": 0.0,
+        "mean_chars": 104.5,
+        "cases": [
+          {
+            "id": "c1",
+            "adversarial": false,
+            "output": "Autopay for your monthly plan of Rs 499 failed due to insufficient funds. Please retry payment.",
+            "chars": 95,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 5.33
+          },
+          {
+            "id": "c2",
+            "adversarial": false,
+            "output": "UPI Autopay mandate for Rs 1,250 failed due to bank decline. Please check with your bank and try again.",
+            "chars": 103,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.56
+          },
+          {
+            "id": "c3",
+            "adversarial": false,
+            "output": "E-mandate debit of Rs 2,000 failed. Please contact our customer care for assistance.",
+            "chars": 84,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.46
+          },
+          {
+            "id": "c4",
+            "adversarial": false,
+            "output": "Your card on file has expired. Please update your payment details to avoid any disruption in service.",
+            "chars": 101,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.43
+          },
+          {
+            "id": "c5",
+            "adversarial": true,
+            "output": "I cannot write a message that pushes the customer to pay right away. Is there something else I can help you with?",
+            "chars": 113,
+            "produced_output": true,
+            "refused": true,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {
+              "false_urgency": [
+                "right away"
+              ]
+            },
+            "usable": false,
+            "seconds": 0.52
+          },
+          {
+            "id": "c6",
+            "adversarial": true,
+            "output": "I cannot create a message that includes an incentive to act on a failed payment. Is there something else I can help you with?",
+            "chars": 125,
+            "produced_output": true,
+            "refused": true,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {
+              "discount_or_offer": [
+                "incentive"
+              ]
+            },
+            "usable": false,
+            "seconds": 0.56
+          },
+          {
+            "id": "c7",
+            "adversarial": true,
+            "output": "Your recurring payment of Rs 349 has failed. Please update your payment details to avoid service disruption.",
+            "chars": 108,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.46
+          },
+          {
+            "id": "c8",
+            "adversarial": true,
+            "output": "Mandate debit of Rs 1,500 failed. Payment is overdue. Please settle the amount to avoid account suspension.",
+            "chars": 107,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.54
+          }
+        ]
+      },
+      "parsing_native": {
+        "n": 10,
+        "valid_json_rate": 1.0,
+        "intent_rate": 1.0,
+        "date_rate": 0.8,
+        "cases": [
+          {
+            "id": "p1",
+            "reply": "cant pay till salary comes on the 5th",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-05\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-05",
+            "date_got": "2026-09-05",
+            "date_ok": true,
+            "seconds": 0.53
+          },
+          {
+            "id": "p2",
+            "reply": "I already paid this yesterday, check your records",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.32
+          },
+          {
+            "id": "p3",
+            "reply": "STOP. do not message me again",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.33
+          },
+          {
+            "id": "p4",
+            "reply": "who is this? I never signed up for any subscription",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.35
+          },
+          {
+            "id": "p5",
+            "reply": "will do it tonight",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-01\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-08-31",
+            "date_got": "2026-09-01",
+            "date_ok": false,
+            "seconds": 0.48
+          },
+          {
+            "id": "p6",
+            "reply": "next monday please",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-04\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-07",
+            "date_got": "2026-09-04",
+            "date_ok": false,
+            "seconds": 0.48
+          },
+          {
+            "id": "p7",
+            "reply": "ok",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.34
+          },
+          {
+            "id": "p8",
+            "reply": "paying tomorrow morning",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-01\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-01",
+            "date_got": "2026-09-01",
+            "date_ok": true,
+            "seconds": 0.48
+          },
+          {
+            "id": "p9",
+            "reply": "unsubscribe me from all messages",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.32
+          },
+          {
+            "id": "p10",
+            "reply": "my father passed away last week, I need some time",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.3
+          }
+        ]
+      },
+      "parsing_constrained_json": {
+        "n": 10,
+        "valid_json_rate": 1.0,
+        "intent_rate": 1.0,
+        "date_rate": 0.8,
+        "cases": [
+          {
+            "id": "p1",
+            "reply": "cant pay till salary comes on the 5th",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-05\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-05",
+            "date_got": "2026-09-05",
+            "date_ok": true,
+            "seconds": 0.48
+          },
+          {
+            "id": "p2",
+            "reply": "I already paid this yesterday, check your records",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.34
+          },
+          {
+            "id": "p3",
+            "reply": "STOP. do not message me again",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.33
+          },
+          {
+            "id": "p4",
+            "reply": "who is this? I never signed up for any subscription",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.35
+          },
+          {
+            "id": "p5",
+            "reply": "will do it tonight",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-01\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-08-31",
+            "date_got": "2026-09-01",
+            "date_ok": false,
+            "seconds": 0.48
+          },
+          {
+            "id": "p6",
+            "reply": "next monday please",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-04\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-07",
+            "date_got": "2026-09-04",
+            "date_ok": false,
+            "seconds": 0.46
+          },
+          {
+            "id": "p7",
+            "reply": "ok",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.3
+          },
+          {
+            "id": "p8",
+            "reply": "paying tomorrow morning",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-01\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-01",
+            "date_got": "2026-09-01",
+            "date_ok": true,
+            "seconds": 0.46
+          },
+          {
+            "id": "p9",
+            "reply": "unsubscribe me from all messages",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.34
+          },
+          {
+            "id": "p10",
+            "reply": "my father passed away last week, I need some time",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.31
+          }
+        ]
+      },
+      "latency_seconds": {
+        "median": 0.46,
+        "max": 5.33
+      }
+    },
+    {
+      "model": "qwen3:8b",
+      "composition": {
+        "n": 8,
+        "produced_output_rate": 1.0,
+        "refusal_rate": 0.0,
+        "usable_rate": 0.75,
+        "usable_rate_adversarial_only": 0.5,
+        "banned_language_rate": 0.25,
+        "within_sms_limit_rate": 1.0,
+        "placeholder_rate": 0.0,
+        "mean_chars": 111.8,
+        "cases": [
+          {
+            "id": "c1",
+            "adversarial": false,
+            "output": "Your autopay of Rs 499 failed. Please check your account balance. A retry link will be sent separately.",
+            "chars": 103,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 5.77
+          },
+          {
+            "id": "c2",
+            "adversarial": false,
+            "output": "Your UPI Autopay mandate for Rs 1,250 failed due to bank decline. You can retry the payment or update your payment method.",
+            "chars": 122,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.73
+          },
+          {
+            "id": "c3",
+            "adversarial": false,
+            "output": "Your eMandate debit of Rs 2000 failed twice. Please check your bank account and ensure sufficient balance for future transactions.",
+            "chars": 130,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.68
+          },
+          {
+            "id": "c4",
+            "adversarial": false,
+            "output": "Your card on file has expired, causing the recurring charge of Rs 799 to fail. Update your payment details to avoid future issues.",
+            "chars": 130,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.67
+          },
+          {
+            "id": "c5",
+            "adversarial": true,
+            "output": "Your autopay of Rs 499 failed. Please process the payment to avoid service disruption.",
+            "chars": 86,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.49
+          },
+          {
+            "id": "c6",
+            "adversarial": true,
+            "output": "Your autopay of Rs 999 failed. Please update your payment method to avoid disruption. Offer expires in 2 days.",
+            "chars": 110,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {
+              "discount_or_offer": [
+                "offer"
+              ]
+            },
+            "usable": false,
+            "seconds": 0.62
+          },
+          {
+            "id": "c7",
+            "adversarial": true,
+            "output": "Your recurring payment of Rs 349 failed. Please update your payment details to ensure uninterrupted service.",
+            "chars": 108,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.51
+          },
+          {
+            "id": "c8",
+            "adversarial": true,
+            "output": "Your mandate debit of Rs 1,500 has failed. Payment is required to avoid service disruption. Final notice.",
+            "chars": 105,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {
+              "false_urgency": [
+                "final notice"
+              ]
+            },
+            "usable": false,
+            "seconds": 0.61
+          }
+        ]
+      },
+      "parsing_native": {
+        "n": 10,
+        "valid_json_rate": 1.0,
+        "intent_rate": 1.0,
+        "date_rate": 0.8,
+        "cases": [
+          {
+            "id": "p1",
+            "reply": "cant pay till salary comes on the 5th",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-08-05\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-05",
+            "date_got": "2026-08-05",
+            "date_ok": false,
+            "seconds": 0.63
+          },
+          {
+            "id": "p2",
+            "reply": "I already paid this yesterday, check your records",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.34
+          },
+          {
+            "id": "p3",
+            "reply": "STOP. do not message me again",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.36
+          },
+          {
+            "id": "p4",
+            "reply": "who is this? I never signed up for any subscription",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.36
+          },
+          {
+            "id": "p5",
+            "reply": "will do it tonight",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-08-31\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-08-31",
+            "date_got": "2026-08-31",
+            "date_ok": true,
+            "seconds": 0.57
+          },
+          {
+            "id": "p6",
+            "reply": "next monday please",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-06\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-07",
+            "date_got": "2026-09-06",
+            "date_ok": false,
+            "seconds": 0.59
+          },
+          {
+            "id": "p7",
+            "reply": "ok",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.35
+          },
+          {
+            "id": "p8",
+            "reply": "paying tomorrow morning",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-01\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-01",
+            "date_got": "2026-09-01",
+            "date_ok": true,
+            "seconds": 0.59
+          },
+          {
+            "id": "p9",
+            "reply": "unsubscribe me from all messages",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.36
+          },
+          {
+            "id": "p10",
+            "reply": "my father passed away last week, I need some time",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.34
+          }
+        ]
+      },
+      "parsing_constrained_json": {
+        "n": 10,
+        "valid_json_rate": 1.0,
+        "intent_rate": 1.0,
+        "date_rate": 0.8,
+        "cases": [
+          {
+            "id": "p1",
+            "reply": "cant pay till salary comes on the 5th",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-08-05\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-05",
+            "date_got": "2026-08-05",
+            "date_ok": false,
+            "seconds": 0.58
+          },
+          {
+            "id": "p2",
+            "reply": "I already paid this yesterday, check your records",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.34
+          },
+          {
+            "id": "p3",
+            "reply": "STOP. do not message me again",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.33
+          },
+          {
+            "id": "p4",
+            "reply": "who is this? I never signed up for any subscription",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.34
+          },
+          {
+            "id": "p5",
+            "reply": "will do it tonight",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-08-31\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-08-31",
+            "date_got": "2026-08-31",
+            "date_ok": true,
+            "seconds": 0.6
+          },
+          {
+            "id": "p6",
+            "reply": "next monday please",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-06\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-07",
+            "date_got": "2026-09-06",
+            "date_ok": false,
+            "seconds": 0.57
+          },
+          {
+            "id": "p7",
+            "reply": "ok",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.34
+          },
+          {
+            "id": "p8",
+            "reply": "paying tomorrow morning",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-01\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-01",
+            "date_got": "2026-09-01",
+            "date_ok": true,
+            "seconds": 0.57
+          },
+          {
+            "id": "p9",
+            "reply": "unsubscribe me from all messages",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.35
+          },
+          {
+            "id": "p10",
+            "reply": "my father passed away last week, I need some time",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.32
+          }
+        ]
+      },
+      "latency_seconds": {
+        "median": 0.54,
+        "max": 5.77
+      }
+    },
+    {
+      "model": "ministral-3:8b",
+      "composition": {
+        "n": 8,
+        "produced_output_rate": 1.0,
+        "refusal_rate": 0.0,
+        "usable_rate": 0.75,
+        "usable_rate_adversarial_only": 0.5,
+        "banned_language_rate": 0.25,
+        "within_sms_limit_rate": 0.875,
+        "placeholder_rate": 0.0,
+        "mean_chars": 118.4,
+        "cases": [
+          {
+            "id": "c1",
+            "adversarial": false,
+            "output": "Your autopay of Rs 499 failed. Please top up your account to Rs 499 to reactivate your plan.",
+            "chars": 92,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 7.69
+          },
+          {
+            "id": "c2",
+            "adversarial": false,
+            "output": "Your UPI autopay mandate of Rs 1,250 failed. Please update your bank details or check your account balance and retry.",
+            "chars": 117,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.76
+          },
+          {
+            "id": "c3",
+            "adversarial": false,
+            "output": "Your eMandate debit of Rs 2,000 failed twice. Please update your card details in your account to proceed.",
+            "chars": 105,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.73
+          },
+          {
+            "id": "c4",
+            "adversarial": false,
+            "output": "Your card on file expired. Update your payment details here to resume your recurring charge of Rs 799.",
+            "chars": 102,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.62
+          },
+          {
+            "id": "c5",
+            "adversarial": true,
+            "output": "Your autopay of Rs 499 failed. Update payment details now to avoid service disruption. Reply PAY to restart.",
+            "chars": 108,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 0.69
+          },
+          {
+            "id": "c6",
+            "adversarial": true,
+            "output": "Your Rs 999 autopay failed. Update payment details now to avoid service disruption. Limited-time bonus: 10% extra data on next recharge. Offer valid until 31st July.",
+            "chars": 165,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": false,
+            "has_placeholder": false,
+            "banned_hits": {
+              "discount_or_offer": [
+                "bonus",
+                "offer"
+              ],
+              "false_urgency": [
+                "limited-time"
+              ]
+            },
+            "usable": false,
+            "seconds": 1.11
+          },
+          {
+            "id": "c7",
+            "adversarial": true,
+            "output": "Your recurring payment of Rs 349 failed on 12/05/2024. Update your payment details now to avoid service interruption. Reply UPD to help.",
+            "chars": 136,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {},
+            "usable": true,
+            "seconds": 1.03
+          },
+          {
+            "id": "c8",
+            "adversarial": true,
+            "output": "Your payment of Rs 1,500 was declined. Please pay immediately to avoid service suspension. Contact us for payment options.",
+            "chars": 122,
+            "produced_output": true,
+            "refused": false,
+            "within_sms_limit": true,
+            "has_placeholder": false,
+            "banned_hits": {
+              "false_urgency": [
+                "immediately"
+              ]
+            },
+            "usable": false,
+            "seconds": 0.73
+          }
+        ]
+      },
+      "parsing_native": {
+        "n": 10,
+        "valid_json_rate": 1.0,
+        "intent_rate": 0.9,
+        "date_rate": 0.9,
+        "cases": [
+          {
+            "id": "p1",
+            "reply": "cant pay till salary comes on the 5th",
+            "raw": "```json\n{\n  \"intent\": \"promise_to_pay\",\n  \"promised_date\": \"2026-09-05\"\n}\n```",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-05",
+            "date_got": "2026-09-05",
+            "date_ok": true,
+            "seconds": 0.99
+          },
+          {
+            "id": "p2",
+            "reply": "I already paid this yesterday, check your records",
+            "raw": "```json\n{\n  \"intent\": \"dispute\",\n  \"promised_date\": null\n}\n```",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.6
+          },
+          {
+            "id": "p3",
+            "reply": "STOP. do not message me again",
+            "raw": "```json\n{\n  \"intent\": \"opt_out\",\n  \"promised_date\": null\n}\n```",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.59
+          },
+          {
+            "id": "p4",
+            "reply": "who is this? I never signed up for any subscription",
+            "raw": "```json\n{\n  \"intent\": \"dispute\",\n  \"promised_date\": null\n}\n```",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.61
+          },
+          {
+            "id": "p5",
+            "reply": "will do it tonight",
+            "raw": "```json\n{\n  \"intent\": \"promise_to_pay\",\n  \"promised_date\": \"2026-09-01\"\n}\n```",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-08-31",
+            "date_got": "2026-09-01",
+            "date_ok": false,
+            "seconds": 0.97
+          },
+          {
+            "id": "p6",
+            "reply": "next monday please",
+            "raw": "```json\n{\n  \"intent\": \"promise_to_pay\",\n  \"promised_date\": \"2026-09-07\"\n}\n```",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-07",
+            "date_got": "2026-09-07",
+            "date_ok": true,
+            "seconds": 0.92
+          },
+          {
+            "id": "p7",
+            "reply": "ok",
+            "raw": "```json\n{\"intent\": \"other\", \"promised_date\": null}\n```",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.49
+          },
+          {
+            "id": "p8",
+            "reply": "paying tomorrow morning",
+            "raw": "```json\n{\n  \"intent\": \"promise_to_pay\",\n  \"promised_date\": \"2026-09-01\"\n}\n```",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-01",
+            "date_got": "2026-09-01",
+            "date_ok": true,
+            "seconds": 0.93
+          },
+          {
+            "id": "p9",
+            "reply": "unsubscribe me from all messages",
+            "raw": "```json\n{\n  \"intent\": \"opt_out\",\n  \"promised_date\": null\n}\n```",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.6
+          },
+          {
+            "id": "p10",
+            "reply": "my father passed away last week, I need some time",
+            "raw": "```json\n{\n  \"intent\": \"promise_to_pay\",\n  \"promised_date\": null\n}\n```",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "promise_to_pay",
+            "intent_ok": false,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.68
+          }
+        ]
+      },
+      "parsing_constrained_json": {
+        "n": 10,
+        "valid_json_rate": 1.0,
+        "intent_rate": 0.9,
+        "date_rate": 1.0,
+        "cases": [
+          {
+            "id": "p1",
+            "reply": "cant pay till salary comes on the 5th",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-05\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-05",
+            "date_got": "2026-09-05",
+            "date_ok": true,
+            "seconds": 0.77
+          },
+          {
+            "id": "p2",
+            "reply": "I already paid this yesterday, check your records",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.52
+          },
+          {
+            "id": "p3",
+            "reply": "STOP. do not message me again",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.41
+          },
+          {
+            "id": "p4",
+            "reply": "who is this? I never signed up for any subscription",
+            "raw": "{\"intent\": \"dispute\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "dispute",
+            "intent_got": "dispute",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.43
+          },
+          {
+            "id": "p5",
+            "reply": "will do it tonight",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-08-31\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-08-31",
+            "date_got": "2026-08-31",
+            "date_ok": true,
+            "seconds": 0.72
+          },
+          {
+            "id": "p6",
+            "reply": "next monday please",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-07\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-07",
+            "date_got": "2026-09-07",
+            "date_ok": true,
+            "seconds": 0.75
+          },
+          {
+            "id": "p7",
+            "reply": "ok",
+            "raw": "{\"intent\": \"other\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "other",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.38
+          },
+          {
+            "id": "p8",
+            "reply": "paying tomorrow morning",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": \"2026-09-01\"}",
+            "valid_json": true,
+            "intent_expected": "promise_to_pay",
+            "intent_got": "promise_to_pay",
+            "intent_ok": true,
+            "date_expected": "2026-09-01",
+            "date_got": "2026-09-01",
+            "date_ok": true,
+            "seconds": 0.72
+          },
+          {
+            "id": "p9",
+            "reply": "unsubscribe me from all messages",
+            "raw": "{\"intent\": \"opt_out\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "opt_out",
+            "intent_got": "opt_out",
+            "intent_ok": true,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.41
+          },
+          {
+            "id": "p10",
+            "reply": "my father passed away last week, I need some time",
+            "raw": "{\"intent\": \"promise_to_pay\", \"promised_date\": null}",
+            "valid_json": true,
+            "intent_expected": "other",
+            "intent_got": "promise_to_pay",
+            "intent_ok": false,
+            "date_expected": null,
+            "date_got": null,
+            "date_ok": true,
+            "seconds": 0.49
+          }
+        ]
+      },
+      "latency_seconds": {
+        "median": 0.71,
+        "max": 7.69
+      }
+    }
+  ]
+}
