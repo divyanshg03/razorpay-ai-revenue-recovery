@@ -75,16 +75,35 @@ CAUSE_TEXT: dict[Actionability, str] = {
 
 @dataclass
 class ComposedMessage:
+    """`gate` ALWAYS describes `text` — the message actually being sent.
+
+    An earlier version returned the template as `text` while carrying the *rejected LLM
+    candidate's* verdict in `gate`, so `gate.ok` was False for a message that was perfectly
+    fine to send. Any caller gating on `msg.gate.ok` would have refused to send valid
+    fallback copy — silently dropping the customer contact rather than degrading to a
+    template, which is the opposite of the intended failure mode.
+
+    The rejection is not lost: it moves to `llm_gate`, which is the copy gate's evidence
+    that it caught something, and is written to the audit ledger.
+    """
+
     text: str
     source: str            # "llm" | "template"
-    gate: GateResult
+    gate: GateResult       # verdict for `text`, whatever `text` ended up being
     model: str | None
     llm_output: str | None = None   # what the model wrote, pre-gate, for the audit trail
     llm_seconds: float | None = None
+    #: Set only when the model's words were rejected or refused and a template was used
+    #: instead. This is what proves the gate fired.
+    llm_gate: GateResult | None = None
 
     @property
     def template_ref(self) -> str:
         return f"{self.source}:{self.model or 'static'}"
+
+    @property
+    def gate_rejected_llm(self) -> bool:
+        return self.llm_gate is not None
 
 
 def template(facts: Facts, actionability: Actionability) -> str:
@@ -133,10 +152,12 @@ def compose(facts: Facts, actionability: Actionability, channel: Channel = Chann
             verdict = check(candidate, facts, limit=SMS_LIMIT)
             if verdict.ok:
                 return ComposedMessage(candidate, "llm", verdict, model, raw, secs)
-            # Rejected or refused: fall through to the template, carrying the verdict so
-            # the audit trail shows WHY the model's words were not used.
+            # Rejected or refused: fall back to the template. `gate` describes the TEMPLATE
+            # (what we are actually sending); the model's rejection is preserved separately
+            # in `llm_gate` so the audit trail still shows why its words were not used.
             fallback = template(facts, actionability)
-            return ComposedMessage(fallback, "template", verdict, model, raw, secs)
+            return ComposedMessage(fallback, "template", check(fallback, facts), model,
+                                   raw, secs, llm_gate=verdict)
     text = template(facts, actionability)
     return ComposedMessage(text, "template", check(text, facts), None)
 

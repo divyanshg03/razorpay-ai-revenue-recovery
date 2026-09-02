@@ -437,14 +437,60 @@ class TestInvariantsOverARealRun:
 # The real LLM. No mock. Skips only if Ollama is down.
 # ---------------------------------------------------------------------------------------
 
+def test_gate_verdict_always_describes_the_message_actually_returned():
+    """Regression: compose() used to return the template as `text` while carrying the
+    REJECTED LLM candidate's verdict in `gate`. A caller gating on `msg.gate.ok` would then
+    refuse to send perfectly valid fallback copy - dropping the contact entirely instead of
+    degrading to a template, the opposite of the intended failure mode.
+
+    Driven without the model so the fallback path is exercised deterministically.
+    """
+    msg = composer.compose(FACTS, Actionability.NEEDS_FUNDS, use_llm=False)
+    assert msg.source == "template"
+    assert msg.gate.ok, "the returned template must pass its own gate"
+    assert msg.gate is not None and msg.text
+    # The gate result must be the one for `text`, so re-checking `text` agrees with it.
+    assert check(msg.text, FACTS).verdict is msg.gate.verdict
+
+
+def test_a_rejected_llm_candidate_is_preserved_separately_not_conflated(monkeypatch):
+    """When the gate rejects the model, the template ships AND the rejection is kept."""
+    monkeypatch.setattr(composer, "_ask", lambda *a, **k: (MINISTRAL_REAL_OUTPUT, 0.1))
+    msg = composer.compose(FACTS, Actionability.NEEDS_FUNDS, use_llm=True)
+    assert msg.source == "template"
+    assert msg.gate.ok, "the template we actually send must pass"
+    assert msg.gate_rejected_llm and msg.llm_gate is not None
+    assert msg.llm_gate.verdict is Verdict.REJECTED
+    assert "discount_or_offer" in msg.llm_gate.categories
+    assert msg.llm_output == MINISTRAL_REAL_OUTPUT
+
+
+def test_copy_gate_rejection_reaches_the_audit_ledger(tmp_path):
+    """A gate nobody can see firing is indistinguishable from one that never fires."""
+    from recovery.models import Action
+    led = AuditLedger(tmp_path / "gate.jsonl", P.version)
+    led.record_action(
+        Action(debt_id="d1", customer_ref="c1", channel=Channel.SMS_SERVICE, at=at(10),
+               cost_paise=22, policy_version=P.version, rendered_text="template text"),
+        copy_gate_rejected={"verdict": "rejected",
+                            "categories": {"discount_or_offer": ["bonus"]}, "reasons": []},
+        llm_output=MINISTRAL_REAL_OUTPUT)
+    body = led.read()[0]["body"]
+    assert body["copy_gate_rejected_llm"]["verdict"] == "rejected"
+    assert body["llm_output_rejected"] == MINISTRAL_REAL_OUTPUT
+    assert body["rendered_text"] == "template text"   # what was SENT, not what was blocked
+
+
 @needs_ollama
 def test_composer_uses_the_real_model_and_the_link_is_injected_by_code():
     composer.warm()
     msg = composer.compose(FACTS, Actionability.NEEDS_FUNDS, use_llm=True)
     assert FACTS.link in msg.text and len(msg.text) <= 160
-    assert msg.gate.ok or msg.source == "template"   # gate-passed LLM text, or the fallback
+    # `gate` describes what is being sent, so it must pass either way now.
+    assert msg.gate.ok, (msg.source, msg.gate.categories, msg.gate.reasons)
     if msg.source == "llm":
         assert "http" not in (msg.llm_output or "")   # the model never wrote the link
+        assert not msg.gate_rejected_llm
 
 
 @needs_ollama

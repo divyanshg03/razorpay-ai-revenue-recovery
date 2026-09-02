@@ -177,7 +177,9 @@ class AuditLedger:
         })
 
     def record_action(self, action: Action, message_class: str = "service",
-                      consent_basis: str = "dpdp_s7a_voluntarily_provided") -> dict:
+                      consent_basis: str = "dpdp_s7a_voluntarily_provided",
+                      copy_gate_rejected: dict | None = None,
+                      llm_output: str | None = None) -> dict:
         """Something was actually sent. `message_class` is load-bearing: under TRAI's
         mixed-content rule, promotional content inside a service message makes the WHOLE
         message promotional and inherits consent, DND and time-band obligations."""
@@ -193,6 +195,12 @@ class AuditLedger:
             "rendered_text": action.rendered_text,
             "rules_fired": action.rules_fired,
             "rules_passed": action.rules_passed,
+            # When the copy gate rejected the model's wording and a template was sent
+            # instead, record BOTH: what the model wrote, and the categories it tripped.
+            # Without this the gate's interventions are invisible - and a gate nobody can
+            # see firing is indistinguishable from one that never fires.
+            "copy_gate_rejected_llm": copy_gate_rejected,
+            "llm_output_rejected": llm_output if copy_gate_rejected else None,
         })
 
     def record_outcome(self, debt_id: str, customer_ref: str, recovered_paise: int,

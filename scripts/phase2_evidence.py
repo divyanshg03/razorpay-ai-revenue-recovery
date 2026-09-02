@@ -76,7 +76,16 @@ def main() -> int:
             "model": live.model, "warm_seconds": round(warm_s, 2),
             "gen_seconds": round(live.llm_seconds or 0, 2),
             "llm_wrote": live.llm_output, "sent": live.text, "source": live.source,
-            "gate": live.gate.verdict.value, "gate_categories": live.gate.categories,
+            # `gate` describes the message actually SENT. If the model's wording was
+            # rejected, that verdict is separate - conflating them would have made a
+            # perfectly good template look like a failure.
+            "gate_on_sent_message": live.gate.verdict.value,
+            "gate_categories_on_sent": live.gate.categories,
+            "llm_candidate_rejected": live.gate_rejected_llm,
+            "llm_rejection": ({"verdict": live.llm_gate.verdict.value,
+                               "categories": live.llm_gate.categories,
+                               "reasons": live.llm_gate.reasons}
+                              if live.llm_gate else None),
             "chars": len(live.text),
             "link_written_by_model": "http" in (live.llm_output or ""),
         }

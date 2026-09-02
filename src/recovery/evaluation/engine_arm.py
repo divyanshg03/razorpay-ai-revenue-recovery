@@ -101,11 +101,18 @@ def run_engine(cohort: SimulatedCohort, debts: list[Debt], customers: list[Custo
                               link=f"{link_base}{debt.debt_id[-8:]}", merchant="")
                 msg = compose(facts, diag.actionability, decision.channel, use_llm=use_llm)
                 cost = policy.cost_paise[decision.channel]
-                ledger.record_action(Action(
-                    debt_id=debt.debt_id, customer_ref=customer.ref, channel=decision.channel,
-                    at=now, cost_paise=cost, policy_version=policy.version,
-                    rendered_text=msg.text, template_ref=msg.template_ref,
-                    rules_fired=decision.rules_fired, rules_passed=decision.rules_passed))
+                rejected = None
+                if msg.gate_rejected_llm:
+                    rejected = {"verdict": msg.llm_gate.verdict.value,
+                                "categories": msg.llm_gate.categories,
+                                "reasons": msg.llm_gate.reasons}
+                ledger.record_action(
+                    Action(debt_id=debt.debt_id, customer_ref=customer.ref,
+                           channel=decision.channel, at=now, cost_paise=cost,
+                           policy_version=policy.version, rendered_text=msg.text,
+                           template_ref=msg.template_ref, rules_fired=decision.rules_fired,
+                           rules_passed=decision.rules_passed),
+                    copy_gate_rejected=rejected, llm_output=msg.llm_output)
                 out.contacts += 1
                 out.contact_cost_paise += cost
 
