@@ -57,10 +57,32 @@ class Policy:
     retry_horizon_days: int = 21
 
     # -- escalation ladder: terminates, never loops, tone never escalates --------------
-    ladder: tuple[Channel, ...] = (
-        Channel.WHATSAPP_UTILITY,
-        Channel.SMS_SERVICE,
-        Channel.HUMAN_CALL,
+    #: STEPS, not fixed channels. Each step lists its preferred channels in order; the first
+    #: one the customer can actually receive is what gets used.
+    #:
+    #: Defining this as a channel sequence quietly penalised anyone without WhatsApp: they
+    #: skipped step 1 entirely and received a mean of **1.31 contacts against 1.94** for a
+    #: fully-reachable customer. That deficit is structural and deterministic — every such
+    #: customer lost exactly one escalation step because of our ladder's shape, not because
+    #: of anything about them. A person's channel mix must change HOW we reach them, never
+    #: HOW MANY times we are willing to try.
+    #:
+    #: HONEST SCOPE OF THE FIX. A first look also showed those customers recovering 4.9pp
+    #: less, and that was NOT a real effect — at n=248 the standard error is ~3.2pp. Measured
+    #: properly at n=8,000 the difference is **-0.76pp, 95% CI [-3.73, +2.20]** (z=-0.50):
+    #: indistinguishable from zero, and the generated sub-populations are identical on
+    #: payday, debt size and cause mix. So this change is justified as product correctness
+    #: and equal treatment, NOT as a recovery win. It costs slightly more (SMS at Rs 0.2124
+    #: against WhatsApp at Rs 0.1711, and one extra touch for ~18% of the cohort) for no
+    #: measurable lift, and Phase 3's net-of-cost metric will carry that cost honestly.
+    #:
+    #: The cost of the fix is real and accepted: SMS is dearer than WhatsApp Utility
+    #: (Rs 0.2124 vs Rs 0.1711) and carries DLT obligations WhatsApp does not, so an
+    #: SMS-only customer costs more to recover. Reaching them is worth it.
+    ladder: tuple[tuple[Channel, ...], ...] = (
+        (Channel.WHATSAPP_UTILITY, Channel.SMS_SERVICE),
+        (Channel.SMS_SERVICE, Channel.WHATSAPP_UTILITY),
+        (Channel.HUMAN_CALL,),
     )
     #: Days to wait after the first contact before escalating one rung.
     escalation_wait_days: int = 4

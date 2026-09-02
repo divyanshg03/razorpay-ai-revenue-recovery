@@ -81,15 +81,27 @@ class RecoveryEngine:
         since = (today - state.last_contact_day).days if state.last_contact_day else 0
         return since >= self.policy.escalation_wait_days
 
-    def _first_reachable_rung(self, customer: Customer, start: int) -> int | None:
-        for i in range(start, len(self.policy.ladder)):
-            ch = self.policy.ladder[i]
+    def _channel_for_step(self, customer: Customer, step: int) -> Channel | None:
+        """Resolve one escalation step to a channel this customer can actually receive.
+
+        A customer with no WhatsApp takes SMS at step 1 and SMS again at step 2 — two
+        touches, four days apart, inside the per-channel 24h cap. They get the same number
+        of attempts as anyone else, delivered on the channel they actually have.
+        """
+        for ch in self.policy.ladder[step]:
             if ch is Channel.WHATSAPP_UTILITY and customer.has_whatsapp:
-                return i
+                return ch
             if ch is Channel.SMS_SERVICE and customer.has_sms:
-                return i
+                return ch
             if ch is Channel.HUMAN_CALL and (customer.has_sms or customer.has_whatsapp):
-                return i
+                return ch
+        return None
+
+    def _next_step(self, customer: Customer, start: int) -> tuple[int, Channel] | None:
+        for i in range(start, len(self.policy.ladder)):
+            ch = self._channel_for_step(customer, i)
+            if ch is not None:
+                return i, ch
         return None
 
     # -- the decision -----------------------------------------------------------------
@@ -111,18 +123,15 @@ class RecoveryEngine:
         if self._retry_due(debt, state, today):
             candidates.append(Channel.RETRY)
         if self._contact_due(debt, state, today):
-            # Skip rungs the customer cannot be reached on. Without this, the 18% of the
-            # cohort with no WhatsApp sat on rung 0 forever and never received an SMS - a
-            # recovery leak the guardrail correctly refused but nothing ever moved past.
-            rung = self._first_reachable_rung(customer, state.ladder_rung)
-            if rung is None:
-                # Nothing reachable at all: consider the last rung once so the refusal is
-                # logged with its reason, then retire the ladder.
-                candidates.append(self.policy.ladder[-1])
+            nxt = self._next_step(customer, state.ladder_rung)
+            if nxt is None:
+                # No remaining step has a channel this customer can receive. Consider it
+                # once so the refusal is logged with its reason, then retire the ladder.
+                candidates.append(self.policy.ladder[-1][0])
                 state.ladder_rung = len(self.policy.ladder)
             else:
-                state.ladder_rung = rung
-                candidates.append(self.policy.ladder[rung])
+                state.ladder_rung, step_channel = nxt
+                candidates.append(step_channel)
         if not candidates:
             return decisions
 
@@ -199,9 +208,12 @@ class RecoveryEngine:
             state.hard_stopped = StopReason.OPTED_OUT
             # Statutory: the s.7(a) basis has evaporated on ALL channels, and the objection
             # must be an immutable event with propagation recorded.
-            self.ledger.record_consent(customer.ref, event="objection_raised",
-                                       basis="dpdp_s7a_conditional_on_no_objection",
-                                       propagated_to=[c.value for c in self.policy.ladder])
+            self.ledger.record_consent(
+                customer.ref, event="objection_raised",
+                basis="dpdp_s7a_conditional_on_no_objection",
+                # Every channel in the ladder, not just the one they replied on. Opt-out
+                # suppression is account-wide.
+                propagated_to=sorted({c.value for step in self.policy.ladder for c in step}))
         elif parsed.intent is Intent.DISPUTE:
             customer.disputed = True
             state.hard_stopped = StopReason.DISPUTED
