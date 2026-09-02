@@ -1,0 +1,34 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/orders",
+    "body": {
+      "amount": 0,
+      "currency": "INR",
+      "method": "emandate",
+      "customer_id": "cust_TTfo82xIO39puh",
+      "token": {
+        "auth_type": "netbanking",
+        "max_amount": 900000,
+        "expire_at": 4102444799,
+        "bank_account": {
+          "beneficiary_name": "Probe",
+          "account_number": "11214311521",
+          "account_type": "savings",
+          "ifsc_code": "HDFC0000001"
+        }
+      }
+    }
+  },
+  "status": 400,
+  "response": {
+    "error": {
+      "code": "BAD_REQUEST_ERROR",
+      "description": "expire_at cannot be more than 40 years for emandate & paper nach",
+      "metadata": {},
+      "reason": "input_validation_failed",
+      "source": "business",
+      "step": "payment_initiation"
+    }
+  }
+}

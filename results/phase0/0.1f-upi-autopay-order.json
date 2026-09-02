@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/orders",
+    "body": {
+      "amount": 0,
+      "currency": "INR",
+      "method": "upi",
+      "customer_id": "cust_TTfo82xIO39puh",
+      "token": {
+        "max_amount": 90000,
+        "expire_at": 4102444799,
+        "frequency": "monthly"
+      }
+    }
+  },
+  "status": 400,
+  "response": {
+    "error": {
+      "code": "BAD_REQUEST_ERROR",
+      "description": "Order amount less than minimum amount allowed",
+      "metadata": {},
+      "reason": "NA",
+      "source": "order",
+      "step": "NA"
+    }
+  }
+}

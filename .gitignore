@@ -39,5 +39,22 @@ Thumbs.db
 scratch/
 *.log
 
-# Agent instructions — local-only, references paths outside this repo
+# Agent tooling — local-only, not part of the submission
 CLAUDE.md
+.claude*/
+
+# Raw credentials export from the Razorpay dashboard. Never commit.
+rzp-key.csv
+
+# NOTE: results/ is deliberately NOT ignored.
+# docs/phase-0.md requires results/phase0/ as committed evidence, and
+# docs/metric-definition.md proves the metric was frozen before any result existed
+# by git ancestry — both of which need these files in history. It is 68K of JSON.
+# If a future artifact is genuinely too large to track, ignore that file by name
+# and say so in the README; do not ignore the directory.
+
+# Vendored tooling — downloaded binaries, never committed (zrok, etc.)
+tools/
+
+# Daemon logs and local runtime state
+runtime/

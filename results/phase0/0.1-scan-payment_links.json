@@ -1,0 +1,11 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/payment_links?count=1",
+    "body": null
+  },
+  "status": 200,
+  "response": {
+    "payment_links": []
+  }
+}

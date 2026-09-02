@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/orders",
+    "body": {
+      "amount": 50000,
+      "currency": "INR",
+      "receipt": "phase0-probe"
+    }
+  },
+  "status": 200,
+  "response": {
+    "amount": 50000,
+    "amount_due": 50000,
+    "amount_paid": 0,
+    "attempts": 0,
+    "created_at": 1787589010,
+    "currency": "INR",
+    "entity": "order",
+    "id": "order_TTfoC0rqOKAxpB",
+    "notes": [],
+    "offer_id": null,
+    "receipt": "phase0-probe",
+    "status": "created"
+  }
+}

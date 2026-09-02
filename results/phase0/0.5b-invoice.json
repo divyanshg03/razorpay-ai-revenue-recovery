@@ -1,0 +1,101 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/invoices",
+    "body": {
+      "type": "invoice",
+      "customer": {
+        "name": "Probe User",
+        "contact": "9123456780",
+        "email": "probe2@example.com"
+      },
+      "line_items": [
+        {
+          "name": "Monthly plan",
+          "amount": 50000,
+          "currency": "INR",
+          "quantity": 1
+        }
+      ],
+      "sms_notify": 0,
+      "email_notify": 0
+    }
+  },
+  "status": 200,
+  "response": {
+    "id": "inv_TTfpnQgnLN7CDc",
+    "entity": "invoice",
+    "receipt": null,
+    "invoice_number": null,
+    "customer_id": "cust_TTfovcJBaTuiOT",
+    "customer_details": {
+      "id": "cust_TTfovcJBaTuiOT",
+      "name": "Phase 0 Probe 2",
+      "email": "probe2@example.com",
+      "contact": "9123456780",
+      "gstin": null,
+      "billing_address": null,
+      "shipping_address": null,
+      "customer_name": "Phase 0 Probe 2",
+      "customer_email": "probe2@example.com",
+      "customer_contact": "9123456780"
+    },
+    "order_id": "order_TTfpnbDCkqlBOA",
+    "line_items": [
+      {
+        "id": "li_TTfpnUTojTdvIy",
+        "item_id": null,
+        "ref_id": null,
+        "ref_type": null,
+        "name": "Monthly plan",
+        "description": null,
+        "amount": 50000,
+        "unit_amount": 50000,
+        "gross_amount": 50000,
+        "tax_amount": 0,
+        "taxable_amount": 50000,
+        "net_amount": 50000,
+        "currency": "INR",
+        "type": "invoice",
+        "tax_inclusive": false,
+        "hsn_code": null,
+        "sac_code": null,
+        "tax_rate": null,
+        "unit": null,
+        "quantity": 1,
+        "taxes": []
+      }
+    ],
+    "payment_id": null,
+    "status": "issued",
+    "expire_by": null,
+    "issued_at": 1787589101,
+    "paid_at": null,
+    "cancelled_at": null,
+    "expired_at": null,
+    "sms_status": null,
+    "email_status": null,
+    "date": 1787589101,
+    "terms": null,
+    "partial_payment": false,
+    "gross_amount": 50000,
+    "tax_amount": 0,
+    "taxable_amount": 50000,
+    "amount": 50000,
+    "amount_paid": 0,
+    "amount_due": 50000,
+    "currency": "INR",
+    "currency_symbol": "\u20b9",
+    "description": null,
+    "notes": [],
+    "comment": null,
+    "short_url": "https://rzp.io/rzp/fZYnKkZx",
+    "view_less": true,
+    "billing_start": null,
+    "billing_end": null,
+    "type": "invoice",
+    "group_taxes_discounts": false,
+    "created_at": 1787589101,
+    "ref_num": null
+  }
+}

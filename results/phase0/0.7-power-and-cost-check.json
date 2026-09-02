@@ -1,0 +1,48 @@
+{
+  "seed": 20260905,
+  "cohort_size": 5000,
+  "allocation": {
+    "A": 0.2,
+    "B": 0.2,
+    "C": 0.6
+  },
+  "arm_counts": {
+    "A": 1000,
+    "B": 1000,
+    "C": 3000
+  },
+  "sizing_assumptions_recovery_rate": {
+    "A": 0.08,
+    "B": 0.18,
+    "C": 0.25
+  },
+  "power": {
+    "alpha_two_sided": 0.05,
+    "power": 0.8
+  },
+  "mde_pp": {
+    "C_vs_B_primary": 4.06,
+    "C_vs_A_secondary": 3.27
+  },
+  "assumed_effect_pp": {
+    "C_vs_B": 7.0,
+    "C_vs_A": 17.0
+  },
+  "cost_with_gst": {
+    "whatsapp_utility_outside_window": 0.1711,
+    "whatsapp_utility_inside_window": 0.0,
+    "sms_service_dlt": 0.2124,
+    "human_agent_connected_call": 15.34,
+    "payment_link_notify": 0.0,
+    "retry_attempt": 0.0
+  },
+  "breakeven_uplift_pp_on_1000_rupee_debt": {
+    "whatsapp_utility_outside_window": 0.0171,
+    "sms_service_dlt": 0.0212,
+    "human_agent_connected_call": 1.534
+  },
+  "adequately_powered": {
+    "C_vs_B_primary": true,
+    "C_vs_A_secondary": true
+  }
+}

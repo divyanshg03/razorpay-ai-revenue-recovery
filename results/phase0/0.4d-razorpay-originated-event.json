@@ -1,0 +1,62 @@
+{
+  "gate": "0.4 - can webhooks be received at all?",
+  "verdict": "PASS - a Razorpay-originated event was received, signature-verified, and logged",
+  "captured_at": "2026-09-02T11:29:53+0530",
+  "proof": {
+    "event_id": "TX3rOCAcRmbwOd",
+    "event": "payment.failed",
+    "received_at": "2026-09-02T11:28:51+0530",
+    "account_id": "acc_TTWdDfBShe5ZbR",
+    "payment_id": "pay_TX3rF1G3TyjbEX",
+    "signed_by": "Razorpay (HMAC-SHA256 over raw body, verified against the Dashboard secret)",
+    "note": "Distinguished from our own self-tests by event-id shape: Razorpay ids are bare tokens like TX3rOCAcRmbwOd, ours are prefixed evt_*."
+  },
+  "delivery_latency": {
+    "payment_created": "11:28:43 IST",
+    "event_received": "2026-09-02T11:28:51+0530",
+    "approx_seconds": 8,
+    "ack_budget_seconds": 5.0,
+    "note": "The 8s is Razorpay's own dispatch delay plus tunnel transit. Our ACK, measured separately, is ~1.5-2.7s through zrok - inside the 5s budget because the handler verifies, enqueues and returns without processing inline."
+  },
+  "error_fields_in_webhook_payload": {
+    "error_code": "BAD_REQUEST_ERROR",
+    "error_description": "Payment failed",
+    "error_source": "gateway",
+    "error_step": "payment_authorization",
+    "error_reason": "payment_failed"
+  },
+  "architectural_finding_error_fields_arrive_in_the_webhook": "The webhook payload carries the same five error fields as GET /payments/:id. The diagnosis layer can therefore classify straight off the event without a follow-up API call - though the state re-check before ACTING still needs one, because payment.failed can be followed by payment.captured for the same transaction.",
+  "incident_the_gate_uncovered": {
+    "symptom": "18+ deliveries arrived and every one was rejected 'invalid signature', while the endpoint reported perfectly healthy and the event log stayed empty.",
+    "root_cause": "The secret entered in the Dashboard had surrounding whitespace.",
+    "why_it_was_invisible_at_first": "Rejections were tracked in memory only, so 'Razorpay never called' and 'Razorpay called and we rejected it' looked identical. Durable rejection logging was added and immediately exposed it.",
+    "misleading_heuristic": "Filtering rejections by 'non-local peer IP' found nothing, because zrok proxies to localhost - peer is ALWAYS 127.0.0.1 for tunnelled traffic. The User-Agent (Razorpay-Webhook/v1) is the correct discriminator."
+  },
+  "finding_signature_is_computed_once_per_event": {
+    "claim": "Razorpay signs an event ONCE at creation; retries replay the identical payload and signature. It does NOT re-sign per delivery attempt.",
+    "evidence_distinct_signatures_per_event_id": {
+      "TX3YT81HtLiSK6": 1,
+      "TX3Me54gnf1ydi": 1,
+      "TX3NgavH8NwVDf": 1,
+      "TX35aT8D0HmH0B": 1
+    },
+    "test": "14 whitespace/quoting variants of the corrected secret were tested against the captured signatures of pre-fix events; none matched.",
+    "operational_consequence": "Rotating a webhook secret PERMANENTLY STRANDS every event already created under the old secret - they will retry for 24h and never verify. This is not stated in Razorpay's documentation and is worth designing around."
+  },
+  "observed_retry_ladder": {
+    "note": "Razorpay's at-least-once redelivery, observed live rather than quoted from docs.",
+    "gaps_seconds": [
+      6,
+      11,
+      22,
+      44,
+      67,
+      97,
+      190
+    ],
+    "same_event_redelivered": 1,
+    "why_it_matters": "Dedup on x-razorpay-event-id is load-bearing, not decorative."
+  },
+  "razorpay_deliveries_rejected_before_fix": 29,
+  "razorpay_events_verified_after_fix": 1
+}

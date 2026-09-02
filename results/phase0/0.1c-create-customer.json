@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/customers",
+    "body": {
+      "name": "Phase 0 Probe",
+      "email": "probe@example.com",
+      "contact": "9999999999",
+      "fail_existing": "0"
+    }
+  },
+  "status": 200,
+  "response": {
+    "id": "cust_TTfo82xIO39puh",
+    "entity": "customer",
+    "name": "Phase 0 Probe",
+    "email": "probe@example.com",
+    "contact": "9999999999",
+    "gstin": null,
+    "notes": [],
+    "shipping_address": [],
+    "created_at": 1787589006
+  }
+}

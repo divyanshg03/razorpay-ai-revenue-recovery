@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/customers?count=1",
+    "body": null
+  },
+  "status": 200,
+  "response": {
+    "entity": "collection",
+    "count": 0,
+    "items": []
+  }
+}
