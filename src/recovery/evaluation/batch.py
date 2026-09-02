@@ -142,11 +142,23 @@ def _residual_predicates(cohort: SimulatedCohort, start: dt.date, window: int, p
 
 
 def _cohort_block(arms, assignment_info, ledger, policy, window, seed, shifted, cohort=None,
-                  start=None):
+                  start=None, resamples: int = BOOTSTRAP_RESAMPLES):
+    """`resamples` is threaded in rather than defaulted here on purpose.
+
+    It used to be neither: `run()` took a `resamples` argument, reported it under
+    `bootstrap.resamples` in the artifact, and then never passed it down - so `compare()`
+    silently used its own default and the JSON described a run that had not happened. At the
+    shipped default the two coincide at 10,000, so the published number was never wrong; but
+    a caller asking for a cheaper interval got an expensive one, and the artifact would have
+    misreported it. A figure that describes its own provenance has to actually be that
+    figure's provenance.
+    """
     inv = check_ledger(ledger, policy.max_contacts_per_debt_7d)
     a, b, c = arms["A"], arms["B"], arms["C"]
-    primary = compare("engine vs incumbent ladder (PRIMARY)", c, b, "C", "B")
-    secondary = compare("engine vs do-nothing (context only)", c, a, "C", "A")
+    primary = compare("engine vs incumbent ladder (PRIMARY)", c, b, "C", "B",
+                      resamples=resamples)
+    secondary = compare("engine vs do-nothing (context only)", c, a, "C", "A",
+                        resamples=resamples)
     return {
         "seed": seed, "shifted_parameters": shifted, "window_days": window,
         "assignment": assignment_info,
@@ -175,7 +187,8 @@ def run(out_path: str | pathlib.Path = "results/metrics.json",
     primary_arms, primary_ledger, primary_assign, primary_cohort = run_arms(
         SEED, N_CUSTOMERS, START, WINDOW_DAYS, policy, ledger_dir / "arm-c-audit.jsonl")
     block = _cohort_block(primary_arms, primary_assign, primary_ledger, policy,
-                          WINDOW_DAYS, SEED, shifted=False, cohort=primary_cohort, start=START)
+                          WINDOW_DAYS, SEED, shifted=False, cohort=primary_cohort, start=START,
+                          resamples=resamples)
 
     if not block["guardrails_all_zero"]:
         raise GuardrailViolation(
@@ -188,7 +201,7 @@ def run(out_path: str | pathlib.Path = "results/metrics.json",
         ledger_dir / "arm-c-audit-14d.jsonl")
     short = _cohort_block(short_arms, short_assign, short_ledger, policy,
                           SECONDARY_WINDOW_DAYS, SEED, shifted=False, cohort=short_cohort,
-                          start=START)
+                          start=START, resamples=resamples)
 
     # Shifted-parameter cohort: a policy that merely inverted the generator collapses here.
     shifted_arms, shifted_ledger, shifted_assign, shifted_cohort = run_arms(
@@ -196,7 +209,7 @@ def run(out_path: str | pathlib.Path = "results/metrics.json",
         ledger_dir / "arm-c-audit-shifted.jsonl", shifted=True)
     shifted = _cohort_block(shifted_arms, shifted_assign, shifted_ledger, policy,
                             WINDOW_DAYS, SEED + 1, shifted=True, cohort=shifted_cohort,
-                            start=START)
+                            start=START, resamples=resamples)
 
     report = {
         "metric_definition": {

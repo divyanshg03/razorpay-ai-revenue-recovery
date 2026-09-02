@@ -17,6 +17,7 @@ import datetime as dt
 import json
 import pathlib
 import subprocess
+import sys
 
 import pytest
 
@@ -244,6 +245,34 @@ def test_ledger_still_appends_by_default(tmp_path):
     assert c.read() == []
 
 
+def test_the_reported_resample_count_is_the_one_actually_used(tmp_path, monkeypatch):
+    """`bootstrap.resamples` in the artifact must describe the run that produced it.
+
+    It did not. `run()` accepted a `resamples` argument and reported it, but `_cohort_block`
+    called `compare()` without it, so the bootstrap always used its own default. At the
+    shipped default the two numbers coincide at 10,000, which is why the published interval
+    was never wrong and why nothing caught it - the bug was invisible precisely at the
+    setting anyone would check.
+
+    A figure that carries its own provenance has to actually have that provenance, so this
+    records what the bootstrap was really called with rather than trusting the JSON.
+    """
+    seen: list[int] = []
+    real = batch_mod.compare
+
+    def spy(*a, **kw):
+        seen.append(kw.get("resamples"))
+        return real(*a, **kw)
+
+    monkeypatch.setattr(batch_mod, "N_CUSTOMERS", 400)
+    monkeypatch.setattr(batch_mod, "compare", spy)
+    report = batch_mod.run(out_path=tmp_path / "m.json", ledger_dir=tmp_path, resamples=37)
+
+    assert seen, "compare() was never called"
+    assert set(seen) == {37}, f"bootstrap ran with {set(seen)}, artifact claims 37"
+    assert report["bootstrap"]["resamples"] == 37
+
+
 def test_batch_refuses_to_write_when_a_guardrail_fired(tmp_path, monkeypatch):
     """A number from a run that broke its own stopping rules is worse than no number."""
     monkeypatch.setattr(batch_mod, "N_CUSTOMERS", 400)
@@ -330,6 +359,48 @@ class TestCommittedArtifact:
         # The two buckets that are not defects must be reported, not folded away.
         assert counts["stopped_by_a_guardrail_correct"] > 0
         assert counts["no_money_in_the_window_unreachable"] > 0
+
+    def test_committed_docs_agree_with_the_artifact(self, m):
+        """Every figure in the docs must be the artifact's, checked rather than trusted.
+
+        This is the rule the repo already had - "no hand-written numbers, every figure is
+        generated from results/metrics.json and a test asserts they match" - and Phase 3 is
+        where it was found not to be enforced. `docs/phase-3.md` was written by hand, the
+        retry-horizon defect was fixed, the batch was re-run, and the document went on
+        claiming Rs 736,114 while the artifact said Rs 935,664. A reviewer caught it. A panel
+        catching a submission whose own documents disagree about what it recovered is the
+        version of that where it costs something.
+
+        `scripts/render_docs.py --check` exits non-zero if any generated block is stale, so
+        the failure now lands here instead.
+        """
+        r = subprocess.run([sys.executable, "scripts/render_docs.py", "--check"],
+                           capture_output=True, text=True, cwd=REPO)
+        assert r.returncode == 0, (
+            "docs are stale - run `python scripts/render_docs.py`\n"
+            f"{r.stdout}\n{r.stderr}")
+
+    def test_no_superseded_headline_survives_anywhere_in_the_docs(self, m):
+        """The pre-amendment figures must not linger in prose the renderer does not own.
+
+        A generated block keeps ITS numbers honest and says nothing about the paragraph
+        underneath it. These are the superseded values from the first run; if one reappears
+        outside the amendments that exist to record it, something was copied rather than
+        generated.
+        """
+        superseded = ("736,114", "736,113.77", "263.09", "0.0033", "58.15%", "32.9 pp",
+                      "943,979", "1,171 of 2,798", "41.9%")
+        allowed = {"docs/metric-definition.md"}      # the amendments MUST cite the old numbers
+        offenders = []
+        for path in sorted((REPO / "docs").rglob("*.md")):
+            rel = path.relative_to(REPO).as_posix()
+            if rel in allowed:
+                continue
+            text = path.read_text(encoding="utf-8")
+            for token in superseded:
+                if token in text:
+                    offenders.append(f"{rel}: {token}")
+        assert not offenders, offenders
 
     def test_cohort_declares_it_is_simulated(self, m):
         assert "SIMULATED" in m["primary_cohort_21d"]["assignment"]["provenance"]

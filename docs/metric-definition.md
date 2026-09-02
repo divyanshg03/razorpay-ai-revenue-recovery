@@ -440,6 +440,29 @@ exists and the split is simply absent.
 `metrics.json` is byte-identical except `head_commit`, which records the commit it was
 generated at. That identity is the evidence the change was reporting-only.
 
+### A5 - 3 Sept 2026 - review fixes, batch re-run, no number changed
+
+Raised by an automated review of the pull request. Recorded because the batch ran again, and
+the rule is that every run is recorded whether or not anything moved.
+
+**The correctness fix.** `run()` accepted a `resamples` argument and reported it in the
+artifact under `bootstrap.resamples`, but `_cohort_block` called `compare()` without passing
+it, so the bootstrap always used its own default. At the shipped default the two coincide at
+10,000, which is why every published interval was computed with the resample count the
+artifact claims, and why nothing caught it - the bug was invisible at exactly the setting
+anyone would check. A caller asking for a cheaper interval got an expensive one and an
+artifact that misdescribed it. Now threaded through, with a test that records what the
+bootstrap was really called with rather than trusting the JSON.
+
+**Also fixed, neither affecting any figure:** `by_cause` and `by_debt_size_tercile` each
+called `summarise` twice per group, once per reported field. A phone number in
+`results/phase0/0.4c-received-events.jsonl` was redacted; see `docs/local-setup.md` for the
+disclosure and what was deliberately left alone.
+
+**Result: no number changed.** Every value in `results/metrics.json` is byte-identical to the
+A1/A4 run except `head_commit`. That identity is the whole evidence for calling these fixes
+non-behavioural, which is why the batch was re-run rather than argued about.
+
 ### A3 - 2 Sept 2026 - the first invocation of that run refused to write, and why
 
 Disclosed because "one batch run" above would otherwise be false, and because a reader who

@@ -179,9 +179,12 @@ def by_cause(outcomes: list[ArmOutcome]) -> dict[str, dict]:
     groups: dict[str, list[ArmOutcome]] = {}
     for o in outcomes:
         groups.setdefault(o.actionability or "unknown", []).append(o)
-    return {k: {"n": len(v), "recovery_rate": summarise(v).recovery_rate,
-                "recovered_rupees": summarise(v).recovered_rupees}
-            for k, v in sorted(groups.items())}
+    out: dict[str, dict] = {}
+    for k, v in sorted(groups.items()):
+        s = summarise(v)                       # once per group, not once per field
+        out[k] = {"n": len(v), "recovery_rate": s.recovery_rate,
+                  "recovered_rupees": s.recovered_rupees}
+    return out
 
 
 def by_debt_size_tercile(outcomes: list[ArmOutcome]) -> dict[str, dict]:
@@ -196,10 +199,13 @@ def by_debt_size_tercile(outcomes: list[ArmOutcome]) -> dict[str, dict]:
     for o in outcomes:
         key = "low" if o.amount_paise <= lo_cut else ("mid" if o.amount_paise <= hi_cut else "high")
         buckets[key].append(o)
-    return {k: {"n": len(v), "recovery_rate": summarise(v).recovery_rate,
-                "recovered_rupees": summarise(v).recovered_rupees,
-                "cut_points_rupees": [round(lo_cut / 100, 2), round(hi_cut / 100, 2)]}
-            for k, v in buckets.items()}
+    cuts = [round(lo_cut / 100, 2), round(hi_cut / 100, 2)]
+    out: dict[str, dict] = {}
+    for k, v in buckets.items():
+        s = summarise(v)                       # once per bucket, not once per field
+        out[k] = {"n": len(v), "recovery_rate": s.recovery_rate,
+                  "recovered_rupees": s.recovered_rupees, "cut_points_rupees": cuts}
+    return out
 
 
 #: Stop reasons that mean the engine was RIGHT to walk away. Recovering these would require
