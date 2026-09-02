@@ -173,7 +173,7 @@ def test_debt_size_terciles_report_their_cut_points():
 # ---------------------------------------------------------------------------------------
 
 def test_arms_are_disjoint_and_cover_the_included_population(tmp_path):
-    arms, _, info = run_arms(SEED, 900, START, 21, Policy(), tmp_path / "l.jsonl")
+    arms, _, info, _c = run_arms(SEED, 900, START, 21, Policy(), tmp_path / "l.jsonl")
     refs = {k: {o.customer_ref for o in v} for k, v in arms.items()}
     assert not (refs["A"] & refs["B"]) and not (refs["B"] & refs["C"]) and not (refs["A"] & refs["C"])
     assert sum(len(v) for v in refs.values()) == sum(info["counts"].values())
@@ -189,8 +189,8 @@ def test_the_same_customer_gets_the_same_payday_in_every_arm():
 def test_batch_run_is_deterministic(tmp_path):
     """Same seed, same result - twice, into different ledgers."""
     p = Policy()
-    r1, _, _ = run_arms(SEED, 700, START, 21, p, tmp_path / "a.jsonl")
-    r2, _, _ = run_arms(SEED, 700, START, 21, p, tmp_path / "b.jsonl")
+    r1, _, _, _ = run_arms(SEED, 700, START, 21, p, tmp_path / "a.jsonl")
+    r2, _, _, _ = run_arms(SEED, 700, START, 21, p, tmp_path / "b.jsonl")
     for arm in ("A", "B", "C"):
         assert [(o.debt_id, o.recovered_paise, o.contact_cost_paise) for o in r1[arm]] == \
                [(o.debt_id, o.recovered_paise, o.contact_cost_paise) for o in r2[arm]]
@@ -216,7 +216,7 @@ def test_a_rerun_does_not_append_onto_the_previous_runs_ledger(tmp_path):
     p = Policy()
     run_arms(SEED, 500, START, 21, p, path)
     first_size = path.stat().st_size
-    _, ledger, _ = run_arms(SEED, 500, START, 21, p, path)
+    _, ledger, _, _ = run_arms(SEED, 500, START, 21, p, path)
 
     assert path.stat().st_size == first_size, (
         "the second run appended to the first instead of starting a new chain")
@@ -302,6 +302,34 @@ class TestCommittedArtifact:
     def test_arm_shares_match_the_frozen_split(self, m):
         s = m["primary_cohort_21d"]["assignment"]["shares"]
         assert abs(s["A"] - 0.20) < 0.02 and abs(s["C"] - 0.60) < 0.03
+
+    def test_no_debt_was_funded_during_the_window_and_never_attempted(self, m):
+        """The one bucket of the failure list that is a DEFECT rather than a limitation.
+
+        A customer whose salary landed inside the horizon we advertise, on a day we never
+        tried, is money lost to arithmetic rather than to circumstance. That bucket stood at
+        489 of 1,171 - 42% of everything unrecovered - because `retry_schedule` truncated a
+        fixed-spacing list and stopped at day 15 of a 21-day window.
+
+        It must stay at zero. If it climbs, the schedule has drifted off the horizon it
+        advertises again, and the headline is overstating what the engine actually covers.
+        """
+        for key in ("primary_cohort_21d", "shifted_parameter_cohort"):
+            standing = m[key]["failure_list"]["standing"]["counts"]
+            assert standing["funded_but_never_attempted_DEFECT"] == 0, (key, standing)
+
+    def test_the_residual_is_decomposed_not_just_counted(self, m):
+        """"33% not recovered" is four different claims and they are not interchangeable:
+        guardrail stops are correct behaviour, never-funded customers are unreachable inside
+        any horizon, and only the remainder is the engine falling short. Reporting the total
+        without the split invites a panel to read all of it as failure."""
+        f = m["primary_cohort_21d"]["failure_list"]
+        counts = f["standing"]["counts"]
+        assert sum(counts.values()) == f["n_not_recovered"]
+        assert set(f["standing"]["rupees"]) == set(counts)
+        # The two buckets that are not defects must be reported, not folded away.
+        assert counts["stopped_by_a_guardrail_correct"] > 0
+        assert counts["no_money_in_the_window_unreachable"] > 0
 
     def test_cohort_declares_it_is_simulated(self, m):
         assert "SIMULATED" in m["primary_cohort_21d"]["assignment"]["provenance"]

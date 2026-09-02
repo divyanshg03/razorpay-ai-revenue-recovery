@@ -404,6 +404,42 @@ so a schedule spread for one distribution is not automatically better against an
 their cost. Both are the honest behaviour of a change that buys coverage late in a horizon,
 and neither is quietly dropped for undercutting the headline.
 
+### A4 - 2 Sept 2026 - the residual is now decomposed in the artifact, reporting only
+
+"33.49% not recovered" is not one claim, it is four, and collapsing them invites a reader to
+score all of it as failure. The failure list now carries a standing split, generated rather
+than written:
+
+| | primary (21d) | shifted |
+|---|---|---|
+| stopped by a guardrail - **correct behaviour** | 208 / Rs 185,742 | 163 / Rs 149,237 |
+| no money in the window at all - **unreachable** | 267 / Rs 200,233 | 674 / Rs 556,726 |
+| funded, but never attempted - **DEFECT** | **0** | **0** |
+| attempted while funded, still unpaid | 462 / Rs 358,388 | 475 / Rs 392,875 |
+
+The third row is the only one that is a bug: a customer whose salary landed inside the horizon
+we advertise, on a day we never tried. It stood at 489 before A1 and is now zero, and a test
+asserts it stays zero in both cohorts. The first two rows are not defects and recovering them
+would mean either breaking the stopping rules or collecting from people who had no money at
+any point in the window. The fourth is the honest residual - we asked, at a moment they could
+have paid, and they did not.
+
+This also explains the shifted cohort undercutting the primary, which A1 reported without
+accounting for: it has 674 never-funded customers against 267, because shifting the payday
+distribution moves more salaries outside the collection horizon entirely. That is a property
+of the cohort, not a weakness of the schedule, and it is the kind of thing the shifted cohort
+exists to expose.
+
+The predicates read the simulator's generative truth. That is safe and deliberate: this runs
+in the evaluation layer, after the engine has finished, and the engine never has access to it.
+Knowing afterwards that a customer never had money is what a simulator is for. Both predicates
+are optional, so the function still works against a real cohort where no such ground truth
+exists and the split is simply absent.
+
+**No number changed.** The batch was re-run to regenerate the artifact and every value in
+`metrics.json` is byte-identical except `head_commit`, which records the commit it was
+generated at. That identity is the evidence the change was reporting-only.
+
 ### A3 - 2 Sept 2026 - the first invocation of that run refused to write, and why
 
 Disclosed because "one batch run" above would otherwise be false, and because a reader who

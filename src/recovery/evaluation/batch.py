@@ -28,7 +28,7 @@ import pathlib
 import subprocess
 
 from ..cohort.simulator import SimulatedCohort
-from ..engine.policy import Policy
+from ..engine.policy import Policy, retry_schedule
 from ..ledger.audit import AuditLedger
 from ..models import Arm
 from .assignment import SEED, assign
@@ -79,7 +79,7 @@ def _partition(cohort: SimulatedCohort, refs: set[str]):
 
 def run_arms(seed: int, n: int, start: dt.date, window: int, policy: Policy,
              ledger_path: pathlib.Path, shifted: bool = False
-             ) -> tuple[dict[str, list[ArmOutcome]], AuditLedger, dict]:
+             ) -> tuple[dict[str, list[ArmOutcome]], AuditLedger, dict, SimulatedCohort]:
     """Run all three arms over one cohort partitioned by the frozen assignment."""
     base = SimulatedCohort(seed=seed, n_customers=n, start=start, shifted=shifted)
     assignment = assign(base.customers(), seed=SEED)
@@ -104,11 +104,14 @@ def run_arms(seed: int, n: int, start: dt.date, window: int, policy: Policy,
                        [c for c in cc.customers() if c.ref in engine_refs],
                        start, window, policy, ledger)
 
+    # `cc` goes back to the caller so the residual can be decomposed against generative
+    # truth - see metrics.failure_list. Reporting only; the engine has already finished and
+    # never had access to it.
     return ({"A": out_a, "B": out_b, "C": out_c}, ledger,
             {"counts": assignment.counts(), "shares": assignment.shares(),
              "excluded": len(assignment.excluded),
              "excluded_reasons": _count(assignment.excluded.values()),
-             "provenance": base.provenance})
+             "provenance": base.provenance}, cc)
 
 
 def _count(values) -> dict[str, int]:
@@ -118,7 +121,28 @@ def _count(values) -> dict[str, int]:
     return dict(sorted(out.items(), key=lambda kv: -kv[1]))
 
 
-def _cohort_block(arms, assignment_info, ledger, policy, window, seed, shifted):
+def _residual_predicates(cohort: SimulatedCohort, start: dt.date, window: int, policy: Policy):
+    """Predicates that let the failure list separate defects from correct behaviour.
+
+    Bucket 3 - funded on some day of the window, but never on a day we attempted - is the
+    only one of the four that is a bug. It stood at 489 until the 2 Sept `retry_schedule`
+    fix and must now stay at zero; if it ever climbs again, the schedule has drifted off the
+    horizon it advertises.
+    """
+    attempt_days = {start + dt.timedelta(days=d) for d in retry_schedule(policy)}
+    window_days = [start + dt.timedelta(days=d) for d in range(window + 1)]
+
+    def ever_funded(ref: str) -> bool:
+        return any(cohort.funds_available(ref, d) for d in window_days)
+
+    def funded_on_attempt_day(ref: str) -> bool:
+        return any(cohort.funds_available(ref, d) for d in window_days if d in attempt_days)
+
+    return ever_funded, funded_on_attempt_day
+
+
+def _cohort_block(arms, assignment_info, ledger, policy, window, seed, shifted, cohort=None,
+                  start=None):
     inv = check_ledger(ledger, policy.max_contacts_per_debt_7d)
     a, b, c = arms["A"], arms["B"], arms["C"]
     primary = compare("engine vs incumbent ladder (PRIMARY)", c, b, "C", "B")
@@ -135,7 +159,9 @@ def _cohort_block(arms, assignment_info, ledger, policy, window, seed, shifted):
         "ledger": ledger.summary(),
         "subgroup_by_diagnosed_cause": by_cause(c),
         "subgroup_by_debt_size_tercile": by_debt_size_tercile(c),
-        "failure_list": failure_list(c),
+        "failure_list": failure_list(c, *(_residual_predicates(cohort, start, window, policy)
+                                          if cohort is not None and start is not None
+                                          else (None, None))),
     }
 
 
@@ -146,10 +172,10 @@ def run(out_path: str | pathlib.Path = "results/metrics.json",
     ledger_dir = pathlib.Path(ledger_dir)
     ledger_dir.mkdir(parents=True, exist_ok=True)
 
-    primary_arms, primary_ledger, primary_assign = run_arms(
+    primary_arms, primary_ledger, primary_assign, primary_cohort = run_arms(
         SEED, N_CUSTOMERS, START, WINDOW_DAYS, policy, ledger_dir / "arm-c-audit.jsonl")
     block = _cohort_block(primary_arms, primary_assign, primary_ledger, policy,
-                          WINDOW_DAYS, SEED, shifted=False)
+                          WINDOW_DAYS, SEED, shifted=False, cohort=primary_cohort, start=START)
 
     if not block["guardrails_all_zero"]:
         raise GuardrailViolation(
@@ -157,18 +183,20 @@ def run(out_path: str | pathlib.Path = "results/metrics.json",
             "A number from a run that broke its own stopping rules is worse than no number.")
 
     # Secondary readout at 14 days, pre-declared in the frozen definition.
-    short_arms, short_ledger, short_assign = run_arms(
+    short_arms, short_ledger, short_assign, short_cohort = run_arms(
         SEED, N_CUSTOMERS, START, SECONDARY_WINDOW_DAYS, policy,
         ledger_dir / "arm-c-audit-14d.jsonl")
     short = _cohort_block(short_arms, short_assign, short_ledger, policy,
-                          SECONDARY_WINDOW_DAYS, SEED, shifted=False)
+                          SECONDARY_WINDOW_DAYS, SEED, shifted=False, cohort=short_cohort,
+                          start=START)
 
     # Shifted-parameter cohort: a policy that merely inverted the generator collapses here.
-    shifted_arms, shifted_ledger, shifted_assign = run_arms(
+    shifted_arms, shifted_ledger, shifted_assign, shifted_cohort = run_arms(
         SEED + 1, N_CUSTOMERS, START, WINDOW_DAYS, policy,
         ledger_dir / "arm-c-audit-shifted.jsonl", shifted=True)
     shifted = _cohort_block(shifted_arms, shifted_assign, shifted_ledger, policy,
-                            WINDOW_DAYS, SEED + 1, shifted=True)
+                            WINDOW_DAYS, SEED + 1, shifted=True, cohort=shifted_cohort,
+                            start=START)
 
     report = {
         "metric_definition": {

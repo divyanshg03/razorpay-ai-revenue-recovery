@@ -31,6 +31,8 @@ credit the engine for payments that would have happened anyway.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import random
 import statistics
 from dataclasses import dataclass
@@ -200,11 +202,40 @@ def by_debt_size_tercile(outcomes: list[ArmOutcome]) -> dict[str, dict]:
             for k, v in buckets.items()}
 
 
-def failure_list(outcomes: list[ArmOutcome]) -> dict:
+#: Stop reasons that mean the engine was RIGHT to walk away. Recovering these would require
+#: breaking the guardrails the submission is built on, so they are not a defect to be fixed.
+CORRECT_TO_STOP = ("opt_out", "dispute_raised", "bereavement_or_hardship")
+
+
+def failure_list(outcomes: list[ArmOutcome],
+                 was_ever_funded: Callable[[str], bool] | None = None,
+                 was_funded_on_an_attempt_day: Callable[[str], bool] | None = None) -> dict:
     """What the engine did NOT recover, by cause and by why it stopped.
 
     A recovery system that reports only its wins is a marketing asset, not an engineering
     one. This is required by the frozen definition, not optional colour.
+
+    The two optional predicates add a STANDING decomposition of the residual, which matters
+    because "33% not recovered" is not one number - it is four, and they have very different
+    standing in front of a panel:
+
+      1. stopped by a guardrail          - correct behaviour. Recovering these means breaking
+                                           opt-out, dispute or hardship rules.
+      2. no money in the window at all    - unreachable by any policy inside the horizon. A
+                                           different collection date is the only lever.
+      3. funded, never attempted          - a genuine scheduling defect. THIS IS THE ONE THAT
+                                           SHOULD BE ZERO, and it is what the 2 Sept
+                                           `retry_schedule` fix drove from 489 to 0.
+      4. attempted while funded, unpaid   - the honest residual: we asked, at a moment they
+                                           could have paid, and they did not.
+
+    The predicates read the simulator's generative truth, which the ENGINE must never see.
+    That asymmetry is deliberate and safe: this is the evaluation layer reporting on a run
+    that has already finished, not an input to any decision. Knowing afterwards that a
+    customer never had money is exactly what a simulator is for.
+
+    Both are optional so the function still works against a real cohort, where ground truth
+    about someone's bank balance does not exist and the decomposition is simply absent.
     """
     lost = [o for o in outcomes if not o.recovered]
     by_cause_lost: dict[str, int] = {}
@@ -219,4 +250,31 @@ def failure_list(outcomes: list[ArmOutcome]) -> dict:
         "unrecovered_rupees": round(sum(o.amount_paise for o in lost) / 100, 2),
         "by_diagnosed_cause": dict(sorted(by_cause_lost.items(), key=lambda kv: -kv[1])),
         "by_stop_reason": dict(sorted(by_stop.items(), key=lambda kv: -kv[1])),
+        **({"standing": _standing(lost, was_ever_funded, was_funded_on_an_attempt_day)}
+           if was_ever_funded and was_funded_on_an_attempt_day else {}),
+    }
+
+
+def _standing(lost: list[ArmOutcome], ever_funded, funded_on_attempt_day) -> dict:
+    """Split the unrecovered into what is a defect and what is not. See `failure_list`."""
+    keys = ("stopped_by_a_guardrail_correct", "no_money_in_the_window_unreachable",
+            "funded_but_never_attempted_DEFECT", "attempted_while_funded_still_unpaid")
+    n = {k: 0 for k in keys}
+    paise = {k: 0 for k in keys}
+    for o in lost:
+        if set(o.stop_reasons) & set(CORRECT_TO_STOP):
+            k = keys[0]
+        elif not ever_funded(o.customer_ref):
+            k = keys[1]
+        elif not funded_on_attempt_day(o.customer_ref):
+            k = keys[2]
+        else:
+            k = keys[3]
+        n[k] += 1
+        paise[k] += o.amount_paise
+    return {
+        "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 "
+                "is, and must stay at zero.",
+        "counts": n,
+        "rupees": {k: round(v / 100, 2) for k, v in paise.items()},
     }

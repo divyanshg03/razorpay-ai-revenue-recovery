@@ -6,7 +6,7 @@
     "note": "The freeze is only meaningful if that commit precedes this result. Ancestry is checked, not asserted."
   },
   "generated_by": "scripts/run_batch.py -> recovery.evaluation.batch.run()",
-  "head_commit": "46986d5",
+  "head_commit": "b1d4670",
   "policy_version": "2026-09-02.2",
   "n_customers": 5000,
   "bootstrap": {
@@ -209,6 +209,21 @@
         "dispute_raised": 63,
         "bereavement_or_hardship": 40,
         "promise_to_pay_active": 17
+      },
+      "standing": {
+        "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
+        "counts": {
+          "stopped_by_a_guardrail_correct": 208,
+          "no_money_in_the_window_unreachable": 267,
+          "funded_but_never_attempted_DEFECT": 0,
+          "attempted_while_funded_still_unpaid": 462
+        },
+        "rupees": {
+          "stopped_by_a_guardrail_correct": 185742.0,
+          "no_money_in_the_window_unreachable": 200233.0,
+          "funded_but_never_attempted_DEFECT": 0.0,
+          "attempted_while_funded_still_unpaid": 358388.0
+        }
       }
     }
   },
@@ -397,6 +412,21 @@
         "dispute_raised": 63,
         "promise_to_pay_active": 40,
         "bereavement_or_hardship": 40
+      },
+      "standing": {
+        "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
+        "counts": {
+          "stopped_by_a_guardrail_correct": 208,
+          "no_money_in_the_window_unreachable": 907,
+          "funded_but_never_attempted_DEFECT": 65,
+          "attempted_while_funded_still_unpaid": 317
+        },
+        "rupees": {
+          "stopped_by_a_guardrail_correct": 184242.0,
+          "no_money_in_the_window_unreachable": 729243.0,
+          "funded_but_never_attempted_DEFECT": 52685.0,
+          "attempted_while_funded_still_unpaid": 243983.0
+        }
       }
     }
   },
@@ -585,6 +615,21 @@
         "dispute_raised": 51,
         "promise_to_pay_active": 51,
         "bereavement_or_hardship": 35
+      },
+      "standing": {
+        "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
+        "counts": {
+          "stopped_by_a_guardrail_correct": 163,
+          "no_money_in_the_window_unreachable": 674,
+          "funded_but_never_attempted_DEFECT": 0,
+          "attempted_while_funded_still_unpaid": 475
+        },
+        "rupees": {
+          "stopped_by_a_guardrail_correct": 149237.0,
+          "no_money_in_the_window_unreachable": 556726.0,
+          "funded_but_never_attempted_DEFECT": 0.0,
+          "attempted_while_funded_still_unpaid": 392875.0
+        }
       }
     }
   },
