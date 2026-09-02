@@ -329,5 +329,82 @@ Frozen by: ____________________  Date: ____________
 
 ## Amendments
 
-*None. Any future entry must state: date, what changed, why, and whether a result had been
-observed at the time.*
+Each entry states: date, what changed, why, and whether a result had been observed at the time.
+
+### A1 - 2 Sept 2026 - engine defect fixed, batch re-run
+
+**A result HAD been observed.** The first batch had already run and reported Rs 736,113.77 net
+incremental, 95% CI [Rs 590,969.58 - Rs 874,218.90]. This amendment exists because that number
+is now superseded, and the superseded value is recorded here so the change is auditable in the
+direction that matters - you can see what it was before.
+
+**What changed.** One function: `retry_schedule` in `src/recovery/engine/policy.py`. Nothing in
+this definition document, no parameter, no arm, no cost, no window, no seed, no exclusion rule.
+
+The function built a fixed-spacing list and truncated it to the retry budget:
+
+    days = tuple(range(0, policy.retry_horizon_days + 1, policy.retry_spacing_days))
+    return days[: policy.max_retries_per_debt]
+
+which is 0, 3, 6, 9, 12, 15, 18, 21 cut to the first six. So `retry_horizon_days = 21` was
+declared in the policy, described in the docstring, and never reached: the final attempt landed
+on day 15 and the last six days of the horizon were never attempted. It now spreads the same
+six attempts across the horizon - 0, 4, 8, 13, 17, 21 - with `retry_spacing_days` demoted from
+a step to a minimum, since its justification (issuers throttle repeated mandate execution) is a
+floor and not a rhythm.
+
+**Why this is a defect and not a tuning knob.** The budget did not change (6), the horizon did
+not change (21), the throttle floor did not change (3), and retries are free in the frozen cost
+model so no cost moved. The docstring asserting that coverage of the salary cycle is the point
+predates the measurement and is the older specification; the implementation contradicted it.
+The test that should have caught it asserted `max(days) >= 15` - it tested the value the bug
+produced rather than the property the docstring promised, and has been replaced with an
+assertion that the last retry lands **on** the declared horizon.
+
+**How it was found - this is the part that keeps it honest.** Not by re-running until the
+number improved. The Phase 3 failure list was decomposed by asking, for each of the 1,171
+unrecovered debts, whether money was ever available during the window and on which days. 489 of
+them - 42% of the entire failure list - had funds arrive strictly after day 15, inside the
+window we claimed to cover, on days we had stopped attempting. That decomposition is a
+diagnostic that names a mechanism; it is reproducible and it pointed at one function before any
+change was made.
+
+**Scope of who it helps.** Arm C only. Arm B is Razorpay's T+0..T+3 ladder and does not call
+this function; arm A takes no action. So this widens C vs B, and that asymmetry is disclosed
+rather than buried. It is nonetheless the correct fix, because the alternative - leaving a
+declared parameter unhonoured so the headline stays modest - would misreport the engine as
+worse than the design it documents.
+
+**One batch run follows this amendment.** Not a search over variants.
+
+### A2 - 2 Sept 2026 - a change deliberately NOT made
+
+Recorded because a rejected change is evidence too, and because the next person to look at the
+failure list will find the same tempting thing.
+
+`needs_customer_action` recovers 17.99% against 67.24% for `needs_funds` and is the weakest
+subgroup in the result. The engine never silently retries it: `guardrails.py` permits a retry
+for `NEEDS_NEW_INSTRUMENT` once a contact has gone out, on the reasoning that the customer may
+have supplied a new instrument and only a charge attempt can find out - but grants
+`NEEDS_CUSTOMER_ACTION` no equivalent. Making those two symmetric is a one-line change and
+would raise the headline.
+
+It was not made, for a reason that survives inspection better than the extra rupees would.
+In the simulator, `attempt_charge` gates `NEEDS_NEW_INSTRUMENT` on a `has_new_instrument` flag
+that only a delivered contact can set - a real causal chain, contact then act then charge.
+`NEEDS_CUSTOMER_ACTION` has **no such gate**: it succeeds on funds alone. So an engine allowed
+to retry it would not be recovering money by prompting anyone; it would be collecting rupees
+from a constraint the simulator forgot to impose, and the gain would measure a modelling gap.
+
+The obvious repair - add the missing gate so the chain is real - is also declined, and this is
+the harder call. It would make the simulator stricter, which sounds unimpeachable, except that
+arm B retries blindly and does not contact anyone at all. Tightening that gate would strip
+recovery from the incumbent baseline while leaving the engine a path to earn it back, i.e. it
+would raise the headline by handicapping the thing we are measuring against, using a
+generative model we wrote ourselves. The domain evidence does not settle it either:
+`authentication_failed` and `incorrect_otp` plausibly do clear on a silent re-execution, while
+`payment_cancelled` plausibly does not, and the taxonomy lumps them together.
+
+So the weak spot stands, unpatched and reported. It is a genuine limitation of the engine and
+partly an artifact of the simulator, and that ambiguity is stated in the README rather than
+resolved in whichever direction pays.
