@@ -18,12 +18,39 @@ results/phase0/0.4c-received-events.jsonl.
 #>
 param(
     [int]$Port = 9090,
-    [string]$Url = "https://<zrok-share-name>.shares.zrok.io/webhook",
+    # Built from .env (gitignored) like the secret. The share name is not a credential, but
+    # it is a live endpoint on this machine and a public repo should not advertise it.
+    [string]$Url = "",
+    [string]$ShareDomain = "shares.zrok.io",
     [string]$TaskName = "RazorpayWebhookDaemon"
 )
 
 $Repo = Split-Path -Parent $PSScriptRoot
 $EventLog = Join-Path $Repo "results\phase0\0.4c-received-events.jsonl"
+
+function Get-EnvValue([string]$Name) {
+    $envFile = Join-Path $Repo ".env"
+    if (-not (Test-Path $envFile)) { return $null }
+    foreach ($line in Get-Content $envFile) {
+        $trimmed = $line.Trim()
+        if ($trimmed -and -not $trimmed.StartsWith("#") -and $trimmed.Contains("=")) {
+            $parts = $trimmed.Split("=", 2)
+            if ($parts[0].Trim() -eq $Name) { return $parts[1].Trim() }
+        }
+    }
+    return $null
+}
+
+if (-not $Url) {
+    $name = Get-EnvValue "RAZORPAY_WEBHOOK_ZROK_NAME"
+    if (-not $name) {
+        Write-Output ""
+        Write-Output "  RAZORPAY_WEBHOOK_ZROK_NAME is not set in .env - cannot build the public URL."
+        Write-Output ""
+        exit 1
+    }
+    $Url = "https://$name.$ShareDomain/webhook"
+}
 
 function Test-Port([int]$p) {
     $client = New-Object Net.Sockets.TcpClient

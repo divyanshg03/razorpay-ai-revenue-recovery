@@ -136,6 +136,7 @@ reserves a name in a namespace, then `share public … -n <namespace>:<name>` bi
 it. The endpoint is now stable across restarts:
 
 ```
+# share name lives in RAZORPAY_WEBHOOK_ZROK_NAME (.env, gitignored)
 https://<zrok-share-name>.shares.zrok.io/webhook
 restart:  zrok2 share public 9090 --headless --force-local -n public:<zrok-share-name>
 ```

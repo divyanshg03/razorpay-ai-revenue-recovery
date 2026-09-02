@@ -31,7 +31,9 @@ param(
     # Read from .env (gitignored), never hardcoded: this repo is destined to be public and
     # git history is permanent. Pass -Secret to override.
     [string]$Secret = "",
-    [string]$ZrokName = "<zrok-share-name>",
+    # Read from .env (gitignored) like the secret. The share name is not a credential, but
+    # it is a live endpoint on this machine and a public repo should not advertise it.
+    [string]$ZrokName = "",
     [string]$Namespace = "public",
     [string]$ShareDomain = "shares.zrok.io",
     # Pinned deliberately. Launching "python" by name resolves via PATH, which on this
@@ -53,7 +55,6 @@ $EventLog = Join-Path $Repo "results\phase0\0.4c-received-events.jsonl"
 # a wrong secret in the Dashboard is indistinguishable from Razorpay never calling at all —
 # both look like an empty event log behind a perfectly healthy endpoint.
 $RejectLog = Join-Path $RuntimeDir "webhook-rejected.jsonl"
-$PublicUrl = "https://$ZrokName.$ShareDomain/webhook"
 
 New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
 
@@ -73,6 +74,18 @@ function Get-EnvValue([string]$Name) {
 }
 
 if (-not $Secret) { $Secret = Get-EnvValue "RAZORPAY_WEBHOOK_SECRET" }
+if (-not $ZrokName) { $ZrokName = Get-EnvValue "RAZORPAY_WEBHOOK_ZROK_NAME" }
+if (-not $ZrokName) {
+    Add-Content -Path (Join-Path $RuntimeDir "webhook-daemon.log") -Encoding utf8 `
+        -Value ("{0}  FATAL: RAZORPAY_WEBHOOK_ZROK_NAME not set in .env" -f (Get-Date -Format o))
+    exit 1
+}
+
+# Built only AFTER the share name is resolved. Computing it earlier interpolated an empty
+# name, so the health probe hit "https://.shares.zrok.io" and reported UNHEALTHY forever -
+# which would have had the watchdog delete and recreate a perfectly good share every five
+# minutes.
+$PublicUrl = "https://$ZrokName.$ShareDomain/webhook"
 if (-not $Secret) {
     # Serving with an empty secret would reject every delivery while looking healthy -
     # exactly the silent failure this whole daemon exists to prevent.

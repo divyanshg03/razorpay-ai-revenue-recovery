@@ -87,7 +87,10 @@ observation and varies (4.8 ms and 18.1 ms across two runs, against a 5 s budget
 
 ## The webhook endpoint — permanent, not session-scoped
 
-**Public URL:** `https://<zrok-share-name>.shares.zrok.io/webhook`
+**Public URL:** `https://<zrok-share-name>.shares.zrok.io/webhook`, where the share name comes
+from `RAZORPAY_WEBHOOK_ZROK_NAME` in `.env` (gitignored). It is not a credential — unsigned
+requests get a 400 and never reach the queue — but it is a live endpoint on this machine,
+and a public repo has no reason to advertise where to aim.
 **Secret:** `RAZORPAY_WEBHOOK_SECRET` in `.env` (gitignored). It must match the Dashboard
 value **exactly** — trailing whitespace on it once caused 18 real Razorpay deliveries to be
 silently rejected while the endpoint reported perfectly healthy.

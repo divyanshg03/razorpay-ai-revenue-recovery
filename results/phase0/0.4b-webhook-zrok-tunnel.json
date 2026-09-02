@@ -40,5 +40,6 @@
       "pass": true
     }
   },
-  "all_passed": true
+  "all_passed": true,
+  "redaction_note": "The zrok share name was replaced with a placeholder before this repo was pushed. It is a live endpoint on the author's machine, not a credential. Nothing else in this artifact is altered: the HTTP statuses, round-trip timings and check verdicts are exactly as measured."
 }
