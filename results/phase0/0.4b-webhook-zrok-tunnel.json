@@ -1,0 +1,44 @@
+{
+  "gate": "0.4 \u2014 webhook receive path (RESERVED public URL)",
+  "tunnel": "zrok v2.0.4, reserved name in namespace 'public'",
+  "public_endpoint": "https://<zrok-share-name>.shares.zrok.io/webhook",
+  "url_is_stable": true,
+  "restart_command": "zrok2 share public 9090 --headless --force-local -n public:<zrok-share-name>",
+  "ack_budget_seconds": 5.0,
+  "max_round_trip_seconds": 2.258,
+  "headroom_seconds": 2.742,
+  "scope": "Everything except an event originated by Razorpay itself, which needs dashboard registration (test-mode OTP 754081).",
+  "checks": {
+    "signed_event_on_reserved_url": {
+      "http": 200,
+      "body": {
+        "status": "queued"
+      },
+      "round_trip_seconds": 2.258,
+      "pass": true
+    },
+    "duplicate_deduped": {
+      "http": 200,
+      "body": {
+        "status": "duplicate ignored"
+      },
+      "round_trip_seconds": 1.541,
+      "pass": true
+    },
+    "tampered_rejected": {
+      "http": 400,
+      "body": {
+        "status": "invalid signature"
+      },
+      "pass": true
+    },
+    "reserialised_rejected": {
+      "http": 400,
+      "body": {
+        "status": "invalid signature"
+      },
+      "pass": true
+    }
+  },
+  "all_passed": true
+}

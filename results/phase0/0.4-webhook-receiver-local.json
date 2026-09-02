@@ -1,0 +1,61 @@
+{
+  "gate": "0.4 \u2014 webhook receive path (local leg)",
+  "scope": "receiver logic only; the zrok tunnel + dashboard registration leg is NOT covered here",
+  "checks": {
+    "valid_event_accepted": {
+      "http": 200,
+      "body": {
+        "status": "queued"
+      },
+      "ack_seconds": 0.0048,
+      "ack_budget_seconds": 5.0,
+      "pass": true
+    },
+    "duplicate_event_id_deduped": {
+      "http": 200,
+      "body": {
+        "status": "duplicate ignored"
+      },
+      "pass": true
+    },
+    "tampered_body_rejected": {
+      "http": 400,
+      "body": {
+        "status": "invalid signature"
+      },
+      "pass": true
+    },
+    "reserialised_body_fails_signature": {
+      "http": 400,
+      "body": {
+        "status": "invalid signature"
+      },
+      "raw_len": 207,
+      "reserialised_len": 223,
+      "bytes_differ": true,
+      "pass": true
+    },
+    "missing_signature_rejected": {
+      "http": 400,
+      "body": {
+        "status": "invalid signature"
+      },
+      "pass": true
+    },
+    "distinct_event_id_accepted": {
+      "http": 200,
+      "body": {
+        "status": "queued"
+      },
+      "pass": true
+    },
+    "processing_decoupled_from_ack": {
+      "enqueued_and_processed": 2,
+      "duplicates_ignored": 1,
+      "signature_rejections": 3,
+      "expected_processed": 2,
+      "pass": true
+    }
+  },
+  "all_passed": true
+}
