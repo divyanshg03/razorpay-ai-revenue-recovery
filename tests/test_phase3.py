@@ -390,7 +390,11 @@ class TestCommittedArtifact:
         """
         superseded = ("736,114", "736,113.77", "263.09", "0.0033", "58.15%", "32.9 pp",
                       "943,979", "1,171 of 2,798", "41.9%")
-        allowed = {"docs/metric-definition.md"}      # the amendments MUST cite the old numbers
+        # Two files MUST be able to cite the old numbers: the amendments that exist to record
+        # what was superseded, and the archived PR threads, which are a verbatim record of a
+        # review that discussed them. Editing either to satisfy this test would be falsifying
+        # a history, which is the opposite of what the test is for.
+        allowed = {"docs/metric-definition.md", "docs/pr-review-archive.md"}
         offenders = []
         for path in sorted((REPO / "docs").rglob("*.md")):
             rel = path.relative_to(REPO).as_posix()
