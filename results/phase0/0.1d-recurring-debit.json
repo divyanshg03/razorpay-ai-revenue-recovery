@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/payments/create/recurring",
+    "body": {
+      "email": "probe@example.com",
+      "contact": "9999999999",
+      "amount": 50000,
+      "currency": "INR",
+      "order_id": "order_probe",
+      "customer_id": "cust_TTfo82xIO39puh",
+      "token": "token_probe",
+      "recurring": "1"
+    }
+  },
+  "status": 400,
+  "response": {
+    "error": {
+      "code": "BAD_REQUEST_ERROR",
+      "description": "The requested URL was not found on the server.",
+      "source": "internal",
+      "step": "NA",
+      "reason": "NA",
+      "metadata": {}
+    }
+  }
+}

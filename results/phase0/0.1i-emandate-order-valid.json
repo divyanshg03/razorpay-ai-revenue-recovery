@@ -1,0 +1,60 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/orders",
+    "body": {
+      "amount": 0,
+      "currency": "INR",
+      "method": "emandate",
+      "customer_id": "cust_TTfovcJBaTuiOT",
+      "receipt": "phase0-emandate",
+      "token": {
+        "auth_type": "netbanking",
+        "max_amount": 900000,
+        "expire_at": 1893456000,
+        "bank_account": {
+          "beneficiary_name": "Probe User",
+          "account_number": "11214311521",
+          "account_type": "savings",
+          "ifsc_code": "HDFC0000001"
+        }
+      }
+    }
+  },
+  "status": 200,
+  "response": {
+    "amount": 0,
+    "amount_due": 0,
+    "amount_paid": 0,
+    "attempts": 0,
+    "created_at": 1787589052,
+    "currency": "INR",
+    "entity": "order",
+    "id": "order_TTfovsBccQaHm6",
+    "notes": [],
+    "offer_id": null,
+    "receipt": "phase0-emandate",
+    "status": "created",
+    "token": {
+      "auth_type": "netbanking",
+      "bank_account": {
+        "account_number": "11214311521",
+        "account_type": "savings",
+        "bank_name": "HDFC Bank",
+        "beneficiary_email": "probe2@example.com",
+        "beneficiary_mobile": "9123456780",
+        "ifsc": "HDFC0000001",
+        "name": "Probe User"
+      },
+      "currency": "INR",
+      "expire_at": 1893456000,
+      "failure_reason": null,
+      "first_payment_amount": 0,
+      "frequency": null,
+      "max_amount": 900000,
+      "method": "emandate",
+      "notes": [],
+      "recurring_status": null
+    }
+  }
+}

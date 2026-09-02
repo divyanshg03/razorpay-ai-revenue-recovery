@@ -1,0 +1,33 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/orders",
+    "body": {
+      "amount": 100,
+      "currency": "INR",
+      "method": "upi",
+      "customer_id": "cust_TTfovcJBaTuiOT",
+      "receipt": "phase0-upi-100",
+      "token": {
+        "max_amount": 900000,
+        "expire_at": 1893456000,
+        "frequency": "monthly"
+      }
+    }
+  },
+  "status": 200,
+  "response": {
+    "amount": 100,
+    "amount_due": 100,
+    "amount_paid": 0,
+    "attempts": 0,
+    "created_at": 1787589053,
+    "currency": "INR",
+    "entity": "order",
+    "id": "order_TTfoxT5tVTOR6X",
+    "notes": [],
+    "offer_id": null,
+    "receipt": "phase0-upi-100",
+    "status": "created"
+  }
+}

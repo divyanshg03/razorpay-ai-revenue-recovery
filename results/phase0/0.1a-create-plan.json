@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/plans",
+    "body": {
+      "period": "monthly",
+      "interval": 1,
+      "item": {
+        "name": "Phase 0 probe plan",
+        "amount": 50000,
+        "currency": "INR",
+        "description": "Phase 0 feasibility probe"
+      }
+    }
+  },
+  "status": 401,
+  "response": {
+    "error": "Unauthorized"
+  }
+}

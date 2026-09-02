@@ -1,0 +1,11 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/payment_links/plink_TTfpmEhYSaahyN/notify_by/sms",
+    "body": {}
+  },
+  "status": 200,
+  "response": {
+    "success": true
+  }
+}

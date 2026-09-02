@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/payment_links",
+    "body": {
+      "amount": 50000,
+      "currency": "INR",
+      "description": "Phase 0 probe",
+      "customer": {
+        "contact": "+919999999999"
+      },
+      "notify": {
+        "sms": false,
+        "email": false
+      }
+    }
+  },
+  "status": 400,
+  "response": {
+    "error": {
+      "code": "BAD_REQUEST_ERROR",
+      "description": "Recurring digits in customer contact are disallowed",
+      "metadata": [],
+      "reason": null,
+      "source": null,
+      "step": null
+    }
+  }
+}

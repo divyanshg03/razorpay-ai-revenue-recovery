@@ -1,0 +1,12 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/disputes?count=1",
+    "body": null
+  },
+  "status": 200,
+  "response": {
+    "entity": "collection",
+    "has_more": false
+  }
+}

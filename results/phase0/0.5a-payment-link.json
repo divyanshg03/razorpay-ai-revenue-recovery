@@ -1,0 +1,58 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/payment_links",
+    "body": {
+      "amount": 50000,
+      "currency": "INR",
+      "description": "Recovery probe",
+      "customer": {
+        "name": "Probe User",
+        "contact": "+919123456780",
+        "email": "probe2@example.com"
+      },
+      "notify": {
+        "sms": false,
+        "email": false
+      },
+      "reminder_enable": false
+    }
+  },
+  "status": 200,
+  "response": {
+    "accept_partial": false,
+    "allow_full_payment": false,
+    "amount": 50000,
+    "amount_paid": 0,
+    "cancelled_at": 0,
+    "created_at": 1787589100,
+    "currency": "INR",
+    "customer": {
+      "contact": "+919123456780",
+      "email": "probe2@example.com",
+      "name": "Probe User"
+    },
+    "description": "Recovery probe",
+    "expire_by": 0,
+    "expired_at": 0,
+    "first_min_partial_amount": 0,
+    "id": "plink_TTfpmEhYSaahyN",
+    "notes": null,
+    "notify": {
+      "email": false,
+      "sms": false,
+      "whatsapp": false
+    },
+    "payment_plan": false,
+    "payments": null,
+    "reference_id": "",
+    "reminder_enable": false,
+    "reminders": [],
+    "short_url": "https://rzp.io/rzp/hiXo0bty",
+    "status": "created",
+    "updated_at": 1787589100,
+    "upi_link": false,
+    "user_id": "",
+    "whatsapp_link": false
+  }
+}

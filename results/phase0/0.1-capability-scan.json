@@ -1,0 +1,50 @@
+{
+  "payments": {
+    "status": 200,
+    "verdict": "REACHABLE (count=0)"
+  },
+  "orders": {
+    "status": 200,
+    "verdict": "REACHABLE (count=0)"
+  },
+  "customers": {
+    "status": 200,
+    "verdict": "REACHABLE (count=0)"
+  },
+  "payment_links": {
+    "status": 200,
+    "verdict": "REACHABLE (count=None)"
+  },
+  "invoices": {
+    "status": 200,
+    "verdict": "REACHABLE (count=0)"
+  },
+  "items": {
+    "status": 200,
+    "verdict": "REACHABLE (count=0)"
+  },
+  "refunds": {
+    "status": 200,
+    "verdict": "REACHABLE (count=0)"
+  },
+  "settlements": {
+    "status": 200,
+    "verdict": "REACHABLE (count=0)"
+  },
+  "disputes": {
+    "status": 200,
+    "verdict": "REACHABLE (count=None)"
+  },
+  "virtual_accounts": {
+    "status": 400,
+    "verdict": "400 The requested URL was not found on the server."
+  },
+  "plans": {
+    "status": 401,
+    "verdict": "GATED / not enabled on this account"
+  },
+  "subscriptions": {
+    "status": 401,
+    "verdict": "GATED / not enabled on this account"
+  }
+}
