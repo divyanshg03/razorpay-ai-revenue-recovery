@@ -235,6 +235,48 @@ def test_no_engine_module_performs_network_io():
     assert not offenders, offenders
 
 
+def test_the_demo_runs_clean_offline_and_shows_the_gate_firing():
+    """The demo is the artifact the track is actually judged on, so it must not rot.
+
+    Run headless, with no model: that path has to work, because a judge reproducing this on
+    a machine without Ollama is the likeliest way it gets watched. The batch measurement is
+    template-composed for the same reason, so running offline is honest rather than degraded.
+
+    The MISMATCH assertion is the valuable one. Each copy-gate probe declares the rule it is
+    meant to trip and the demo prints whether the gate agreed. The first version of that
+    scene showed five clean rejections, one of which had actually been rejected for "payment
+    link missing" - the shaming rule was never exercised and the screen implied it had been.
+    If a gate pattern drifts so a probe passes for the wrong reason, this fails.
+    """
+    r = subprocess.run([sys.executable, "scripts/demo.py"],
+                       capture_output=True, text=True, cwd=REPO, timeout=300)
+    assert r.returncode == 0, r.stderr[-2000:]
+    out = r.stdout
+
+    assert "MISMATCH" not in out, "a copy-gate probe tripped a different rule than it claims"
+
+    for rule in ("discount_or_offer", "false_urgency", "scarcity", "threat_or_shaming",
+                 "fabricated_amount"):
+        assert rule in out, f"the gate never demonstrated {rule}"
+
+    # The loop's load-bearing moments, each of which a panel will ask about.
+    for beat in ("DIAGNOSIS", "GUARDRAILS", "COPY GATE", "AUDIT TRAIL",
+                 "stop_reason=opt_out", "stop_reason=payment_received",
+                 "hash chain intact          True"):
+        assert beat in out, f"missing from the demo: {beat}"
+
+    assert "cohort is simulated" in out, "the demo must disclose the simulator before it ends"
+
+
+def test_the_demo_uses_the_real_components_not_a_reimplementation():
+    """A demo that re-implements the system is a demo of the demo."""
+    src = (REPO / "scripts" / "demo.py").read_text(encoding="utf-8")
+    for module in ("recovery.engine.machine", "recovery.engine.policy",
+                   "recovery.llm.copy_gate", "recovery.llm.composer",
+                   "recovery.llm.parser", "recovery.ledger.audit"):
+        assert module in src, f"demo does not import {module}"
+
+
 def test_the_readme_diagram_is_present_and_renderable():
     """A mermaid block GitHub cannot parse renders as a wall of text on the front page."""
     text = README.read_text(encoding="utf-8")

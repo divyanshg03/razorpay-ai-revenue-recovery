@@ -26,7 +26,25 @@ a human, or stop. Every decision is written to an append-only, hash-chained ledg
 replayed afterwards under the policy version that applied at the time.
 
 A local language model writes the wording and reads inbound replies. **It never decides
-whether to contact anyone about money**, and there is no import path from the engine to it.
+whether to contact anyone about money.**
+
+## Watch it run
+
+```bash
+python scripts/demo.py           # deterministic; no model, no credentials, no network
+python scripts/demo.py --live    # ask the local model for real wording
+python scripts/demo.py --pause   # step through scene by scene
+```
+
+One failed collection, end to end: the raw error fields, the diagnosis that error code alone
+cannot give you, the guardrails firing, the ladder escalating, the message being composed, the
+copy gate rejecting non-compliant wording, a reply parsed into a promise-to-pay and then an
+opt-out, the stopping rules taking effect, and the hash-chained ledger replayed in order.
+
+Every component in it is imported from `src/recovery/` exactly as the batch imports them —
+nothing is re-implemented for the demo, because a demo that re-implements the system is a demo
+of the demo. The copy-gate probes each declare the rule they are meant to trip, and the run
+prints whether the gate agreed; a test fails the build if they ever disagree.
 
 ---
 
