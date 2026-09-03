@@ -93,9 +93,51 @@ as outcomes, not as failures to fix.
 
 ## How it is built
 
+```mermaid
+flowchart TB
+    IN["Failed charge<br/>webhook or batch"] --> DIAG
+
+    subgraph ENGINE ["Engine — deterministic. Decides everything."]
+        DIAG["Diagnosis<br/>cause + actionability"] --> GUARD["Guardrails<br/>hard stops → soft stops → contact rules"]
+        GUARD --> RECHECK{"Re-check payment<br/>state, now"}
+        RECHECK -->|"already paid"| STOP["Stop"]
+        RECHECK -->|"still owing"| SM["State machine<br/>retry · message · escalate · stop"]
+    end
+
+    SM --> RUN["Orchestration<br/>asks for words only after the decision is made"]
+
+    subgraph LLM ["Local model on Ollama — wording only. Decides nothing."]
+        COMP["Composer"] --> GATE{"Copy gate<br/>discount · urgency · scarcity · shaming"}
+        PARSE["Reply parser<br/>intent + date phrase"]
+    end
+
+    RUN --> COMP
+    GATE -->|"rejected"| TPL["Deterministic template"]
+    GATE -->|"passed"| SEND["Send"]
+    TPL --> SEND
+    REPLY["Customer reply"] --> PARSE
+    PARSE -->|"intent, as evidence"| GUARD
+
+    SM --> LEDGER[("Append-only<br/>hash-chained ledger")]
+    SEND --> LEDGER
+    GATE --> LEDGER
+    STOP --> LEDGER
+    LEDGER --> INV["Replay invariants<br/>never import the engine"]
+```
+
 **A deterministic state machine owns every decision.** The model composes wording and parses
-replies. That split is enforced structurally, not by convention: `engine/machine.py` has no
-import path to `llm/`.
+replies. Read the diagram in one direction: the arrow into the model box leaves *after* the
+decision has already been made, and no arrow returns into the state machine carrying an
+action. A parsed reply re-enters as **evidence** for the guardrails — an opt-out stops
+contact — never as a choice about whether to dun someone.
+
+The split is structural rather than conventional, and stated exactly: the engine imports two
+names from `llm/parser` — `Intent`, an enum, and `ParsedReply`, a frozen dataclass. Both are
+vocabulary for describing a reply that has *already* been parsed. It imports no function that
+reaches a model, and nothing under `engine/` performs an HTTP call. So there is no call path
+from a decision to a language model, which is the property that matters and is narrower than
+"no import at all". A test enumerates the permitted names and fails if the engine ever
+imports one that can invoke something.
 
 **The copy gate is demonstrated, not asserted.** Generated wording is rejected if it
 introduces a discount, urgency, scarcity, or shaming. This is not a tone preference. Under

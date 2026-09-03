@@ -174,3 +174,78 @@ def test_readme_states_the_comparison_is_against_the_incumbent(readme):
     low = readme.lower()
     assert "do-nothing" in low or "do nothing" in low
     assert "ladder" in low
+
+
+# ---------------------------------------------------------------------------------------
+# 4.4 the architecture claim the README makes must actually hold
+# ---------------------------------------------------------------------------------------
+
+#: The ONLY names `engine/` may take from `llm/`. Both are vocabulary for describing a reply
+#: that has already been parsed - an enum and a frozen dataclass. Neither can invoke anything.
+PERMITTED_LLM_IMPORTS = {"Intent", "ParsedReply"}
+
+
+def test_the_engine_cannot_reach_a_language_model():
+    """The claim a panel will probe first, pinned as an enumerated allow-list.
+
+    The README originally said "engine/machine.py has no import path to llm/". That was
+    FALSE - it imports Intent and ParsedReply - and the wording was corrected rather than the
+    code, because the import is correct and the sentence was lazy. What actually matters is
+    narrower and stronger: the engine may name the reply vocabulary, but it must not import
+    anything capable of *calling* a model, and nothing under engine/ may open a socket.
+
+    An allow-list rather than a deny-list, so a newly added model-invoking helper fails here
+    by default instead of needing to be predicted.
+    """
+    import ast
+
+    engine_dir = REPO / "src" / "recovery" / "engine"
+    offenders: list[str] = []
+    for path in sorted(engine_dir.glob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module and "llm" in node.module:
+                for alias in node.names:
+                    if alias.name not in PERMITTED_LLM_IMPORTS:
+                        offenders.append(f"{path.name} imports {alias.name} from {node.module}")
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if "llm" in alias.name:
+                        offenders.append(f"{path.name} imports module {alias.name}")
+    assert not offenders, offenders
+
+
+def test_no_engine_module_performs_network_io():
+    """A decision path that can open a socket is a decision path that can call a model."""
+    import ast
+
+    banned = {"urllib", "http", "requests", "socket", "httpx", "ollama"}
+    offenders: list[str] = []
+    for path in sorted((REPO / "src" / "recovery" / "engine").glob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            names = []
+            if isinstance(node, ast.Import):
+                names = [a.name for a in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                names = [node.module]
+            for n in names:
+                if n.split(".")[0] in banned:
+                    offenders.append(f"{path.name}: {n}")
+    assert not offenders, offenders
+
+
+def test_the_readme_diagram_is_present_and_renderable():
+    """A mermaid block GitHub cannot parse renders as a wall of text on the front page."""
+    text = README.read_text(encoding="utf-8")
+    assert "```mermaid" in text, "the architecture diagram is missing"
+    block = text.split("```mermaid", 1)[1].split("```", 1)[0]
+    # Count KEYWORDS, not substrings: "end" also lives inside "Append-only", which made the
+    # first version of this test report four ends against two subgraphs.
+    lines = [ln.strip() for ln in block.splitlines()]
+    opens = sum(1 for ln in lines if ln.startswith("subgraph "))
+    closes = sum(1 for ln in lines if ln == "end")
+    assert opens == closes, f"unbalanced mermaid: {opens} subgraph, {closes} end"
+    assert opens >= 2, "expected the engine and model boundaries to be drawn as subgraphs"
+    for must in ("Engine", "Copy gate", "ledger"):
+        assert must.lower() in block.lower(), must
