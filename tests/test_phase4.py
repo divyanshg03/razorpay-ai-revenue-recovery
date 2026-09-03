@@ -1,0 +1,176 @@
+"""Phase 4 exit criteria — the packaging must not be able to lie.
+
+Phase 3 established the number. Phase 4 is where a submission usually starts overstating it,
+because prose is easier to edit than an artifact. So the tests here are not about whether the
+README reads well. They are about whether it *can* disagree with `results/metrics.json`, and
+whether the disclosure can drift below the headline while nobody is looking.
+
+Three properties, each of which failed at least once in a real project before it was pinned:
+
+  - every rupee figure in the README comes from a generated block
+  - every limitation the artifact carries appears in the README, counted, none dropped
+  - the simulated-cohort disclosure appears BEFORE the headline figure, in file order
+"""
+
+from __future__ import annotations
+
+import json
+import pathlib
+import re
+import subprocess
+import sys
+
+import pytest
+
+REPO = pathlib.Path(__file__).resolve().parents[1]
+README = REPO / "README.md"
+METRICS = REPO / "results" / "metrics.json"
+
+GEN = re.compile(r"<!-- generated:([a-z0-9-]+) -->(.*?)<!-- /generated:\1 -->", re.S)
+
+
+@pytest.fixture(scope="module")
+def m():
+    return json.loads(METRICS.read_text(encoding="utf-8"))
+
+
+@pytest.fixture(scope="module")
+def readme():
+    return README.read_text(encoding="utf-8")
+
+
+def _outside_generated(text: str) -> str:
+    """The README with every generated block removed - i.e. the hand-written part."""
+    return GEN.sub("", text)
+
+
+# ---------------------------------------------------------------------------------------
+# 4.1 every figure is generated
+# ---------------------------------------------------------------------------------------
+
+def test_readme_has_the_generated_blocks_it_claims():
+    names = {m_.group(1) for m_ in GEN.finditer(README.read_text(encoding="utf-8"))}
+    assert {"readme-headline", "readme-failures", "readme-limitations",
+            "readme-reproduce"} <= names, names
+
+
+def test_no_rupee_figure_is_hand_typed_in_the_README(readme):
+    """A rupee amount outside a generated block is a figure nobody can check.
+
+    This is the rule the repo has had since Phase 0 - "if it isn't in the artifact, it
+    doesn't go in the prose" - and Phase 3 proved it needed enforcing rather than stating:
+    docs/phase-3.md sat for a day claiming a headline the artifact had already superseded.
+    """
+    hand_written = _outside_generated(readme)
+    # Any "Rs" followed by digits. Currency words without a number are fine.
+    offenders = re.findall(r"Rs\s?[\d,]+(?:\.\d+)?", hand_written)
+    assert not offenders, f"hand-typed rupee figures outside generated blocks: {offenders}"
+
+
+def test_render_check_covers_the_README_and_is_clean():
+    """`--check` must actually include README.md, not just the phase doc."""
+    from importlib import util
+    spec = util.spec_from_file_location("rd", REPO / "scripts" / "render_docs.py")
+    rd = util.module_from_spec(spec)
+    spec.loader.exec_module(rd)
+    assert "README.md" in rd.TARGETS, rd.TARGETS
+
+    r = subprocess.run([sys.executable, "scripts/render_docs.py", "--check"],
+                       capture_output=True, text=True, cwd=REPO)
+    assert r.returncode == 0, f"{r.stdout}\n{r.stderr}"
+
+
+def test_headline_in_the_README_equals_the_artifact(readme, m):
+    """Spot-check the actual number, not just that a renderer ran."""
+    block = next(g.group(2) for g in GEN.finditer(readme) if g.group(1) == "readme-headline")
+    expected = f"Rs {m['headline']['net_incremental_rupees']:,.0f}"
+    assert expected in block, (expected, block[:400])
+
+
+# ---------------------------------------------------------------------------------------
+# 4.2 limitations are complete, and placed before the claim
+# ---------------------------------------------------------------------------------------
+
+def test_every_limitation_in_the_artifact_reaches_the_README(readme, m):
+    """Adding a limitation to batch.py and forgetting the README must fail the build.
+
+    The count is asserted as well as the content, because a renderer that silently truncates
+    is exactly the failure being guarded against, and it would slip past a check that only
+    looked for the text of the limitations it did emit.
+    """
+    block = next(g.group(2) for g in GEN.finditer(readme) if g.group(1) == "readme-limitations")
+    numbered = re.findall(r"^\s*(\d+)\.\s", block, re.M)
+    assert len(numbered) == len(m["limitations"]), (
+        f"README lists {len(numbered)} limitations, artifact has {len(m['limitations'])}")
+
+    flat = " ".join(block.split())
+    for lim in m["limitations"]:
+        head = " ".join(lim.split())[:60]
+        assert head in flat, f"limitation missing from README: {head!r}"
+
+
+def test_the_two_phase3_self_criticisms_are_present(m):
+    """The findings Phase 3 made about ITSELF, which a panel would otherwise find first."""
+    joined = " ".join(m["limitations"]).lower()
+    assert "needs_customer_action" in joined and "declined" in joined, \
+        "the deliberately-unfixed weak spot (A2) is not disclosed"
+    assert "pre-registered prediction" in joined and "did not hold" in joined, \
+        "the failed pre-registration (A1) is not disclosed"
+
+
+def test_the_simulator_disclosure_comes_before_the_headline_number(readme):
+    """Ordering is the whole ethic of this README, so it is asserted rather than trusted.
+
+    The temptation when packaging is to lead with the money and let the disclosure drift down
+    the page. That single edit turns an honest project into a dishonest one, and it is
+    invisible to every other test in this suite - the figures would still all be generated
+    and correct.
+    """
+    disclosure = readme.lower().find("cohort is simulated")
+    headline = readme.find("<!-- generated:readme-headline -->")
+    assert disclosure != -1, "the simulated-cohort disclosure is missing entirely"
+    assert headline != -1
+    assert disclosure < headline, \
+        "the headline figure appears above the simulated-cohort disclosure"
+
+
+def test_the_failure_list_comes_before_the_architecture_section(readme):
+    """What it failed to recover is part of the result, not an appendix to the design."""
+    failures = readme.find("<!-- generated:readme-failures -->")
+    architecture = readme.find("## How it is built")
+    assert -1 not in (failures, architecture)
+    assert failures < architecture
+
+
+# ---------------------------------------------------------------------------------------
+# 4.3 / claims the README is not allowed to make
+# ---------------------------------------------------------------------------------------
+
+def test_readme_never_claims_dpdp_compliance(readme):
+    """Substantive DPDP obligations commence 14 May 2027. "Designed for" is the true claim.
+
+    The phrase may appear only inside an explicit negation, which is why this checks the
+    surrounding words rather than banning the string.
+    """
+    for match in re.finditer(r'.{0,40}DPDP.compliant', readme, re.I):
+        context = match.group(0).lower()
+        assert "not" in context or "never" in context, f"unqualified claim: {match.group(0)!r}"
+    assert "14 May 2027" in readme, "the correct commencement date is not stated"
+
+
+def test_readme_attributes_no_numeric_call_cap_to_rbi(readme):
+    """RBI says only "excessively calling" and names no figure. The 7-in-7 rule is US Reg F."""
+    for match in re.finditer(r'RBI.{0,160}', readme, re.S):
+        seg = match.group(0)
+        assert not re.search(r"\b\d+\s*(calls|contacts|attempts)\b", seg, re.I), seg
+
+
+def test_the_word_accuracy_appears_nowhere_in_the_README(readme):
+    assert "accuracy" not in readme.lower()
+
+
+def test_readme_states_the_comparison_is_against_the_incumbent(readme):
+    """Beating do-nothing proves nothing; the README must say what it beat."""
+    low = readme.lower()
+    assert "do-nothing" in low or "do nothing" in low
+    assert "ladder" in low

@@ -277,6 +277,25 @@ def run(out_path: str | pathlib.Path = "results/metrics.json",
             "In-batch composition uses deterministic templates. The simulator has no notion "
             "of wording, so the LLM cannot affect this measurement; it is exercised live in "
             "the test suite and results/phase2/.",
+            # Added 3 Sept 2026 (amendment A7). Both are findings Phase 3 produced about
+            # ITSELF, and both are the kind a panel finds if the submission does not say them
+            # first. They live in the artifact rather than in README prose so that the README
+            # cannot report the result without also reporting these.
+            "The weakest subgroup is needs_customer_action, and it was deliberately NOT "
+            "fixed. The engine never silently retries it, while it does retry a dead "
+            "instrument once a contact has gone out. Making those symmetric is a one-line "
+            "change that would raise the headline - but the simulator gates the instrument "
+            "case on a flag only a contact can set and gates this case on nothing, so the "
+            "gain would measure a modelling gap rather than recovered money. Repairing that "
+            "gap instead would strip recovery from the incumbent baseline, which retries "
+            "blindly and contacts nobody. Both were declined; see amendment A2.",
+            "The pre-registered prediction for this phase did not hold. The plan said a "
+            "randomised holdout would produce a SMALLER lift than the un-held-out Phase 2 "
+            "sanity run; the measured lift is larger. The cause is identified rather than "
+            "guessed - both the sanity run and the first Phase 3 run were measuring an "
+            "engine whose retry schedule stopped six days short of its declared 21-day "
+            "horizon (amendment A1). The prediction is left unedited in docs/phase-3.md, "
+            "because a pre-registration revised after the result is not a pre-registration.",
         ],
     }
 

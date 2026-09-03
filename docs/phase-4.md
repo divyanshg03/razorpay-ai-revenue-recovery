@@ -94,15 +94,22 @@ A short section plus one diagram covering the four things a panel will actually 
 - **the stopping rules**, and that the unrecovered residual includes people the system was
   *right* to leave alone — the decomposition, rendered from the artifact, not the raw total
 
-### 4.5 — The five-minute video
+## Deferred — decided 3 September 2026
+
+**4.5 (the five-minute video) and 4.6 (making the repo public) are out of scope for this
+branch**, by explicit decision, not by running out of time. They are recorded here rather
+than deleted, because both are still submission deliverables and the plan should not quietly
+lose them.
+
+### 4.5 — The five-minute video *(deferred)*
 
 Structure, timed: the problem in 45 seconds; the live demo slice against Razorpay test mode;
 the batch result with its interval; the copy gate rejecting something; the failure list; the
 simulator disclosure. Demo before numbers — the track is judged on a working demo.
 
-### 4.6 — Repo public
+### 4.6 — Repo public *(deferred)*
 
-Last, and only after 4.1–4.4 are green. Pre-flight, all mechanical:
+Only after 4.1–4.4 are green. Pre-flight, all mechanical:
 
 - `.env` gitignored and absent from history; no test key in any tracked file
 - no zrok hostname, no phone number, no personal data — the sweep from A6, re-run
@@ -113,14 +120,18 @@ Last, and only after 4.1–4.4 are green. Pre-flight, all mechanical:
 
 - **Pass** A scripted pre-flight check runs all of the above and exits non-zero on any hit.
 
+Note that the repo going public is what makes the A6 exposure analysis binding: while it stays
+private, a phone number in a pull-request ref is a latent problem; the moment it is public,
+it is a live one. Do not reorder 4.6 ahead of that sweep.
+
 ## Exit criteria
+
+Scoped to 4.1–4.4. The two deferred items carry their own criteria above.
 
 1. README's every figure is generated, and a test proves it.
 2. Limitations appear before the headline, and their count is asserted against the artifact.
 3. A clean clone reproduces `metrics.json` with three commands.
-4. The pre-flight secret and claim sweep passes.
-5. Video recorded, under five minutes, demo first.
-6. Repo public.
+4. The architecture section answers the four questions a panel actually probes.
 
 ## Explicitly not in Phase 4
 
@@ -132,7 +143,8 @@ new subgroup. If a figure looks wrong, it gets an amendment, not an edit.
 
 **Time.** Two days, and the video is the item with no partial credit — a half-cut video scores
 as no video. So 4.1 and 4.2 land first, because a repo that a judge can read and reproduce is
-worth more than a polished narration of one they cannot.
+worth more than a polished narration of one they cannot. With 4.5 and 4.6 deferred, that
+ordering is now explicit rather than aspirational.
 
 **The second risk is tone.** The temptation in packaging is to state the ₹935,664 and let the
 simulator disclosure drift down the page. That single edit would convert an honest project

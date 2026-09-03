@@ -42,6 +42,8 @@ METRICS = REPO / "results" / "metrics.json"
 #: Which generated block belongs to which file. One block may appear in several files.
 TARGETS: dict[str, tuple[str, ...]] = {
     "docs/phase-3.md": ("phase3-results",),
+    "README.md": ("readme-headline", "readme-failures", "readme-limitations",
+                  "readme-reproduce"),
 }
 
 
@@ -67,7 +69,9 @@ def _an(x: float) -> str:
 
 def _wrap(text: str, width: int = 95) -> str:
     """Match the hand-written prose around it. Markdown does not care; a reviewer does."""
-    return "\n".join(textwrap.wrap(text, width=width))
+    # break_on_hyphens=False: otherwise "pre-registration" splits across lines at the hyphen,
+    # which reads as a typo in a document whose subject is being precise.
+    return "\n".join(textwrap.wrap(text, width=width, break_on_hyphens=False))
 
 
 def _cost(value: float | None) -> str:
@@ -164,7 +168,111 @@ def render_phase3_results(m: dict) -> str:
     return "\n".join(lines)
 
 
-RENDERERS = {"phase3-results": render_phase3_results}
+def render_readme_headline(m: dict) -> str:
+    h, p21 = m["headline"], m["primary_cohort_21d"]
+    lo, hi = h["ci95_rupees"]
+    rr, md = p21["arms"], m["metric_definition"]
+    b = m["bootstrap"]
+    return "\n".join([
+        f"| | |",
+        f"|---|---|",
+        f"| **Net incremental recovery** | **{_rs(h['net_incremental_rupees'])}** |",
+        f"| 95% CI | {_rs(lo)} – {_rs(hi)} |",
+        f"| Per treated customer | {_rs2(h['per_customer_rupees'])} |",
+        f"| Compared against | {h['comparison']} |",
+        f"| Cost per incremental rupee | "
+        f"{('Rs ' + str(p21['cost_per_incremental_rupee'])) if p21['cost_per_incremental_rupee'] is not None else 'n/a - no incremental recovery'} |",
+        f"| Recovery rate, A / B / C | {_pct(rr['A']['recovery_rate'])} / "
+        f"{_pct(rr['B']['recovery_rate'])} / {_pct(rr['C']['recovery_rate'])} |",
+        f"| Cohort | {m['n_customers']:,} simulated customers, seed {b['seed']} |",
+        f"| Interval method | {b['method']}, {b['resamples']:,} resamples |",
+        f"| Metric frozen at | `{md['frozen_at_commit']}`, ancestry verified: "
+        f"{str(md['is_ancestor_of_head']).lower()} |",
+        "",
+        _wrap(
+        f"Arm A does nothing. Arm B is Razorpay's own T+0..T+3 ladder, reimplemented. Arm C "
+        f"is the engine. The headline is **C against B** - beating do-nothing proves nothing, "
+        f"since every recovery vendor beats doing nothing. {_intervals_claim(m)}"),
+    ])
+
+
+def render_readme_failures(m: dict) -> str:
+    p21 = m["primary_cohort_21d"]
+    f = p21["failure_list"]
+    st, rup = f["standing"]["counts"], f["standing"]["rupees"]
+    labels = {
+        "stopped_by_a_guardrail_correct":
+            "Stopped by a guardrail — **the system was right to stop**",
+        "no_money_in_the_window_unreachable":
+            "No money in the window at all — **unreachable by any policy**",
+        "funded_but_never_attempted_DEFECT":
+            "Funded, but never attempted — **a defect; must stay 0**",
+        "attempted_while_funded_still_unpaid":
+            "Attempted while funded, still unpaid — the honest residual",
+    }
+    lines = [
+        _wrap(f"The engine did not recover {f['n_not_recovered']:,} of "
+              f"{p21['arms']['C']['n']:,} debts "
+              f"({_pct(f['share_not_recovered'])}), leaving "
+              f"{_rs(f['unrecovered_rupees'])} on the table. That total is four different "
+              f"things, and only one of them is a defect:"),
+        "",
+        "| Why it was not recovered | Customers | Rupees |",
+        "|---|---|---|",
+    ]
+    for k, label in labels.items():
+        lines.append(f"| {label} | {st[k]:,} | {_rs(rup[k])} |")
+    lines += ["", _wrap(
+        "Recovering the first two rows would mean either breaking the opt-out, dispute and "
+        "hardship rules, or collecting from people who had no money at any point in the "
+        "window. They are reported as outcomes, not as failures to fix.")]
+    return "\n".join(lines)
+
+
+def render_readme_limitations(m: dict) -> str:
+    """Every limitation the artifact carries, numbered, none omitted.
+
+    Rendered rather than retyped so that adding one to `batch.py` and forgetting the README
+    is impossible - the count is asserted by a test.
+    """
+    items = []
+    for i, lim in enumerate(m["limitations"], 1):
+        marker = f"{i}. "
+        # Continuation lines are indented to the marker width. GitHub's lazy continuation
+        # would render it either way; a human reading the raw file would not.
+        body = textwrap.fill(lim, width=95, initial_indent=marker,
+                             subsequent_indent=" " * len(marker), break_on_hyphens=False)
+        items.append(body)
+    return "\n\n".join(items)
+
+
+def render_readme_reproduce(m: dict) -> str:
+    b, md = m["bootstrap"], m["metric_definition"]
+    return "\n".join([
+        "```bash",
+        "pip install -e '.[dev]'                 # Python >= 3.11; no runtime dependencies",
+        "python scripts/run_batch.py             # regenerates results/metrics.json",
+        "python scripts/render_docs.py --check   # fails if any figure in the docs drifted",
+        "pytest                                  # the full suite",
+        "```",
+        "",
+        _wrap(
+        f"The batch is offline and deterministic: no Razorpay credentials, no network, and "
+        f"no Ollama. It regenerates `results/metrics.json` byte-for-byte from seed "
+        f"{b['seed']} on {m['n_customers']:,} customers, with the sole exception of "
+        f"`head_commit`, which records the commit it was generated at. The local model is "
+        f"exercised in the test suite and the demo, where wording is the point; it cannot "
+        f"affect this measurement, and `{md['document']}` says so."),
+    ])
+
+
+RENDERERS = {
+    "phase3-results": render_phase3_results,
+    "readme-headline": render_readme_headline,
+    "readme-failures": render_readme_failures,
+    "readme-limitations": render_readme_limitations,
+    "readme-reproduce": render_readme_reproduce,
+}
 
 
 def apply(text: str, name: str, body: str) -> str:

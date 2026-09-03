@@ -463,6 +463,32 @@ disclosure and what was deliberately left alone.
 A1/A4 run except `head_commit`. That identity is the whole evidence for calling these fixes
 non-behavioural, which is why the batch was re-run rather than argued about.
 
+### A7 - 3 Sept 2026 - two limitations added, batch re-run, no figure changed
+
+Phase 4 packaging. Recorded because the batch ran again.
+
+**What changed.** Two entries appended to `limitations` in `batch.py`. Nothing else: no
+parameter, no arm, no cost, no window, no seed, no exclusion rule, no engine code.
+
+Both are findings Phase 3 made about **itself**, and both are the kind a panel finds within
+ten minutes if the submission does not say them first:
+
+* `needs_customer_action` is the weakest subgroup, and it was deliberately not fixed. The
+  one-line change that would raise it harvests a gap in our own simulator, and repairing that
+  gap would strip recovery from the incumbent baseline instead. See A2.
+* The pre-registered prediction for Phase 3 did not hold - the measured lift came in above the
+  un-held-out sanity run, not below it. The cause is the retry-horizon defect in A1.
+
+They live in the artifact rather than in README prose specifically so the README **cannot**
+report the result without also reporting them: the README's limitations section is generated
+from this list, and a test asserts the counts match. Adding a limitation and forgetting the
+README now fails the build.
+
+**Result: no figure changed.** Every value in `results/metrics.json` is byte-identical to the
+A5 run except `head_commit` and the length of `limitations`. That is the whole evidence for
+calling this a reporting-only change, which is why the batch was re-run rather than argued
+about.
+
 ### A6 - 3 Sept 2026 - git history rewritten to remove a real phone number
 
 Recorded here because the rewrite changed commit SHAs that this document and the artifact
