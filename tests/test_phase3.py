@@ -101,6 +101,35 @@ def test_unreachable_customer_is_excluded():
     assert is_excluded(Customer("c", has_whatsapp=False, has_sms=False)) == "no_reachable_channel"
 
 
+def test_assignment_is_invariant_to_the_cohort_seed():
+    """Two seeds exist and only one may move. This pins which.
+
+    `run_arms(cohort_seed=...)` seeds the WORLD - who exists, when they are paid, what
+    failed. The ASSIGNMENT seed is frozen at 20260905 and is read from the module constant,
+    never from the caller, so the split cannot be varied by anyone shopping for a better
+    number. The shifted cohort relies on exactly this: same customers, same arms, different
+    world, so a difference between cohorts is attributable to the world and not to a
+    reshuffle.
+
+    Until 3 Sept 2026 the parameter was called `seed`, which read as though it drove both.
+    A reviewer flagged it. The rename fixed the reading; this fixes the meaning.
+    """
+    a = cohort(400, seed=SEED)
+    b = cohort(400, seed=SEED + 1, shifted=True)
+
+    assert [c.ref for c in a.customers()] == [c.ref for c in b.customers()], \
+        "customer refs must not depend on the cohort seed, or the arms stop being comparable"
+
+    arms_a, arms_b = assign(a.customers()).arms, assign(b.customers()).arms
+    shared = set(arms_a) & set(arms_b)
+    assert shared
+    assert all(arms_a[r] is arms_b[r] for r in shared), \
+        "a customer changed arm when only the cohort seed moved"
+
+    # ...and the world genuinely did change, or the check above proves nothing.
+    assert [a._payday(c.ref) for c in a.customers()] != [b._payday(c.ref) for c in b.customers()]
+
+
 # ---------------------------------------------------------------------------------------
 # 3.3 the metric
 # ---------------------------------------------------------------------------------------
@@ -379,6 +408,48 @@ class TestCommittedArtifact:
         assert r.returncode == 0, (
             "docs are stale - run `python scripts/render_docs.py`\n"
             f"{r.stdout}\n{r.stderr}")
+
+    def test_renderer_never_prints_a_null_cost_or_asserts_significance_it_lacks(self, m):
+        """Two ways the generated block could state something the artifact does not.
+
+        `cost_per_incremental_rupee` is deliberately None when there is no incremental
+        recovery to divide by - null rather than a flattering zero. Formatted straight into
+        the sentence that becomes "Rs None per incremental rupee recovered".
+
+        Worse, the sentence "All three intervals exclude zero" was a hardcoded string: a
+        claim about statistical significance, asserted rather than read, inside the one
+        section whose entire purpose is that its figures come from the artifact. It would
+        have kept saying so after an interval crossed zero. `excludes_zero` is computed per
+        cohort and is now what the sentence is built from.
+
+        Both are checked against mutated copies, because neither shows up in the happy path
+        and the happy path is the only thing a committed artifact ever exercises.
+        """
+        import copy
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("rd", REPO / "scripts" / "render_docs.py")
+        rd = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rd)
+
+        no_lift = copy.deepcopy(m)
+        no_lift["primary_cohort_21d"]["cost_per_incremental_rupee"] = None
+        out = rd.render_phase3_results(no_lift)
+        assert "Rs None" not in out and "None per incremental" not in out, out
+
+        crossed = copy.deepcopy(m)
+        crossed["secondary_cohort_14d"]["primary"]["excludes_zero"] = False
+        claim = rd._intervals_claim(crossed)
+        assert "All three intervals exclude zero" not in claim, claim
+        assert "14-day" in claim
+
+        none_hold = copy.deepcopy(crossed)
+        for k in ("primary_cohort_21d", "shifted_parameter_cohort"):
+            none_hold[k]["primary"]["excludes_zero"] = False
+        assert "None of the three" in rd._intervals_claim(none_hold)
+
+        # And the true case still reads as it should.
+        assert rd._intervals_claim(m) == "All three intervals exclude zero."
 
     def test_no_superseded_headline_survives_anywhere_in_the_docs(self, m):
         """The pre-amendment figures must not linger in prose the renderer does not own.

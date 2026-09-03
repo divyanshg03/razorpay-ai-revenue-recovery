@@ -77,24 +77,45 @@ def _partition(cohort: SimulatedCohort, refs: set[str]):
     return [d for d in cohort.debts() if d.customer_ref in refs]
 
 
-def run_arms(seed: int, n: int, start: dt.date, window: int, policy: Policy,
+def run_arms(cohort_seed: int, n: int, start: dt.date, window: int, policy: Policy,
              ledger_path: pathlib.Path, shifted: bool = False
              ) -> tuple[dict[str, list[ArmOutcome]], AuditLedger, dict, SimulatedCohort]:
-    """Run all three arms over one cohort partitioned by the frozen assignment."""
-    base = SimulatedCohort(seed=seed, n_customers=n, start=start, shifted=shifted)
-    assignment = assign(base.customers(), seed=SEED)
+    """Run all three arms over one cohort partitioned by the frozen assignment.
+
+    **There are two seeds here and only one of them is a parameter. That asymmetry is the
+    point, not an oversight.**
+
+    `cohort_seed` seeds the WORLD - who exists, when they are paid, what failed. It varies:
+    the shifted-parameter cohort is generated with `SEED + 1` precisely so a policy that had
+    merely memorised one generated population collapses against another.
+
+    The ASSIGNMENT seed is frozen at `SEED = 20260905` in docs/metric-definition.md and is
+    read from the module constant rather than accepted here. Making it an argument would let
+    a caller vary the thing the freeze exists to hold still, and "we tried a few splits" is
+    the single easiest way to turn a randomised holdout into a number-shopping exercise. The
+    parameter was called `seed` until 3 Sept 2026, which read as though it drove both; a
+    reviewer flagged exactly that. Renaming it was the fix. Adding the second seed to the
+    signature would have been the bug the name was hinting at.
+
+    This is safe because customer refs are generated independently of `cohort_seed`, so the
+    same customer lands in the same arm in every cohort while the world around them changes.
+    `test_assignment_is_invariant_to_the_cohort_seed` pins that property, so it cannot drift
+    into a comment that is no longer true.
+    """
+    base = SimulatedCohort(seed=cohort_seed, n_customers=n, start=start, shifted=shifted)
+    assignment = assign(base.customers(), seed=SEED)   # frozen; deliberately not cohort_seed
 
     # Arm A - do nothing.
-    ca = SimulatedCohort(seed=seed, n_customers=n, start=start, shifted=shifted)
+    ca = SimulatedCohort(seed=cohort_seed, n_customers=n, start=start, shifted=shifted)
     out_a = run_do_nothing(ca, _partition(ca, assignment.refs_in(Arm.DO_NOTHING)), start, window)
 
     # Arm B - Razorpay's ladder, reimplemented.
-    cb = SimulatedCohort(seed=seed, n_customers=n, start=start, shifted=shifted)
+    cb = SimulatedCohort(seed=cohort_seed, n_customers=n, start=start, shifted=shifted)
     out_b = run_incumbent_ladder(cb, _partition(cb, assignment.refs_in(Arm.INCUMBENT_LADDER)),
                                  start, window)
 
     # Arm C - the engine. Only this arm writes a ledger; it is the only one that decides.
-    cc = SimulatedCohort(seed=seed, n_customers=n, start=start, shifted=shifted)
+    cc = SimulatedCohort(seed=cohort_seed, n_customers=n, start=start, shifted=shifted)
     engine_refs = assignment.refs_in(Arm.ENGINE)
     # fresh=True: a batch run is a new experiment, not a continuation of the last one. See
     # AuditLedger.__init__ - appending one run onto another interleaves two chains over the

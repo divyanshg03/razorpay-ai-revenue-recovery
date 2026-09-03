@@ -70,6 +70,39 @@ def _wrap(text: str, width: int = 95) -> str:
     return "\n".join(textwrap.wrap(text, width=width))
 
 
+def _cost(value: float | None) -> str:
+    """`cost_per_incremental_rupee` is deliberately None when there is no incremental
+    recovery to divide by - reported as null rather than as a flattering zero. Formatting
+    that straight into the sentence yields "Rs None per incremental rupee recovered", which
+    is worse than a wrong number because it looks like a typo rather than a finding."""
+    if value is None:
+        return ("**no cost per incremental rupee**, because there was no incremental "
+                "recovery to divide by")
+    return f"a cost of **Rs {value} per incremental rupee recovered**"
+
+
+def _intervals_claim(blocks: dict[str, dict]) -> str:
+    """Say what the intervals actually did, rather than asserting the happy case.
+
+    This sentence used to be the literal string "All three intervals exclude zero." - a
+    claim about statistical significance, hardcoded, in the one section of the document whose
+    entire purpose is that its figures come from the artifact. It would have gone on saying
+    so after an interval crossed zero, which is exactly the direction of error that matters.
+    `excludes_zero` is already computed per cohort; this reads it.
+    """
+    labels = ("21-day", "14-day", "shifted-parameter")
+    flags = [blocks[k]["primary"]["excludes_zero"] for k in
+             ("primary_cohort_21d", "secondary_cohort_14d", "shifted_parameter_cohort")]
+    if all(flags):
+        return "All three intervals exclude zero."
+    if not any(flags):
+        return "**None of the three intervals excludes zero.**"
+    failed = [lab for lab, ok in zip(labels, flags) if not ok]
+    verb = "does" if len(failed) == 1 else "do"
+    return (f"**Not every interval excludes zero:** the {' and the '.join(failed)} "
+            f"{verb} not.")
+
+
 def render_phase3_results(m: dict) -> str:
     p21, p14, psh = (m["primary_cohort_21d"], m["secondary_cohort_14d"],
                      m["shifted_parameter_cohort"])
@@ -96,9 +129,8 @@ def render_phase3_results(m: dict) -> str:
         f"{_rs2(h['net_incremental_per_customer_rupees'])} per treated customer. "
         f"Arm A {_pct(rr['A']['recovery_rate'])}, arm B {_pct(rr['B']['recovery_rate'])}, "
         f"arm C {_pct(rr['C']['recovery_rate'])} — {_an(h['lift_pp'])} {h['lift_pp']} pp "
-        f"lift over the incumbent, at a cost of "
-        f"**Rs {p21['cost_per_incremental_rupee']} per incremental "
-        f"rupee recovered**. All three intervals exclude zero."),
+        f"lift over the incumbent, at {_cost(p21['cost_per_incremental_rupee'])}. "
+        f"{_intervals_claim(m)}"),
         "",
         _wrap(
         f"On the shifted cohort — built to be harder, with fewer insufficient-funds cases and "
