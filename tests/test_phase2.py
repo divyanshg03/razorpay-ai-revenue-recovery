@@ -11,12 +11,14 @@ if the server is unreachable, and say so loudly.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import datetime as dt
 import socket
 
 import pytest
 
-from recovery.cohort.simulator import SimulatedCohort
+from recovery.cohort.simulator import FUNDS_WINDOW_DAYS, SimulatedCohort
 from recovery.diagnosis.taxonomy import diagnose
 from recovery.engine.guardrails import ContactRecord, DebtState, evaluate
 from recovery.engine.machine import RecoveryEngine
@@ -88,8 +90,54 @@ def test_contact_window_is_a_permission_not_a_prohibition():
 
 def test_retries_are_spread_across_the_cycle_not_clustered():
     days = retry_schedule(P)
-    assert days[0] == 0 and max(days) >= 15 and len(days) == P.max_retries_per_debt
+    assert days[0] == 0 and len(days) == P.max_retries_per_debt
     assert days != (0, 1, 2, 3)
+
+
+def test_the_last_retry_lands_ON_the_declared_horizon_not_short_of_it():
+    """Regression, 2 Sept 2026. The schedule used to be a fixed-spacing list truncated to the
+    retry budget - 0,3,6,9,12,15,18,21 cut to the first six - so `retry_horizon_days = 21`
+    was declared and never reached, and the last six days of the window got no attempt.
+
+    The old assertion here was `max(days) >= 15`, which is exactly why the suite did not
+    catch it: it tested the value the bug happened to produce. This asserts the PROPERTY the
+    docstring promises instead, so any future change to the budget or the floor still has to
+    cover the horizon it advertises.
+
+    Worth 489 of 1,171 unrecovered debts, all of them funded inside the stated window.
+    """
+    days = retry_schedule(P)
+    assert max(days) == P.retry_horizon_days, (
+        f"schedule stops at day {max(days)} but the policy advertises "
+        f"{P.retry_horizon_days}; the tail of the window is unattempted")
+
+
+def test_spacing_is_a_throttle_FLOOR_that_is_never_breached():
+    """Issuers throttle repeated mandate execution, so attempts may be spread further apart
+    than `retry_spacing_days` but never packed closer. Checked across a range of budgets,
+    including ones too large to spread across the horizon at all."""
+    for n in range(1, 25):
+        days = retry_schedule(replace(P, max_retries_per_debt=n))
+        assert all(b - a >= P.retry_spacing_days for a, b in zip(days, days[1:])), (n, days)
+        assert all(0 <= d <= P.retry_horizon_days for d in days), (n, days)
+        assert len(days) <= n
+        assert len(set(days)) == len(days), (n, days)
+
+
+def test_schedule_degrades_sanely_at_the_edges():
+    assert retry_schedule(replace(P, max_retries_per_debt=0)) == ()
+    assert retry_schedule(replace(P, max_retries_per_debt=1)) == (0,)
+
+
+def test_the_schedule_covers_more_of_a_salary_cycle_than_the_incumbent_ladder():
+    """The whole thesis in one assertion. Coverage is the share of the 30 possible payday
+    positions whose post-payday funded window overlaps at least one attempt. The incumbent
+    fires four attempts inside four days, so it can only ever catch a payday that has just
+    happened; spreading the SAME budget across the horizon is what buys the rest."""
+    def coverage(days):
+        return len({(d - k) % 30 for d in days for k in range(FUNDS_WINDOW_DAYS)})
+
+    assert coverage(retry_schedule(P)) > coverage((0, 1, 2, 3))
 
 
 def test_messaging_is_almost_never_cost_bound_but_a_human_call_eventually_is():

@@ -35,10 +35,16 @@ if ($Uninstall) {
 
 if (-not (Test-Path $Daemon)) { throw "daemon script not found at $Daemon" }
 
-# -NonInteractive and -WindowStyle Hidden keep it off any console. -File (not -Command)
-# avoids quoting surprises in the scheduled-task argument string.
-$action = New-ScheduledTaskAction -Execute "powershell.exe" `
-    -Argument "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$Daemon`"" `
+# Launched through a VBScript shim rather than powershell.exe directly. -WindowStyle Hidden
+# does NOT prevent the flash: PowerShell allocates a console first and hides it a moment
+# later, so a window blinked on screen every repetition interval, all day. WScript.Shell.Run
+# with window style 0 never creates one. Running the task as S4U would also fix it but needs
+# elevation to register, and this project stays non-elevated deliberately.
+$Launcher = Join-Path (Join-Path $Repo "scripts") "run_hidden.vbs"
+if (-not (Test-Path $Launcher)) { throw "launcher not found at $Launcher" }
+
+$action = New-ScheduledTaskAction -Execute "wscript.exe" `
+    -Argument "`"$Launcher`" `"$Daemon`"" `
     -WorkingDirectory $Repo
 
 $logon = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
@@ -62,6 +68,7 @@ $settings = New-ScheduledTaskSettingsSet `
     -DontStopIfGoingOnBatteries `
     -StartWhenAvailable `
     -MultipleInstances IgnoreNew `
+    -Hidden `
     -ExecutionTimeLimit (New-TimeSpan -Minutes 4)
 
 $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" `

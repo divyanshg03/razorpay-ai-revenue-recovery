@@ -329,5 +329,229 @@ Frozen by: ____________________  Date: ____________
 
 ## Amendments
 
-*None. Any future entry must state: date, what changed, why, and whether a result had been
-observed at the time.*
+Each entry states: date, what changed, why, and whether a result had been observed at the time.
+
+### A1 - 2 Sept 2026 - engine defect fixed, batch re-run
+
+**A result HAD been observed.** The first batch had already run and reported Rs 736,113.77 net
+incremental, 95% CI [Rs 590,969.58 - Rs 874,218.90]. This amendment exists because that number
+is now superseded, and the superseded value is recorded here so the change is auditable in the
+direction that matters - you can see what it was before.
+
+**What changed.** One function: `retry_schedule` in `src/recovery/engine/policy.py`. Nothing in
+this definition document, no parameter, no arm, no cost, no window, no seed, no exclusion rule.
+
+The function built a fixed-spacing list and truncated it to the retry budget:
+
+    days = tuple(range(0, policy.retry_horizon_days + 1, policy.retry_spacing_days))
+    return days[: policy.max_retries_per_debt]
+
+which is 0, 3, 6, 9, 12, 15, 18, 21 cut to the first six. So `retry_horizon_days = 21` was
+declared in the policy, described in the docstring, and never reached: the final attempt landed
+on day 15 and the last six days of the horizon were never attempted. It now spreads the same
+six attempts across the horizon - 0, 4, 8, 13, 17, 21 - with `retry_spacing_days` demoted from
+a step to a minimum, since its justification (issuers throttle repeated mandate execution) is a
+floor and not a rhythm.
+
+**Why this is a defect and not a tuning knob.** The budget did not change (6), the horizon did
+not change (21), the throttle floor did not change (3), and retries are free in the frozen cost
+model so no cost moved. The docstring asserting that coverage of the salary cycle is the point
+predates the measurement and is the older specification; the implementation contradicted it.
+The test that should have caught it asserted `max(days) >= 15` - it tested the value the bug
+produced rather than the property the docstring promised, and has been replaced with an
+assertion that the last retry lands **on** the declared horizon.
+
+**How it was found - this is the part that keeps it honest.** Not by re-running until the
+number improved. The Phase 3 failure list was decomposed by asking, for each of the 1,171
+unrecovered debts, whether money was ever available during the window and on which days. 489 of
+them - 42% of the entire failure list - had funds arrive strictly after day 15, inside the
+window we claimed to cover, on days we had stopped attempting. That decomposition is a
+diagnostic that names a mechanism; it is reproducible and it pointed at one function before any
+change was made.
+
+**Scope of who it helps.** Arm C only. Arm B is Razorpay's T+0..T+3 ladder and does not call
+this function; arm A takes no action. So this widens C vs B, and that asymmetry is disclosed
+rather than buried. It is nonetheless the correct fix, because the alternative - leaving a
+declared parameter unhonoured so the headline stays modest - would misreport the engine as
+worse than the design it documents.
+
+**One batch run follows this amendment.** Not a search over variants.
+
+**Result.** Rs 935,664.07 net incremental, 95% CI [Rs 786,950.97 - Rs 1,074,095.45], Rs 334.40
+per customer; cost per incremental rupee Rs 0.0027. Arm C recovery 58.15% -> 66.51%.
+
+Two things in that result are worth more than the headline, because they are what makes it
+checkable rather than merely larger:
+
+* **Arms A and B did not move at all** - 2.00% and 25.25%, identical to the pre-fix run. A1
+  predicted exactly this, because neither arm calls `retry_schedule`. Had either shifted, the
+  change would have reached somewhere it was not supposed to.
+* **`needs_customer_action` did not move either** - 17.99% before, 17.99% after, unchanged to
+  four decimals, 237 failures before and 237 after. It is the one cause the engine never
+  silently retries (see A2), so a pure retry-scheduling fix must leave it untouched. Every
+  cause that *does* depend on a retry landing when money is present moved together:
+  `needs_funds` 67.24% -> 77.48%, `retry_later` 64.88% -> 75.04%, and
+  `needs_new_instrument` only 32.85% -> 35.02%, since it needs a contact before a retry can
+  do anything.
+
+The unrecovered share fell from 41.9% to 33.49%, Rs 943,979 to Rs 744,363.
+
+**The secondary cohorts did not all improve, and are reported as they came out.** The
+shifted-parameter cohort went DOWN, Rs 435,762 -> Rs 418,066, and the 14-day readout went down
+too, Rs 532,261 -> Rs 483,145. The shifted cohort deliberately moves the payday distribution,
+so a schedule spread for one distribution is not automatically better against another; the
+14-day window truncates before the new day-17 and day-21 attempts exist, while still carrying
+their cost. Both are the honest behaviour of a change that buys coverage late in a horizon,
+and neither is quietly dropped for undercutting the headline.
+
+### A4 - 2 Sept 2026 - the residual is now decomposed in the artifact, reporting only
+
+"33.49% not recovered" is not one claim, it is four, and collapsing them invites a reader to
+score all of it as failure. The failure list now carries a standing split, generated rather
+than written:
+
+| | primary (21d) | shifted |
+|---|---|---|
+| stopped by a guardrail - **correct behaviour** | 208 / Rs 185,742 | 163 / Rs 149,237 |
+| no money in the window at all - **unreachable** | 267 / Rs 200,233 | 674 / Rs 556,726 |
+| funded, but never attempted - **DEFECT** | **0** | **0** |
+| attempted while funded, still unpaid | 462 / Rs 358,388 | 475 / Rs 392,875 |
+
+The third row is the only one that is a bug: a customer whose salary landed inside the horizon
+we advertise, on a day we never tried. It stood at 489 before A1 and is now zero, and a test
+asserts it stays zero in both cohorts. The first two rows are not defects and recovering them
+would mean either breaking the stopping rules or collecting from people who had no money at
+any point in the window. The fourth is the honest residual - we asked, at a moment they could
+have paid, and they did not.
+
+This also explains the shifted cohort undercutting the primary, which A1 reported without
+accounting for: it has 674 never-funded customers against 267, because shifting the payday
+distribution moves more salaries outside the collection horizon entirely. That is a property
+of the cohort, not a weakness of the schedule, and it is the kind of thing the shifted cohort
+exists to expose.
+
+The predicates read the simulator's generative truth. That is safe and deliberate: this runs
+in the evaluation layer, after the engine has finished, and the engine never has access to it.
+Knowing afterwards that a customer never had money is what a simulator is for. Both predicates
+are optional, so the function still works against a real cohort where no such ground truth
+exists and the split is simply absent.
+
+**No number changed.** The batch was re-run to regenerate the artifact and every value in
+`metrics.json` is byte-identical except `head_commit`, which records the commit it was
+generated at. That identity is the evidence the change was reporting-only.
+
+### A5 - 3 Sept 2026 - review fixes, batch re-run, no number changed
+
+Raised by an automated review of the pull request. Recorded because the batch ran again, and
+the rule is that every run is recorded whether or not anything moved.
+
+**The correctness fix.** `run()` accepted a `resamples` argument and reported it in the
+artifact under `bootstrap.resamples`, but `_cohort_block` called `compare()` without passing
+it, so the bootstrap always used its own default. At the shipped default the two coincide at
+10,000, which is why every published interval was computed with the resample count the
+artifact claims, and why nothing caught it - the bug was invisible at exactly the setting
+anyone would check. A caller asking for a cheaper interval got an expensive one and an
+artifact that misdescribed it. Now threaded through, with a test that records what the
+bootstrap was really called with rather than trusting the JSON.
+
+**Also fixed, neither affecting any figure:** `by_cause` and `by_debt_size_tercile` each
+called `summarise` twice per group, once per reported field. A phone number in
+`results/phase0/0.4c-received-events.jsonl` was redacted; see `docs/local-setup.md` for the
+disclosure and what was deliberately left alone.
+
+**Result: no number changed.** Every value in `results/metrics.json` is byte-identical to the
+A1/A4 run except `head_commit`. That identity is the whole evidence for calling these fixes
+non-behavioural, which is why the batch was re-run rather than argued about.
+
+### A6 - 3 Sept 2026 - git history rewritten to remove a real phone number
+
+Recorded here because the rewrite changed commit SHAs that this document and the artifact
+depend on, and because the batch was re-run afterwards.
+
+**What was removed.** `results/phase0/0.4c-received-events.jsonl` carried a real-format Indian
+mobile number in the `contact` field of a genuine Razorpay-signed capture - typed into the
+hosted checkout to drive a test payment, not generated. A5 redacted it in the working tree,
+but it survived in history in two commits, and in the message of the commit that redacted it.
+`git filter-repo` replaced it in blobs and in commit messages across every ref. Verified
+afterwards: zero occurrences in any blob, any commit message, or any commit under `-S` search.
+The replacement is `+919812345670`, the synthetic default `scripts/create_payment_link.py`
+already uses.
+
+**The freeze commit survived, and this was checked before the rewrite, not after.**
+`8d14dbe` predates the first tainted commit, so `git filter-repo` left its SHA untouched.
+That matters more than anything else here: `METRIC_DEFINITION_COMMIT` in `batch.py`,
+`frozen_at_commit` in the artifact, and the ancestry test all point at it, and a rewrite that
+moved it would have destroyed the one property this document exists to establish - that the
+definition provably predates the result. `metric_definition_is_ancestor` is still `true`.
+
+**What did move.** The Phase 1 and Phase 2 close commits, referenced in doc prose only:
+`890f972` became `908d336`, `53ae1b4` became `6a17f40`. Both updated. `head_commit` in the
+artifact pointed at a commit that no longer existed, so the batch was re-run; every value is
+byte-identical except that field, which now resolves.
+
+**What this does not undo.** Anyone who cloned or forked before 3 Sept 2026 still has the old
+objects, and GitHub may retain unreferenced objects server-side. The repo was private
+throughout, with a single contributor, which is the only reason this is a complete remedy
+rather than a partial one. A number that reaches a public repo cannot be recalled by rewriting
+history, only by rotating whatever it protects - and the honest framing is that this was
+caught while the window was still closed.
+
+### A3 - 2 Sept 2026 - the first invocation of that run refused to write, and why
+
+Disclosed because "one batch run" above would otherwise be false, and because a reader who
+found this later would be right to ask what the discarded invocation was.
+
+The first invocation after the A1 fix **produced no number**. It aborted with 56
+`contact_after_payment` guardrail violations and wrote no `metrics.json`. The violations were
+real in the data and entirely phantom in fact: `AuditLedger` opens its file in append mode -
+correct, it is an append-only structure - and the batch reused a fixed path, so the new run's
+records were appended onto the previous run's. `arm-c-audit.jsonl` stood at 60 MB against 27 MB
+for the ledgers that had only ever been written once.
+
+The invariant then read two chains over the same debt ids as one history: it took each debt's
+*newest* settlement timestamp, from the new run, and compared it against that debt's contacts
+from the *old* run, which naturally came later. `debt_000092` shows the signature plainly -
+retries on 3, 6 and 9 September, the old 0/3/6 spacing, followed by retries on 3 and 7
+September, the new 0/4/8 spacing, in one file.
+
+`AuditLedger` now takes an explicit `fresh` flag; the batch passes it, because a batch run is a
+new experiment producing a new artifact. Appending remains the default, since silently
+truncating an audit trail would be a worse bug than the one being fixed. Both behaviours are
+now covered by tests.
+
+**No engine parameter, policy value, or metric definition changed between the refused
+invocation and the one that produced the number.** The only change was to how the harness
+opens a file. The guardrail did its job on corrupt input, which is the outcome the
+refuse-to-write rule exists to produce.
+
+### A2 - 2 Sept 2026 - a change deliberately NOT made
+
+Recorded because a rejected change is evidence too, and because the next person to look at the
+failure list will find the same tempting thing.
+
+`needs_customer_action` recovers 17.99% against 67.24% for `needs_funds` and is the weakest
+subgroup in the result. The engine never silently retries it: `guardrails.py` permits a retry
+for `NEEDS_NEW_INSTRUMENT` once a contact has gone out, on the reasoning that the customer may
+have supplied a new instrument and only a charge attempt can find out - but grants
+`NEEDS_CUSTOMER_ACTION` no equivalent. Making those two symmetric is a one-line change and
+would raise the headline.
+
+It was not made, for a reason that survives inspection better than the extra rupees would.
+In the simulator, `attempt_charge` gates `NEEDS_NEW_INSTRUMENT` on a `has_new_instrument` flag
+that only a delivered contact can set - a real causal chain, contact then act then charge.
+`NEEDS_CUSTOMER_ACTION` has **no such gate**: it succeeds on funds alone. So an engine allowed
+to retry it would not be recovering money by prompting anyone; it would be collecting rupees
+from a constraint the simulator forgot to impose, and the gain would measure a modelling gap.
+
+The obvious repair - add the missing gate so the chain is real - is also declined, and this is
+the harder call. It would make the simulator stricter, which sounds unimpeachable, except that
+arm B retries blindly and does not contact anyone at all. Tightening that gate would strip
+recovery from the incumbent baseline while leaving the engine a path to earn it back, i.e. it
+would raise the headline by handicapping the thing we are measuring against, using a
+generative model we wrote ourselves. The domain evidence does not settle it either:
+`authentication_failed` and `incorrect_otp` plausibly do clear on a silent re-execution, while
+`payment_cancelled` plausibly does not, and the taxonomy lumps them together.
+
+So the weak spot stands, unpatched and reported. It is a genuine limitation of the engine and
+partly an artifact of the simulator, and that ambiguity is stated in the README rather than
+resolved in whichever direction pays.

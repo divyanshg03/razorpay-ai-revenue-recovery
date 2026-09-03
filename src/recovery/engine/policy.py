@@ -165,8 +165,50 @@ def worth_acting(policy: Policy, actionability: Actionability, amount_paise: int
 def retry_schedule(policy: Policy) -> tuple[int, ...]:
     """Day offsets on which the engine retries a retryable cause.
 
-    Spread across the horizon — 0, 3, 6, 9, 12, 15 — rather than the incumbent's 0, 1, 2, 3.
-    Same number of attempts either way is NOT the point; coverage of the salary cycle is.
+    Spread ACROSS the horizon rather than clustered at the front like the incumbent's
+    0, 1, 2, 3. The same number of attempts either way is NOT the point; coverage of the
+    salary cycle is, because the binding constraint on a failed mandate is when money next
+    lands in the account, not how insistently we ask for it.
+
+    DEFECT FIXED, 2 Sept 2026 — found by decomposing the Phase 3 failure list, disclosed in
+    the Amendments section of docs/metric-definition.md. This function previously read:
+
+        days = tuple(range(0, policy.retry_horizon_days + 1, policy.retry_spacing_days))
+        return days[: policy.max_retries_per_debt]
+
+    which builds 0, 3, 6, 9, 12, 15, 18, 21 and then truncates to the first six. So
+    `retry_horizon_days = 21` was declared, documented, and never reached: the last retry
+    fell on day 15 and the final six days of the horizon got no attempt at all. Truncating a
+    fixed-spacing list keeps the spacing and discards the horizon; the docstring above claims
+    the opposite priority, and the docstring is the older specification.
+
+    It was worth 489 of the 1,171 unrecovered debts — 42% of the failure list — every one of
+    them a customer whose salary landed inside the window we said we were covering, on a day
+    we had stopped trying. A 30-day payday cycle went from 21/30 covered to 27/30.
+
+    `retry_spacing_days` survives as a MINIMUM, not a step: issuers throttle repeated mandate
+    execution, so attempts may be spread apart but never packed closer than the floor.
     """
-    days = tuple(range(0, policy.retry_horizon_days + 1, policy.retry_spacing_days))
-    return days[: policy.max_retries_per_debt]
+    n, horizon, floor = (policy.max_retries_per_debt, policy.retry_horizon_days,
+                         policy.retry_spacing_days)
+    if n <= 0:
+        return ()
+    if n == 1:
+        return (0,)
+
+    step = horizon / (n - 1)
+    if step < floor:
+        # The budget is too large to spread across the horizon without breaching the throttle
+        # floor. Keep the floor — it is an issuer constraint, not a preference — and accept
+        # that the tail of the horizon goes uncovered.
+        return tuple(range(0, horizon + 1, floor))[:n]
+
+    days: list[int] = []
+    for i in range(n):
+        day = round(i * step)
+        if days and day - days[-1] < floor:
+            day = days[-1] + floor
+        if day > horizon:
+            break
+        days.append(day)
+    return tuple(days)

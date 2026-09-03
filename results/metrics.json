@@ -1,0 +1,646 @@
+{
+  "metric_definition": {
+    "document": "docs/metric-definition.md",
+    "frozen_at_commit": "8d14dbe",
+    "is_ancestor_of_head": true,
+    "note": "The freeze is only meaningful if that commit precedes this result. Ancestry is checked, not asserted."
+  },
+  "generated_by": "scripts/run_batch.py -> recovery.evaluation.batch.run()",
+  "head_commit": "5028df8",
+  "policy_version": "2026-09-02.2",
+  "n_customers": 5000,
+  "bootstrap": {
+    "resamples": 10000,
+    "seed": 20260905,
+    "method": "percentile, stratified by arm"
+  },
+  "headline": {
+    "comparison": "engine (C) vs Razorpay's T+0..T+3 ladder (B)",
+    "net_incremental_rupees": 935664.07,
+    "ci95_rupees": [
+      786950.97,
+      1074095.45
+    ],
+    "per_customer_rupees": 334.4,
+    "note": "Net of contact cost. C vs A is context only and is NOT the headline."
+  },
+  "primary_cohort_21d": {
+    "seed": 20260905,
+    "shifted_parameters": false,
+    "window_days": 21,
+    "assignment": {
+      "counts": {
+        "A": 948,
+        "B": 895,
+        "C": 2798
+      },
+      "shares": {
+        "A": 0.2043,
+        "B": 0.1928,
+        "C": 0.6029
+      },
+      "excluded": 359,
+      "excluded_reasons": {
+        "pre_existing_opt_out": 162,
+        "pre_existing_dispute": 97,
+        "no_reachable_channel": 55,
+        "pre_existing_hardship": 45
+      },
+      "provenance": "SIMULATED cohort (primary), seed=20260905, n=5000. Subscriptions is gated on this Razorpay test account (gate 0.1), so the failed-charge population is generated, not observed. Parameters and sources: src/recovery/cohort/PARAMETERS.md"
+    },
+    "arms": {
+      "A": {
+        "n": 948,
+        "recovered_paise": 1843100,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.02,
+        "mean_recovered_paise": 1944.198312236287,
+        "mean_cost_paise": 0.0
+      },
+      "B": {
+        "n": 895,
+        "recovered_paise": 19332400,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.2525,
+        "mean_recovered_paise": 21600.4469273743,
+        "mean_cost_paise": 0.0
+      },
+      "C": {
+        "n": 2798,
+        "recovered_paise": 154253900,
+        "contact_cost_paise": 249442,
+        "recovery_rate": 0.6651,
+        "mean_recovered_paise": 55130.057183702644,
+        "mean_cost_paise": 89.15010721944246
+      }
+    },
+    "primary": {
+      "label": "engine vs incumbent ladder (PRIMARY)",
+      "treat_arm": "C",
+      "control_arm": "B",
+      "net_incremental_per_customer_rupees": 334.4,
+      "net_incremental_total_rupees": 935664.07,
+      "ci95_per_customer_rupees": [
+        281.25,
+        383.88
+      ],
+      "ci95_total_rupees": [
+        786950.97,
+        1074095.45
+      ],
+      "excludes_zero": true,
+      "treat_recovery_rate": 0.6651,
+      "control_recovery_rate": 0.2525,
+      "lift_pp": 41.26
+    },
+    "secondary_vs_do_nothing": {
+      "label": "engine vs do-nothing (context only)",
+      "treat_arm": "C",
+      "control_arm": "A",
+      "net_incremental_per_customer_rupees": 530.97,
+      "net_incremental_total_rupees": 1485645.91,
+      "ci95_per_customer_rupees": [
+        497.82,
+        564.9
+      ],
+      "ci95_total_rupees": [
+        1392896.15,
+        1580602.7
+      ],
+      "excludes_zero": true,
+      "treat_recovery_rate": 0.6651,
+      "control_recovery_rate": 0.02,
+      "lift_pp": 64.51
+    },
+    "cost_per_incremental_rupee": 0.0027,
+    "guardrail_invariants": {
+      "contact_outside_window": 0,
+      "action_without_state_recheck": 0,
+      "contact_after_stop_signal": 0,
+      "contact_after_payment": 0,
+      "contact_cap_breach": 0,
+      "contact_during_promise_to_pay": 0,
+      "action_without_decision": 0,
+      "ledger_chain_broken": 0
+    },
+    "guardrails_all_zero": true,
+    "ledger": {
+      "records": 43303,
+      "decisions": 18455,
+      "actions_taken": 4011,
+      "decisions_declined": 6068,
+      "stop_reasons": {
+        "escalation_ladder_exhausted": 1564,
+        "cause_not_actionable": 1507,
+        "opt_out": 1048,
+        "dispute_raised": 761,
+        "promise_to_pay_active": 724,
+        "bereavement_or_hardship": 464
+      },
+      "total_contact_cost_paise": 249442,
+      "chain_intact": true,
+      "chain_broken_at": null
+    },
+    "subgroup_by_diagnosed_cause": {
+      "needs_customer_action": {
+        "n": 289,
+        "recovery_rate": 0.1799,
+        "recovered_rupees": 42948.0
+      },
+      "needs_funds": {
+        "n": 1523,
+        "recovery_rate": 0.7748,
+        "recovered_rupees": 974220.0
+      },
+      "needs_new_instrument": {
+        "n": 277,
+        "recovery_rate": 0.3502,
+        "recovered_rupees": 74453.0
+      },
+      "retry_later": {
+        "n": 709,
+        "recovery_rate": 0.7504,
+        "recovered_rupees": 450918.0
+      }
+    },
+    "subgroup_by_debt_size_tercile": {
+      "low": {
+        "n": 975,
+        "recovery_rate": 0.6533,
+        "recovered_rupees": 151463.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      },
+      "mid": {
+        "n": 1005,
+        "recovery_rate": 0.6697,
+        "recovered_rupees": 414127.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      },
+      "high": {
+        "n": 818,
+        "recovery_rate": 0.6736,
+        "recovered_rupees": 976949.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      }
+    },
+    "failure_list": {
+      "n_not_recovered": 937,
+      "share_not_recovered": 0.3349,
+      "unrecovered_rupees": 744363.0,
+      "by_diagnosed_cause": {
+        "needs_funds": 343,
+        "needs_customer_action": 237,
+        "needs_new_instrument": 180,
+        "retry_later": 177
+      },
+      "by_stop_reason": {
+        "escalation_ladder_exhausted": 757,
+        "cause_not_actionable": 417,
+        "opt_out": 105,
+        "dispute_raised": 63,
+        "bereavement_or_hardship": 40,
+        "promise_to_pay_active": 17
+      },
+      "standing": {
+        "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
+        "counts": {
+          "stopped_by_a_guardrail_correct": 208,
+          "no_money_in_the_window_unreachable": 267,
+          "funded_but_never_attempted_DEFECT": 0,
+          "attempted_while_funded_still_unpaid": 462
+        },
+        "rupees": {
+          "stopped_by_a_guardrail_correct": 185742.0,
+          "no_money_in_the_window_unreachable": 200233.0,
+          "funded_but_never_attempted_DEFECT": 0.0,
+          "attempted_while_funded_still_unpaid": 358388.0
+        }
+      }
+    }
+  },
+  "secondary_cohort_14d": {
+    "seed": 20260905,
+    "shifted_parameters": false,
+    "window_days": 14,
+    "assignment": {
+      "counts": {
+        "A": 948,
+        "B": 895,
+        "C": 2798
+      },
+      "shares": {
+        "A": 0.2043,
+        "B": 0.1928,
+        "C": 0.6029
+      },
+      "excluded": 359,
+      "excluded_reasons": {
+        "pre_existing_opt_out": 162,
+        "pre_existing_dispute": 97,
+        "no_reachable_channel": 55,
+        "pre_existing_hardship": 45
+      },
+      "provenance": "SIMULATED cohort (primary), seed=20260905, n=5000. Subscriptions is gated on this Razorpay test account (gate 0.1), so the failed-charge population is generated, not observed. Parameters and sources: src/recovery/cohort/PARAMETERS.md"
+    },
+    "arms": {
+      "A": {
+        "n": 948,
+        "recovered_paise": 1568600,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.0148,
+        "mean_recovered_paise": 1654.6413502109704,
+        "mean_cost_paise": 0.0
+      },
+      "B": {
+        "n": 895,
+        "recovered_paise": 18907900,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.2469,
+        "mean_recovered_paise": 21126.145251396647,
+        "mean_cost_paise": 0.0
+      },
+      "C": {
+        "n": 2798,
+        "recovered_paise": 107674900,
+        "contact_cost_paise": 249420,
+        "recovery_rate": 0.465,
+        "mean_recovered_paise": 38482.80914939242,
+        "mean_cost_paise": 89.14224446032881
+      }
+    },
+    "primary": {
+      "label": "engine vs incumbent ladder (PRIMARY)",
+      "treat_arm": "C",
+      "control_arm": "B",
+      "net_incremental_per_customer_rupees": 172.68,
+      "net_incremental_total_rupees": 483145.26,
+      "ci95_per_customer_rupees": [
+        122.01,
+        220.63
+      ],
+      "ci95_total_rupees": [
+        341385.31,
+        617310.72
+      ],
+      "excludes_zero": true,
+      "treat_recovery_rate": 0.465,
+      "control_recovery_rate": 0.2469,
+      "lift_pp": 21.81
+    },
+    "secondary_vs_do_nothing": {
+      "label": "engine vs do-nothing (context only)",
+      "treat_arm": "C",
+      "control_arm": "A",
+      "net_incremental_per_customer_rupees": 367.39,
+      "net_incremental_total_rupees": 1027957.94,
+      "ci95_per_customer_rupees": [
+        337.38,
+        398.21
+      ],
+      "ci95_total_rupees": [
+        943987.43,
+        1114180.25
+      ],
+      "excludes_zero": true,
+      "treat_recovery_rate": 0.465,
+      "control_recovery_rate": 0.0148,
+      "lift_pp": 45.02
+    },
+    "cost_per_incremental_rupee": 0.0051,
+    "guardrail_invariants": {
+      "contact_outside_window": 0,
+      "action_without_state_recheck": 0,
+      "contact_after_stop_signal": 0,
+      "contact_after_payment": 0,
+      "contact_cap_breach": 0,
+      "contact_during_promise_to_pay": 0,
+      "action_without_decision": 0,
+      "ledger_chain_broken": 0
+    },
+    "guardrails_all_zero": true,
+    "ledger": {
+      "records": 36633,
+      "decisions": 15377,
+      "actions_taken": 4010,
+      "decisions_declined": 4549,
+      "stop_reasons": {
+        "escalation_ladder_exhausted": 1551,
+        "cause_not_actionable": 1156,
+        "opt_out": 596,
+        "promise_to_pay_active": 532,
+        "dispute_raised": 439,
+        "bereavement_or_hardship": 275
+      },
+      "total_contact_cost_paise": 249420,
+      "chain_intact": true,
+      "chain_broken_at": null
+    },
+    "subgroup_by_diagnosed_cause": {
+      "needs_customer_action": {
+        "n": 289,
+        "recovery_rate": 0.173,
+        "recovered_rupees": 42150.0
+      },
+      "needs_funds": {
+        "n": 1523,
+        "recovery_rate": 0.5404,
+        "recovered_rupees": 680977.0
+      },
+      "needs_new_instrument": {
+        "n": 277,
+        "recovery_rate": 0.2274,
+        "recovered_rupees": 49937.0
+      },
+      "retry_later": {
+        "n": 709,
+        "recovery_rate": 0.5148,
+        "recovered_rupees": 303685.0
+      }
+    },
+    "subgroup_by_debt_size_tercile": {
+      "low": {
+        "n": 975,
+        "recovery_rate": 0.4605,
+        "recovered_rupees": 105901.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      },
+      "mid": {
+        "n": 1005,
+        "recovery_rate": 0.4617,
+        "recovered_rupees": 283736.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      },
+      "high": {
+        "n": 818,
+        "recovery_rate": 0.4743,
+        "recovered_rupees": 687112.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      }
+    },
+    "failure_list": {
+      "n_not_recovered": 1497,
+      "share_not_recovered": 0.535,
+      "unrecovered_rupees": 1210153.0,
+      "by_diagnosed_cause": {
+        "needs_funds": 700,
+        "retry_later": 344,
+        "needs_customer_action": 239,
+        "needs_new_instrument": 214
+      },
+      "by_stop_reason": {
+        "escalation_ladder_exhausted": 1251,
+        "cause_not_actionable": 453,
+        "opt_out": 105,
+        "dispute_raised": 63,
+        "promise_to_pay_active": 40,
+        "bereavement_or_hardship": 40
+      },
+      "standing": {
+        "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
+        "counts": {
+          "stopped_by_a_guardrail_correct": 208,
+          "no_money_in_the_window_unreachable": 907,
+          "funded_but_never_attempted_DEFECT": 65,
+          "attempted_while_funded_still_unpaid": 317
+        },
+        "rupees": {
+          "stopped_by_a_guardrail_correct": 184242.0,
+          "no_money_in_the_window_unreachable": 729243.0,
+          "funded_but_never_attempted_DEFECT": 52685.0,
+          "attempted_while_funded_still_unpaid": 243983.0
+        }
+      }
+    }
+  },
+  "shifted_parameter_cohort": {
+    "seed": 20260906,
+    "shifted_parameters": true,
+    "window_days": 21,
+    "assignment": {
+      "counts": {
+        "A": 955,
+        "B": 912,
+        "C": 2813
+      },
+      "shares": {
+        "A": 0.2041,
+        "B": 0.1949,
+        "C": 0.6011
+      },
+      "excluded": 320,
+      "excluded_reasons": {
+        "pre_existing_opt_out": 145,
+        "pre_existing_dispute": 83,
+        "pre_existing_hardship": 55,
+        "no_reachable_channel": 37
+      },
+      "provenance": "SIMULATED cohort (shifted-eval), seed=20260906, n=5000. Subscriptions is gated on this Razorpay test account (gate 0.1), so the failed-charge population is generated, not observed. Parameters and sources: src/recovery/cohort/PARAMETERS.md"
+    },
+    "arms": {
+      "A": {
+        "n": 955,
+        "recovered_paise": 1228300,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.0178,
+        "mean_recovered_paise": 1286.1780104712043,
+        "mean_cost_paise": 0.0
+      },
+      "B": {
+        "n": 912,
+        "recovered_paise": 26683500,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.3454,
+        "mean_recovered_paise": 29258.223684210527,
+        "mean_cost_paise": 0.0
+      },
+      "C": {
+        "n": 2813,
+        "recovered_paise": 124339900,
+        "contact_cost_paise": 229914,
+        "recovery_rate": 0.5336,
+        "mean_recovered_paise": 44201.88410949164,
+        "mean_cost_paise": 81.73266974760043
+      }
+    },
+    "primary": {
+      "label": "engine vs incumbent ladder (PRIMARY)",
+      "treat_arm": "C",
+      "control_arm": "B",
+      "net_incremental_per_customer_rupees": 148.62,
+      "net_incremental_total_rupees": 418066.03,
+      "ci95_per_customer_rupees": [
+        96.12,
+        199.56
+      ],
+      "ci95_total_rupees": [
+        270374.61,
+        561353.35
+      ],
+      "excludes_zero": true,
+      "treat_recovery_rate": 0.5336,
+      "control_recovery_rate": 0.3454,
+      "lift_pp": 18.82
+    },
+    "secondary_vs_do_nothing": {
+      "label": "engine vs do-nothing (context only)",
+      "treat_arm": "C",
+      "control_arm": "A",
+      "net_incremental_per_customer_rupees": 428.34,
+      "net_incremental_total_rupees": 1204919.67,
+      "ci95_per_customer_rupees": [
+        398.19,
+        459.12
+      ],
+      "ci95_total_rupees": [
+        1120100.86,
+        1291499.45
+      ],
+      "excludes_zero": true,
+      "treat_recovery_rate": 0.5336,
+      "control_recovery_rate": 0.0178,
+      "lift_pp": 51.58
+    },
+    "cost_per_incremental_rupee": 0.0055,
+    "guardrail_invariants": {
+      "contact_outside_window": 0,
+      "action_without_state_recheck": 0,
+      "contact_after_stop_signal": 0,
+      "contact_after_payment": 0,
+      "contact_cap_breach": 0,
+      "contact_during_promise_to_pay": 0,
+      "action_without_decision": 0,
+      "ledger_chain_broken": 0
+    },
+    "guardrails_all_zero": true,
+    "ledger": {
+      "records": 37748,
+      "decisions": 16321,
+      "actions_taken": 3263,
+      "decisions_declined": 6003,
+      "stop_reasons": {
+        "cause_not_actionable": 2082,
+        "escalation_ladder_exhausted": 1377,
+        "promise_to_pay_active": 903,
+        "opt_out": 767,
+        "dispute_raised": 514,
+        "bereavement_or_hardship": 360
+      },
+      "total_contact_cost_paise": 229914,
+      "chain_intact": true,
+      "chain_broken_at": null
+    },
+    "subgroup_by_diagnosed_cause": {
+      "needs_customer_action": {
+        "n": 340,
+        "recovery_rate": 0.2088,
+        "recovered_rupees": 43479.0
+      },
+      "needs_funds": {
+        "n": 984,
+        "recovery_rate": 0.7215,
+        "recovered_rupees": 593190.0
+      },
+      "needs_new_instrument": {
+        "n": 692,
+        "recovery_rate": 0.1994,
+        "recovered_rupees": 109162.0
+      },
+      "retry_later": {
+        "n": 797,
+        "recovery_rate": 0.7302,
+        "recovered_rupees": 497568.0
+      }
+    },
+    "subgroup_by_debt_size_tercile": {
+      "low": {
+        "n": 967,
+        "recovery_rate": 0.5429,
+        "recovered_rupees": 120375.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      },
+      "mid": {
+        "n": 1042,
+        "recovery_rate": 0.5317,
+        "recovered_rupees": 333446.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      },
+      "high": {
+        "n": 804,
+        "recovery_rate": 0.5249,
+        "recovered_rupees": 789578.0,
+        "cut_points_rupees": [
+          299.0,
+          799.0
+        ]
+      }
+    },
+    "failure_list": {
+      "n_not_recovered": 1312,
+      "share_not_recovered": 0.4664,
+      "unrecovered_rupees": 1098838.0,
+      "by_diagnosed_cause": {
+        "needs_new_instrument": 554,
+        "needs_funds": 274,
+        "needs_customer_action": 269,
+        "retry_later": 215
+      },
+      "by_stop_reason": {
+        "escalation_ladder_exhausted": 1105,
+        "cause_not_actionable": 823,
+        "opt_out": 77,
+        "dispute_raised": 51,
+        "promise_to_pay_active": 51,
+        "bereavement_or_hardship": 35
+      },
+      "standing": {
+        "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
+        "counts": {
+          "stopped_by_a_guardrail_correct": 163,
+          "no_money_in_the_window_unreachable": 674,
+          "funded_but_never_attempted_DEFECT": 0,
+          "attempted_while_funded_still_unpaid": 475
+        },
+        "rupees": {
+          "stopped_by_a_guardrail_correct": 149237.0,
+          "no_money_in_the_window_unreachable": 556726.0,
+          "funded_but_never_attempted_DEFECT": 0.0,
+          "attempted_while_funded_still_unpaid": 392875.0
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Outcomes are simulated: Subscriptions is gated on this Razorpay test account (docs/phase-0-findings.md), so the failed-charge cohort is generated, not observed. Randomisation removes selection bias WITHIN the simulation; it cannot validate the simulation.",
+    "Significance is cheap here - N is a free parameter on a simulator. The CIs express precision inside the simulation only, not evidence about the real world.",
+    "We wrote the response model. Its parameters trace to cited public figures (src/recovery/cohort/PARAMETERS.md), the engine never sees them, and evaluation runs on shifted parameters - that reduces the problem, it does not eliminate it.",
+    "Contact costs are published list prices, not invoices, taken at the expensive end of each range. The WhatsApp rate could not be read at source.",
+    "MDR is excluded: it scales incremental recovery by (1 - mdr) and cannot change its sign or the ranking of arms.",
+    "Customer annoyance is unpriced, deliberately - no defensible number could be sourced, so it is handled as hard constraints rather than a tradeable term.",
+    "The incumbent baseline is reimplemented from Razorpay's documentation, not observed: gate 0.3 was voided when Subscriptions turned out to be gated.",
+    "In-batch composition uses deterministic templates. The simulator has no notion of wording, so the LLM cannot affect this measurement; it is exercised live in the test suite and results/phase2/."
+  ]
+}

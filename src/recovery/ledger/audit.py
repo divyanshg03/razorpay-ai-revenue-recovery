@@ -82,9 +82,29 @@ class AuditLedger:
     """Append-only JSONL with a hash chain. One instance per run."""
 
     def __init__(self, path: str | pathlib.Path, policy_version: str,
-                 model_version: str = "none", now: dt.datetime | None = None):
+                 model_version: str = "none", now: dt.datetime | None = None,
+                 fresh: bool = False):
+        """`fresh=True` starts a NEW chain at `path`, discarding any file already there.
+
+        Appending is the default and stays the default, because that is what an append-only
+        ledger is for. But a batch RUN is a new experiment producing a new artifact, and
+        silently appending one run onto another produces a file that is not a ledger of
+        anything: two chains of the same debt ids interleaved, where an invariant comparing
+        "was this debt contacted after it settled" reads the second run's settlement against
+        the first run's contacts and reports violations that never happened.
+
+        That is not hypothetical - it is exactly what happened on the first re-run after the
+        `retry_schedule` fix (2 Sept 2026). 56 phantom `contact_after_payment` violations, and
+        the batch correctly refused to write metrics.json off the back of them. The ledger was
+        60 MB against 27 MB for the two that had only ever been written once.
+
+        This is a flag rather than a default because the choice must be visible at the call
+        site. Nothing silently truncates an audit trail; the caller says so, in writing.
+        """
         self.path = pathlib.Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        if fresh and self.path.exists():
+            self.path.unlink()
         self.policy_version = policy_version
         self.model_version = model_version
         self._lock = threading.Lock()

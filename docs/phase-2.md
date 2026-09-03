@@ -1,6 +1,6 @@
 # Phase 2 — Decision engine and guardrails
 
-**Branch:** `feat/phase-2-decision-engine`, cut from `feat(v1)` at `890f972`.
+**Branch:** `feat/phase-2-decision-engine`, cut from `feat(v1)` at `908d336`.
 **Status: BUILT, 2 September 2026.** All nine work items done; 77 tests green including the
 five zero-assertions and two real-Ollama tests. Evidence: `results/phase2/2-engine-and-gate.json`.
 
@@ -22,7 +22,7 @@ five zero-assertions and two real-Ollama tests. Evidence: `results/phase2/2-engi
 | | Phase | Ends when |
 |---|---|---|
 | 0 | De-risk and freeze the contract | ✅ CLOSED — GO signed, metric frozen at `8d14dbe` |
-| 1 | Ingest, taxonomy, ledger | ✅ CLOSED at `890f972` — 25 tests green, arm B validated at 23.6% |
+| 1 | Ingest, taxonomy, ledger | ✅ CLOSED at `908d336` — 25 tests green, arm B validated at 23.6% |
 | **2** | **Decision engine and guardrails** | A deterministic state machine owns every action; stopping rules enforced in code and logged; the LLM boxed behind a copy gate that is **demonstrated** catching a real violation |
 | 3 | Run the batch and measure | `results/metrics.json` — net incremental rupees vs a randomised holdout |
 | 4 | Package and defend | README generated from the artifact, limitations written, video cut, repo public |

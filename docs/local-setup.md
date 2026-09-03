@@ -98,6 +98,37 @@ silently rejected while the endpoint reported perfectly healthy.
 Razorpay retries a failing webhook with exponential backoff for 24 hours and then
 **auto-disables it**. An endpoint that fails silently is worse than none at all.
 
+### The share name was rotated on 2 Sept 2026
+
+The original name reached GitHub before the placeholder work landed — the branch had already
+been pushed twice, so scrubbing the working tree and rewriting history could not un-publish
+it. A force-push removes the branch pointer but GitHub keeps unreachable objects addressable
+by SHA, so the old value stayed reachable to anyone holding the hash.
+
+The repo was private and the name was never a credential (unsigned requests get a 400 and
+never reach the queue), so the exposure was small. Rotating was still the cheaper and
+strictly safer fix than trying to erase it: the old name and its share were **deleted**, so
+whatever survives in any object store now resolves to nothing. Verified: the old URL returns
+404, the new one returns 400 unsigned and 200 to a signed event.
+
+**No code changed.** That is the point of keeping the name in `.env` — a rotation is an env
+edit plus a Dashboard update, not a commit. If it has to be rotated again, the steps are:
+
+```powershell
+tools\zrok\zrok2.exe create name rzp-wh-<new>      # reserve the new name
+# edit RAZORPAY_WEBHOOK_ZROK_NAME in .env
+tools\zrok\zrok2.exe delete share <old-token>      # tear the old one down
+tools\zrok\zrok2.exe delete name <old-name>
+powershell -ExecutionPolicy Bypass -File scripts\webhook_daemon.ps1   # rebuild on the new name
+```
+
+Then update the URL in the Razorpay Dashboard (Test mode → Account & Settings → Webhooks).
+Confirming the change needs an OTP: Razorpay's **published, universal test-mode OTP** is
+`754081` — it is documented publicly, is identical for every test account, and is not a
+secret or a credential. If the Dashboard ever shows or sends a different one, believe the
+screen and not this page. **The secret does not change**, and until the Dashboard is updated
+every delivery 404s — which starts the 24-hour auto-disable clock.
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\webhook_status.ps1              # health
 powershell -ExecutionPolicy Bypass -File scripts\webhook_daemon.ps1              # force a repair
@@ -121,6 +152,17 @@ process was alive, the share record existed, the tunnel was not serving. The pro
 **unsigned** request and expects **HTTP 400** *"invalid signature"*: that proves tunnel →
 receiver → handler end to end, while creating no event, so health checks never pollute
 `results/phase0/0.4c-received-events.jsonl`.
+
+> **One field in that file is redacted, and this note is the disclosure.** The Razorpay-signed
+> `payment.failed` event on line 5 is a genuine capture, and its `contact` field held a real
+> mobile number — typed into Razorpay's hosted checkout to drive the test payment, not
+> generated. It has been replaced with `+919812345670`, the synthetic default that
+> `scripts/create_payment_link.py` uses everywhere else, so the payload shape is unchanged and
+> the artifact is internally consistent. Nothing else in the file was touched: the fields it
+> exists to evidence — `error_code`, `error_description`, `error_source`, `error_step`,
+> `error_reason` — are byte-for-byte as delivered. The `void@razorpay.com` email is Razorpay's
+> own null-address placeholder and is left as received, because redacting it would misreport
+> what the gateway actually sends.
 
 ### What it repairs
 
@@ -152,7 +194,8 @@ registration.
 
 - **Register the webhook** in the Razorpay Dashboard: Test mode → Account & Settings → Webhooks
   → + Add New Webhook. URL and secret above; events `payment.failed` and `payment.captured`;
-  test-mode OTP `754081`. Razorpay rejects `localhost` and any URL whose domain contains
+  test-mode OTP `754081` (Razorpay's published, universal test-mode value — not a secret;
+  if the Dashboard shows a different one, use that). Razorpay rejects `localhost` and any URL whose domain contains
   "razorpay", and delivers only to public URLs — which is what the zrok share is for.
 - **The Razorpay support ticket** in `docs/support-ticket-draft.md` needs a logged-in dashboard
   session.

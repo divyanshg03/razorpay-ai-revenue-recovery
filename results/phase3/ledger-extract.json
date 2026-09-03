@@ -1,0 +1,2843 @@
+{
+  "why_this_exists": "The full ledgers are ~27MB each and gitignored. They are reproducible: `python scripts/run_batch.py` regenerates them byte-for-byte from the seed. This file carries each ledger's chain-head hash so a regenerated copy can be proved identical, plus a full replay of three representative debts.",
+  "ledgers": {
+    "primary_21d": {
+      "source_file": "results/phase3/arm-c-audit.jsonl",
+      "records": 43303,
+      "chain_intact": true,
+      "chain_broken_at": null,
+      "chain_head_hash": "51945148454b0a2bac77845844864b57db2449e93a24bbc1f555c167a18f60df",
+      "summary": {
+        "records": 43303,
+        "decisions": 18455,
+        "actions_taken": 4011,
+        "decisions_declined": 6068,
+        "stop_reasons": {
+          "escalation_ladder_exhausted": 1564,
+          "cause_not_actionable": 1507,
+          "opt_out": 1048,
+          "dispute_raised": 761,
+          "promise_to_pay_active": 724,
+          "bereavement_or_hardship": 464
+        },
+        "total_contact_cost_paise": 249442,
+        "chain_intact": true,
+        "chain_broken_at": null
+      },
+      "replayed_examples": {
+        "recovered": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000016",
+              "source": "payment_state_store"
+            },
+            "event_id": "9a5dcfa7-b4de-447c-8f81-b4c670b5201c",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "227a1f253f6e27c360faf69d895c16b4f78562a15a553dd7a2d32310095b151f",
+            "record_hash": "90a73221e677b790fb89886e641202f49b3dcb0c95a3af8def99ea7ada237d18",
+            "timestamp_ist": "2026-09-03T10:00:00.000007+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000016",
+              "day_offset": 0,
+              "debt_id": "debt_000016",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 19975.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "8fcf8d57-5e60-4a7b-83a1-f86c2630c4fd",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "90a73221e677b790fb89886e641202f49b3dcb0c95a3af8def99ea7ada237d18",
+            "record_hash": "21d582d1d60de5d520222b6849c55f73f5c22e776bbb7ae73fb7fde4685ac6a7",
+            "timestamp_ist": "2026-09-03T10:00:00.000008+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": null,
+              "customer_ref": "cust_000016",
+              "debt_id": "debt_000016",
+              "note": "retry succeeded",
+              "recovered_paise": 79900
+            },
+            "event_id": "36c30177-e6ac-4f6b-a174-9442feffc62d",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "21d582d1d60de5d520222b6849c55f73f5c22e776bbb7ae73fb7fde4685ac6a7",
+            "record_hash": "d319e45e1c5214f414f5105ab2b4af22f434f989f6744c5e1349f82e78de11f3",
+            "timestamp_ist": "2026-09-03T10:00:00.000009+05:30",
+            "type": "outcome"
+          }
+        ],
+        "stopped_on_opt_out": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "93c9adaf-879e-4220-8913-3ee2b9fd55f9",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "28ae422a96fe0790cdd7fc57499754a0383f1f41424a4775492772804b4ac7b1",
+            "record_hash": "b0576abbf514bbb009b71dff24d50ecf59d8f242a4475f57e73c30b6829f3623",
+            "timestamp_ist": "2026-09-03T10:00:00.000423+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 0,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 12475.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "3887cf09-2f22-4056-a2ff-396c5f83da56",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "b0576abbf514bbb009b71dff24d50ecf59d8f242a4475f57e73c30b6829f3623",
+            "record_hash": "20de7448065b28710d2ca9a37a2153f90c527f3d1495b0277f2c3e7c2ceb64bc",
+            "timestamp_ist": "2026-09-03T10:00:00.000424+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "20011b13-4bca-4c99-9db3-04066cf379c0",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "ab9a3b81f155021959960daee76b4a0118b890ad8bc5895ad690d647ff9ed055",
+            "record_hash": "654cea9e03d1b6807503968e460689447119e770f41124e9f7c0421cde4f4e3b",
+            "timestamp_ist": "2026-09-04T10:00:00.001022+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "whatsapp_utility",
+              "channel_considered": "whatsapp_utility",
+              "customer_ref": "cust_001161",
+              "day_offset": 1,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 12457.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "9c57dc28-cc8b-4c07-8f85-d85eb51f2c1f",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "654cea9e03d1b6807503968e460689447119e770f41124e9f7c0421cde4f4e3b",
+            "record_hash": "5c972f1d4ec3b55f7d39ea8369a01f3c53903b1cc94ab3401df9557eafb28834",
+            "timestamp_ist": "2026-09-04T10:00:00.001023+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": "2026-09-04T10:00:00+05:30",
+              "channel": "whatsapp_utility",
+              "consent_basis": "dpdp_s7a_voluntarily_provided",
+              "copy_gate_rejected_llm": null,
+              "cost_paise": 18,
+              "customer_ref": "cust_001161",
+              "debt_id": "debt_001161",
+              "llm_output_rejected": null,
+              "message_class": "service",
+              "rendered_text": "Your payment of Rs 499 did not go through. You can retry here: https://rzp.io/rzp/t_001161",
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "template_ref": "template:static"
+            },
+            "event_id": "1d9ef8e4-b512-4976-a240-1465b05acfb4",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "5c972f1d4ec3b55f7d39ea8369a01f3c53903b1cc94ab3401df9557eafb28834",
+            "record_hash": "376eb3ff023bf37980bc0527832d4cb4d984a041fb00dc2da5556a407735892e",
+            "timestamp_ist": "2026-09-04T10:00:00.001024+05:30",
+            "type": "action"
+          },
+          {
+            "body": {
+              "customer_ref": "cust_001161",
+              "debt_id": "debt_001161",
+              "intent": "opt_out",
+              "parser_source": "override",
+              "promised_date": null,
+              "text": "STOP. do not message me again"
+            },
+            "event_id": "02e31017-be30-4adb-aac0-37401a1a94b8",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "376eb3ff023bf37980bc0527832d4cb4d984a041fb00dc2da5556a407735892e",
+            "record_hash": "b39d14bbe886c61e52685341ce25dab3feda93a475f7ca4b09a2e68d6c63a55e",
+            "timestamp_ist": "2026-09-04T10:00:00.001025+05:30",
+            "type": "inbound"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "9d03074b-2c92-4987-87aa-e50c3abbbc1b",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "78c522ecc24355dfa7c6a731b38722ac4f1074bb7729cc3907f5319af0d3d751",
+            "record_hash": "fcb02e151b5d03b4ab067f813a439f1339ee840fd5128c02f8b198cb62e7c678",
+            "timestamp_ist": "2026-09-07T10:00:00.000388+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 4,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "17f272ef-cf48-4d47-8ef5-dd959fe25fa2",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "fcb02e151b5d03b4ab067f813a439f1339ee840fd5128c02f8b198cb62e7c678",
+            "record_hash": "182bf41b09113f9a22d92428ecf73043e4f8a4f0fbeb7a7b76d95a892d3fe4a2",
+            "timestamp_ist": "2026-09-07T10:00:00.000389+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "67c3ad52-28a3-4276-8817-eb09f9515d22",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2316797bce7a20cffd1956c6b9d2cede7bf46394b56abe7dee574118701fffb9",
+            "record_hash": "c6fb429087a01e9b9ee6a9e06d97bf9565552af66ead37e5d15fcbbfdfde2a68",
+            "timestamp_ist": "2026-09-08T10:00:00.000839+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "human_call",
+              "channel_considered": "human_call",
+              "customer_ref": "cust_001161",
+              "day_offset": 5,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "human_call_below_amount_floor"
+              ],
+              "rules_passed": [],
+              "stop_reason": "escalation_ladder_exhausted"
+            },
+            "event_id": "29270320-c4e1-41c9-84a8-d6f01150586c",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "c6fb429087a01e9b9ee6a9e06d97bf9565552af66ead37e5d15fcbbfdfde2a68",
+            "record_hash": "05ee62999e0a6ed82fa2f4788b64a5acb302eebe13dacf687f01ce226dae2411",
+            "timestamp_ist": "2026-09-08T10:00:00.000840+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "4e9d170d-f3d6-49e0-a3b6-7d0cdfa41189",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "6825c13772264d0b39d5c08f2f8aa984c640dd90626b1ce45f0abf42ed2eea3a",
+            "record_hash": "43a569115d32c744e0bb5e8425ce7ebfb7a4a7f4faa91deb5702750fffd408bd",
+            "timestamp_ist": "2026-09-11T10:00:00.000394+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 8,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "2ec21b75-dbc4-43b8-b677-357437da5617",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "43a569115d32c744e0bb5e8425ce7ebfb7a4a7f4faa91deb5702750fffd408bd",
+            "record_hash": "49a5872368b8ccf1dfed37a90b0f75006c0f6fdda96c7d326e1bd1d08b8f1a29",
+            "timestamp_ist": "2026-09-11T10:00:00.000395+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "0a85efd6-96c4-43fa-8b47-db4aa4ef90a1",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "8947f797ad35a4057a3771b124be40639de6ce510acd30a2deb310e93136dd99",
+            "record_hash": "ade75ee42c76f88b1eed420f3dc8112f570d666337a4b3c8b2a47d815aef621f",
+            "timestamp_ist": "2026-09-16T10:00:00.000333+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 13,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "9e186da3-5110-4c7a-9c89-ce805e529c30",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "ade75ee42c76f88b1eed420f3dc8112f570d666337a4b3c8b2a47d815aef621f",
+            "record_hash": "7b4d222a0eadbb3dc926d50dfe05022a8e640ce726be1ef6d9183bf6b8f954eb",
+            "timestamp_ist": "2026-09-16T10:00:00.000334+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "ca030b34-a936-4abe-9832-050febd891e1",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "1149d23a33370147f3bd41e6d6c850777357031d4a823598438383122cb4d346",
+            "record_hash": "a1fc927dacbf55ba7fc31a19a016aa56f59ee313a64c4388d80952624b554826",
+            "timestamp_ist": "2026-09-20T10:00:00.000294+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 17,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "f41ee05c-7cdf-480a-93ad-dc96dc10337a",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "a1fc927dacbf55ba7fc31a19a016aa56f59ee313a64c4388d80952624b554826",
+            "record_hash": "40d74ccd866d20afeb5316a2b9f3519fd40673b0f5f3b5520c419beedcb3d792",
+            "timestamp_ist": "2026-09-20T10:00:00.000295+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "b935356a-bb70-452d-8745-b1a431b1a9b8",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "6cf1688ec9817b36fadc78b983ecee0669647b4bb0153f8f637bb8c55a924e28",
+            "record_hash": "6796835edbf03649c9e7623e1808fb6f077fe41e1e66d45324bf6ca9ac34479d",
+            "timestamp_ist": "2026-09-24T10:00:00.000222+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 21,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "da148de8-fe53-442e-82b8-cb25a829d4a6",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "6796835edbf03649c9e7623e1808fb6f077fe41e1e66d45324bf6ca9ac34479d",
+            "record_hash": "9aa1112b7c6d13f0dced64777dab56a3b4fcb6abecbfc2b024e96df2e791f66b",
+            "timestamp_ist": "2026-09-24T10:00:00.000223+05:30",
+            "type": "decision"
+          }
+        ],
+        "ladder_exhausted": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "56f12bb6-32a0-491e-95ad-48ec29650707",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "record_hash": "a8d6c458ff6a92a56c5c9f40ba47f5128014a6e75842adeb7a2eabf1fee004a3",
+            "timestamp_ist": "2026-09-03T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000004",
+              "day_offset": 0,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 12475.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "bfae93b2-aac1-46e8-a574-dd042c6839d5",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "a8d6c458ff6a92a56c5c9f40ba47f5128014a6e75842adeb7a2eabf1fee004a3",
+            "record_hash": "ece00f44813a558eb7dc5cf8c187ec5dea04c994243db56b4abf66dfddc79390",
+            "timestamp_ist": "2026-09-03T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "c0f9b19a-624c-4791-a17f-d6553996f5f0",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "c39a1b941cd548bdd57d01e708e3c5589d3e1cf1b83bc24addc3375ae842804d",
+            "record_hash": "cbbff2fe11f8f6af5452109d6609fafa846204cb76ca5f87789d8b4836b862af",
+            "timestamp_ist": "2026-09-04T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000004",
+              "day_offset": 1,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 12453.0,
+              "ladder_rung": 1,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "108141ba-7db1-4cca-9990-3593ed5b021d",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "cbbff2fe11f8f6af5452109d6609fafa846204cb76ca5f87789d8b4836b862af",
+            "record_hash": "1d42ca644834a0bdf5530bfffb2e4f7b35cd3f9341fced04c68de6eb761c4d13",
+            "timestamp_ist": "2026-09-04T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": "2026-09-04T10:00:00+05:30",
+              "channel": "sms_service",
+              "consent_basis": "dpdp_s7a_voluntarily_provided",
+              "copy_gate_rejected_llm": null,
+              "cost_paise": 22,
+              "customer_ref": "cust_000004",
+              "debt_id": "debt_000004",
+              "llm_output_rejected": null,
+              "message_class": "service",
+              "rendered_text": "Your payment of Rs 499 did not go through. You can retry here: https://rzp.io/rzp/t_000004",
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "template_ref": "template:static"
+            },
+            "event_id": "f989f97b-91f9-48b9-80d8-435c0e48683a",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "1d42ca644834a0bdf5530bfffb2e4f7b35cd3f9341fced04c68de6eb761c4d13",
+            "record_hash": "5a988f78ad325d91ee0fde2f3de6209a4746000b407a15b4abf3da328c24d180",
+            "timestamp_ist": "2026-09-04T10:00:00.000003+05:30",
+            "type": "action"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "7d95f6c6-8c1d-4766-be88-ca635243eb7c",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "3974e3755ad9ff6f294f42d5db831f47797045d3187439987c442ae21de84cf8",
+            "record_hash": "0dcdb93e4c3af370e8841e7a8cf60a626107ddb9c104cce3b02773b6e8e3df23",
+            "timestamp_ist": "2026-09-07T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000004",
+              "day_offset": 4,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 6237.5,
+              "ladder_rung": 2,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "62ba2460-347f-44ac-b2f4-209b21ad1d13",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "0dcdb93e4c3af370e8841e7a8cf60a626107ddb9c104cce3b02773b6e8e3df23",
+            "record_hash": "93e886c1b91b3b839827695a3e38ea2cd9329054c3f7c0466b8d2ba65fdfeab7",
+            "timestamp_ist": "2026-09-07T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "028f0c02-58f0-4938-99f0-0c2710f60288",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "df54de9846fc4af8f455e2de983d9ad0a01bef2a0bd844d4f2f2f2d55ef3459b",
+            "record_hash": "943657ec43d588c68d388582ab6645deccb34a1f7d3786737f6ada3a92d5fa0b",
+            "timestamp_ist": "2026-09-08T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "human_call",
+              "channel_considered": "human_call",
+              "customer_ref": "cust_000004",
+              "day_offset": 5,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "human_call_below_amount_floor"
+              ],
+              "rules_passed": [],
+              "stop_reason": "escalation_ladder_exhausted"
+            },
+            "event_id": "3d01560d-c77b-48f7-b31f-107ff8e54250",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "943657ec43d588c68d388582ab6645deccb34a1f7d3786737f6ada3a92d5fa0b",
+            "record_hash": "a256c45477916e225101bacaf9c503c674c53de2e3620990579d55236b13191a",
+            "timestamp_ist": "2026-09-08T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "b50d0985-addb-4885-8f24-e52c96299d15",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "f39aa6d1f3a73bfd6ddcfaff4627765b88e018b103549badab7410d02ffcb213",
+            "record_hash": "3e70f83d6d6080e61fc4543bf91be0ffc7a7796c7c887a25f56c0516dd1f6331",
+            "timestamp_ist": "2026-09-11T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000004",
+              "day_offset": 8,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 6237.5,
+              "ladder_rung": 3,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "a8c8b5e1-a779-4570-911c-4adae456777c",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "3e70f83d6d6080e61fc4543bf91be0ffc7a7796c7c887a25f56c0516dd1f6331",
+            "record_hash": "b9f6b6765623de6fc1cfd43b55fbd520423fb5372806ffe6011ee55277567a6f",
+            "timestamp_ist": "2026-09-11T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": null,
+              "customer_ref": "cust_000004",
+              "debt_id": "debt_000004",
+              "note": "retry succeeded",
+              "recovered_paise": 49900
+            },
+            "event_id": "c03c3c16-c122-46b4-b148-8751960eb3be",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "b9f6b6765623de6fc1cfd43b55fbd520423fb5372806ffe6011ee55277567a6f",
+            "record_hash": "9ad546022a1a73c87f910352cf279829ce6a03663dafffbebf1542d4b71188eb",
+            "timestamp_ist": "2026-09-11T10:00:00.000003+05:30",
+            "type": "outcome"
+          }
+        ]
+      }
+    },
+    "secondary_14d": {
+      "source_file": "results/phase3/arm-c-audit-14d.jsonl",
+      "records": 36633,
+      "chain_intact": true,
+      "chain_broken_at": null,
+      "chain_head_hash": "34b4b70f06458c033cea274f22ca7df417121000f6ce706137591a534f9c4d18",
+      "summary": {
+        "records": 36633,
+        "decisions": 15377,
+        "actions_taken": 4010,
+        "decisions_declined": 4549,
+        "stop_reasons": {
+          "escalation_ladder_exhausted": 1551,
+          "cause_not_actionable": 1156,
+          "opt_out": 596,
+          "promise_to_pay_active": 532,
+          "dispute_raised": 439,
+          "bereavement_or_hardship": 275
+        },
+        "total_contact_cost_paise": 249420,
+        "chain_intact": true,
+        "chain_broken_at": null
+      },
+      "replayed_examples": {
+        "recovered": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000016",
+              "source": "payment_state_store"
+            },
+            "event_id": "4f41a19c-aca7-4acb-88c8-37515b0abd40",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "227a1f253f6e27c360faf69d895c16b4f78562a15a553dd7a2d32310095b151f",
+            "record_hash": "90a73221e677b790fb89886e641202f49b3dcb0c95a3af8def99ea7ada237d18",
+            "timestamp_ist": "2026-09-03T10:00:00.000007+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000016",
+              "day_offset": 0,
+              "debt_id": "debt_000016",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 19975.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "7c1baa6a-3770-4d7c-b73b-30cdd5228a63",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "90a73221e677b790fb89886e641202f49b3dcb0c95a3af8def99ea7ada237d18",
+            "record_hash": "21d582d1d60de5d520222b6849c55f73f5c22e776bbb7ae73fb7fde4685ac6a7",
+            "timestamp_ist": "2026-09-03T10:00:00.000008+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": null,
+              "customer_ref": "cust_000016",
+              "debt_id": "debt_000016",
+              "note": "retry succeeded",
+              "recovered_paise": 79900
+            },
+            "event_id": "f18685f8-3312-4e20-8d69-65f3053743a3",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "21d582d1d60de5d520222b6849c55f73f5c22e776bbb7ae73fb7fde4685ac6a7",
+            "record_hash": "d319e45e1c5214f414f5105ab2b4af22f434f989f6744c5e1349f82e78de11f3",
+            "timestamp_ist": "2026-09-03T10:00:00.000009+05:30",
+            "type": "outcome"
+          }
+        ],
+        "stopped_on_opt_out": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "a159569f-aab6-4b30-a225-7a50c4f687d3",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "28ae422a96fe0790cdd7fc57499754a0383f1f41424a4775492772804b4ac7b1",
+            "record_hash": "b0576abbf514bbb009b71dff24d50ecf59d8f242a4475f57e73c30b6829f3623",
+            "timestamp_ist": "2026-09-03T10:00:00.000423+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 0,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 12475.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "f943a6ca-05ea-44d2-bd61-841b36e02fe5",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "b0576abbf514bbb009b71dff24d50ecf59d8f242a4475f57e73c30b6829f3623",
+            "record_hash": "20de7448065b28710d2ca9a37a2153f90c527f3d1495b0277f2c3e7c2ceb64bc",
+            "timestamp_ist": "2026-09-03T10:00:00.000424+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "d4008edf-c1cc-49c0-bc47-42f59a077820",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "ab9a3b81f155021959960daee76b4a0118b890ad8bc5895ad690d647ff9ed055",
+            "record_hash": "654cea9e03d1b6807503968e460689447119e770f41124e9f7c0421cde4f4e3b",
+            "timestamp_ist": "2026-09-04T10:00:00.001022+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "whatsapp_utility",
+              "channel_considered": "whatsapp_utility",
+              "customer_ref": "cust_001161",
+              "day_offset": 1,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 12457.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "35e56163-8cf7-4310-a930-6b062e80f582",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "654cea9e03d1b6807503968e460689447119e770f41124e9f7c0421cde4f4e3b",
+            "record_hash": "5c972f1d4ec3b55f7d39ea8369a01f3c53903b1cc94ab3401df9557eafb28834",
+            "timestamp_ist": "2026-09-04T10:00:00.001023+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": "2026-09-04T10:00:00+05:30",
+              "channel": "whatsapp_utility",
+              "consent_basis": "dpdp_s7a_voluntarily_provided",
+              "copy_gate_rejected_llm": null,
+              "cost_paise": 18,
+              "customer_ref": "cust_001161",
+              "debt_id": "debt_001161",
+              "llm_output_rejected": null,
+              "message_class": "service",
+              "rendered_text": "Your payment of Rs 499 did not go through. You can retry here: https://rzp.io/rzp/t_001161",
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "template_ref": "template:static"
+            },
+            "event_id": "b2857237-5444-4f70-91ba-3294d4b7e684",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "5c972f1d4ec3b55f7d39ea8369a01f3c53903b1cc94ab3401df9557eafb28834",
+            "record_hash": "376eb3ff023bf37980bc0527832d4cb4d984a041fb00dc2da5556a407735892e",
+            "timestamp_ist": "2026-09-04T10:00:00.001024+05:30",
+            "type": "action"
+          },
+          {
+            "body": {
+              "customer_ref": "cust_001161",
+              "debt_id": "debt_001161",
+              "intent": "opt_out",
+              "parser_source": "override",
+              "promised_date": null,
+              "text": "STOP. do not message me again"
+            },
+            "event_id": "a8c042a2-b583-4731-b39a-8d99dd631164",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "376eb3ff023bf37980bc0527832d4cb4d984a041fb00dc2da5556a407735892e",
+            "record_hash": "b39d14bbe886c61e52685341ce25dab3feda93a475f7ca4b09a2e68d6c63a55e",
+            "timestamp_ist": "2026-09-04T10:00:00.001025+05:30",
+            "type": "inbound"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "74a23530-114e-40fc-991b-b8c7a480b435",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "78c522ecc24355dfa7c6a731b38722ac4f1074bb7729cc3907f5319af0d3d751",
+            "record_hash": "fcb02e151b5d03b4ab067f813a439f1339ee840fd5128c02f8b198cb62e7c678",
+            "timestamp_ist": "2026-09-07T10:00:00.000388+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 4,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "211d3651-1e19-4548-9917-410b1a5777b9",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "fcb02e151b5d03b4ab067f813a439f1339ee840fd5128c02f8b198cb62e7c678",
+            "record_hash": "182bf41b09113f9a22d92428ecf73043e4f8a4f0fbeb7a7b76d95a892d3fe4a2",
+            "timestamp_ist": "2026-09-07T10:00:00.000389+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "c692c8f8-50a1-4083-a2de-4d8e253ce2ee",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2316797bce7a20cffd1956c6b9d2cede7bf46394b56abe7dee574118701fffb9",
+            "record_hash": "c6fb429087a01e9b9ee6a9e06d97bf9565552af66ead37e5d15fcbbfdfde2a68",
+            "timestamp_ist": "2026-09-08T10:00:00.000839+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "human_call",
+              "channel_considered": "human_call",
+              "customer_ref": "cust_001161",
+              "day_offset": 5,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "human_call_below_amount_floor"
+              ],
+              "rules_passed": [],
+              "stop_reason": "escalation_ladder_exhausted"
+            },
+            "event_id": "7e2bb107-d632-4f19-b52a-d53461d7734a",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "c6fb429087a01e9b9ee6a9e06d97bf9565552af66ead37e5d15fcbbfdfde2a68",
+            "record_hash": "05ee62999e0a6ed82fa2f4788b64a5acb302eebe13dacf687f01ce226dae2411",
+            "timestamp_ist": "2026-09-08T10:00:00.000840+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "9d173f0e-1c05-4e1c-90be-3a725a925b10",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "6825c13772264d0b39d5c08f2f8aa984c640dd90626b1ce45f0abf42ed2eea3a",
+            "record_hash": "43a569115d32c744e0bb5e8425ce7ebfb7a4a7f4faa91deb5702750fffd408bd",
+            "timestamp_ist": "2026-09-11T10:00:00.000394+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 8,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "cb2bdb21-2da5-4f96-b986-f2f45355b149",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "43a569115d32c744e0bb5e8425ce7ebfb7a4a7f4faa91deb5702750fffd408bd",
+            "record_hash": "49a5872368b8ccf1dfed37a90b0f75006c0f6fdda96c7d326e1bd1d08b8f1a29",
+            "timestamp_ist": "2026-09-11T10:00:00.000395+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_001161",
+              "source": "payment_state_store"
+            },
+            "event_id": "0fac562e-2ee6-408d-88c2-f663ef05871e",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "8947f797ad35a4057a3771b124be40639de6ce510acd30a2deb310e93136dd99",
+            "record_hash": "ade75ee42c76f88b1eed420f3dc8112f570d666337a4b3c8b2a47d815aef621f",
+            "timestamp_ist": "2026-09-16T10:00:00.000333+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_001161",
+              "day_offset": 13,
+              "debt_id": "debt_001161",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "5806315e-54ec-4b37-925e-0c773687e4d1",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "ade75ee42c76f88b1eed420f3dc8112f570d666337a4b3c8b2a47d815aef621f",
+            "record_hash": "7b4d222a0eadbb3dc926d50dfe05022a8e640ce726be1ef6d9183bf6b8f954eb",
+            "timestamp_ist": "2026-09-16T10:00:00.000334+05:30",
+            "type": "decision"
+          }
+        ],
+        "ladder_exhausted": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "0246d421-f755-458e-be8d-ddf2a43462ef",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "record_hash": "a8d6c458ff6a92a56c5c9f40ba47f5128014a6e75842adeb7a2eabf1fee004a3",
+            "timestamp_ist": "2026-09-03T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000004",
+              "day_offset": 0,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 12475.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "fa48ad46-6389-41e8-b7be-1599d305f905",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "a8d6c458ff6a92a56c5c9f40ba47f5128014a6e75842adeb7a2eabf1fee004a3",
+            "record_hash": "ece00f44813a558eb7dc5cf8c187ec5dea04c994243db56b4abf66dfddc79390",
+            "timestamp_ist": "2026-09-03T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "eac4513d-2962-48be-a071-8a67b9f01f4b",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "c39a1b941cd548bdd57d01e708e3c5589d3e1cf1b83bc24addc3375ae842804d",
+            "record_hash": "cbbff2fe11f8f6af5452109d6609fafa846204cb76ca5f87789d8b4836b862af",
+            "timestamp_ist": "2026-09-04T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000004",
+              "day_offset": 1,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 12453.0,
+              "ladder_rung": 1,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "40944912-58c6-44ea-ac11-c4396a1536db",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "cbbff2fe11f8f6af5452109d6609fafa846204cb76ca5f87789d8b4836b862af",
+            "record_hash": "1d42ca644834a0bdf5530bfffb2e4f7b35cd3f9341fced04c68de6eb761c4d13",
+            "timestamp_ist": "2026-09-04T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": "2026-09-04T10:00:00+05:30",
+              "channel": "sms_service",
+              "consent_basis": "dpdp_s7a_voluntarily_provided",
+              "copy_gate_rejected_llm": null,
+              "cost_paise": 22,
+              "customer_ref": "cust_000004",
+              "debt_id": "debt_000004",
+              "llm_output_rejected": null,
+              "message_class": "service",
+              "rendered_text": "Your payment of Rs 499 did not go through. You can retry here: https://rzp.io/rzp/t_000004",
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "template_ref": "template:static"
+            },
+            "event_id": "3f63a44a-5aee-4d8d-9b84-a868615dee27",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "1d42ca644834a0bdf5530bfffb2e4f7b35cd3f9341fced04c68de6eb761c4d13",
+            "record_hash": "5a988f78ad325d91ee0fde2f3de6209a4746000b407a15b4abf3da328c24d180",
+            "timestamp_ist": "2026-09-04T10:00:00.000003+05:30",
+            "type": "action"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "92c7fd6d-80cf-48c4-8395-fb8bba8dc859",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "3974e3755ad9ff6f294f42d5db831f47797045d3187439987c442ae21de84cf8",
+            "record_hash": "0dcdb93e4c3af370e8841e7a8cf60a626107ddb9c104cce3b02773b6e8e3df23",
+            "timestamp_ist": "2026-09-07T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000004",
+              "day_offset": 4,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 6237.5,
+              "ladder_rung": 2,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "3a4182f4-f985-4908-aa5b-2a2545b2e1cd",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "0dcdb93e4c3af370e8841e7a8cf60a626107ddb9c104cce3b02773b6e8e3df23",
+            "record_hash": "93e886c1b91b3b839827695a3e38ea2cd9329054c3f7c0466b8d2ba65fdfeab7",
+            "timestamp_ist": "2026-09-07T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "88e8d596-3132-4454-84be-7c3e1172216b",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "df54de9846fc4af8f455e2de983d9ad0a01bef2a0bd844d4f2f2f2d55ef3459b",
+            "record_hash": "943657ec43d588c68d388582ab6645deccb34a1f7d3786737f6ada3a92d5fa0b",
+            "timestamp_ist": "2026-09-08T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "human_call",
+              "channel_considered": "human_call",
+              "customer_ref": "cust_000004",
+              "day_offset": 5,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "human_call_below_amount_floor"
+              ],
+              "rules_passed": [],
+              "stop_reason": "escalation_ladder_exhausted"
+            },
+            "event_id": "4439d49a-4978-4d96-92e3-325b392a25fa",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "943657ec43d588c68d388582ab6645deccb34a1f7d3786737f6ada3a92d5fa0b",
+            "record_hash": "a256c45477916e225101bacaf9c503c674c53de2e3620990579d55236b13191a",
+            "timestamp_ist": "2026-09-08T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000004",
+              "source": "payment_state_store"
+            },
+            "event_id": "75fd891d-c86b-41ec-a87d-688be6ccf48d",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "f39aa6d1f3a73bfd6ddcfaff4627765b88e018b103549badab7410d02ffcb213",
+            "record_hash": "3e70f83d6d6080e61fc4543bf91be0ffc7a7796c7c887a25f56c0516dd1f6331",
+            "timestamp_ist": "2026-09-11T10:00:00.000001+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000004",
+              "day_offset": 8,
+              "debt_id": "debt_000004",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 6237.5,
+              "ladder_rung": 3,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "3e954058-6263-4f3e-abfd-8c3d3a8b5a95",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "3e70f83d6d6080e61fc4543bf91be0ffc7a7796c7c887a25f56c0516dd1f6331",
+            "record_hash": "b9f6b6765623de6fc1cfd43b55fbd520423fb5372806ffe6011ee55277567a6f",
+            "timestamp_ist": "2026-09-11T10:00:00.000002+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": null,
+              "customer_ref": "cust_000004",
+              "debt_id": "debt_000004",
+              "note": "retry succeeded",
+              "recovered_paise": 49900
+            },
+            "event_id": "cb155ad9-264f-4d21-a200-a779238a8a10",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "b9f6b6765623de6fc1cfd43b55fbd520423fb5372806ffe6011ee55277567a6f",
+            "record_hash": "9ad546022a1a73c87f910352cf279829ce6a03663dafffbebf1542d4b71188eb",
+            "timestamp_ist": "2026-09-11T10:00:00.000003+05:30",
+            "type": "outcome"
+          }
+        ]
+      }
+    },
+    "shifted": {
+      "source_file": "results/phase3/arm-c-audit-shifted.jsonl",
+      "records": 37748,
+      "chain_intact": true,
+      "chain_broken_at": null,
+      "chain_head_hash": "73c711e78069ea7c0b436078418670e766ddbd4b5368460c9191f242649350f2",
+      "summary": {
+        "records": 37748,
+        "decisions": 16321,
+        "actions_taken": 3263,
+        "decisions_declined": 6003,
+        "stop_reasons": {
+          "cause_not_actionable": 2082,
+          "escalation_ladder_exhausted": 1377,
+          "promise_to_pay_active": 903,
+          "opt_out": 767,
+          "dispute_raised": 514,
+          "bereavement_or_hardship": 360
+        },
+        "total_contact_cost_paise": 229914,
+        "chain_intact": true,
+        "chain_broken_at": null
+      },
+      "replayed_examples": {
+        "recovered": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000015",
+              "source": "payment_state_store"
+            },
+            "event_id": "af76458f-4884-4572-8a01-ca9c0757f65e",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "018e3f03083369cbfd4270f0e6a7f60cbfa82be46534562f5aa136b312102327",
+            "record_hash": "0cdca343b5b907f08ece0b30a9bc515f8e7d8c27336bb5db2bb35e06d6fa344e",
+            "timestamp_ist": "2026-09-03T10:00:00.000005+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000015",
+              "day_offset": 0,
+              "debt_id": "debt_000015",
+              "diagnosis": "needs_funds",
+              "expected_value_paise": 3725.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining",
+                "cause_is_retryable_now",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "a452659e-98fb-428a-85ff-ec7de09d9e5d",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "0cdca343b5b907f08ece0b30a9bc515f8e7d8c27336bb5db2bb35e06d6fa344e",
+            "record_hash": "b5832d83ae8aa5afa4221eeb08af883a77cf28ce6a9dabbb72bd88e9e38edb31",
+            "timestamp_ist": "2026-09-03T10:00:00.000006+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": null,
+              "customer_ref": "cust_000015",
+              "debt_id": "debt_000015",
+              "note": "retry succeeded",
+              "recovered_paise": 14900
+            },
+            "event_id": "2ed7d012-b269-49b3-a66b-c8b00730d21a",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "b5832d83ae8aa5afa4221eeb08af883a77cf28ce6a9dabbb72bd88e9e38edb31",
+            "record_hash": "0bf0144551c4f7fdee02b69cf3da37f00531fa208bd1e5cfa829ebd4f620c1ba",
+            "timestamp_ist": "2026-09-03T10:00:00.000007+05:30",
+            "type": "outcome"
+          }
+        ],
+        "stopped_on_opt_out": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "78be6f87-f25c-4a4a-99cd-7321b0318884",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "8f66ad7db14881598da5391b2b1d024b1dfa3b466363cf1facd8874be4824a91",
+            "record_hash": "eff7e08cc1bed734dc8e1cb4ca4bbdc3f7342b45cc8643473f6c9791a3c7aa9c",
+            "timestamp_ist": "2026-09-03T10:00:00.000147+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000394",
+              "day_offset": 0,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 0,
+              "rules_fired": [
+                "cause_is_retryable_now"
+              ],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining"
+              ],
+              "stop_reason": "cause_not_actionable"
+            },
+            "event_id": "e5e97157-478a-4b6a-8096-da5067329d4b",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "eff7e08cc1bed734dc8e1cb4ca4bbdc3f7342b45cc8643473f6c9791a3c7aa9c",
+            "record_hash": "2b22cc6d3a65d6b0275eb7e8d788cdee61dc22f91507ae31ba650fa290f7730a",
+            "timestamp_ist": "2026-09-03T10:00:00.000148+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "d7a48994-b44c-4ce9-8376-2b20f34f8d28",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "203b61360d9165077821a2b48d9e60199abf629b0c41a6ac9349814be0dc45a0",
+            "record_hash": "11ff6051c660188dbb9e0b094518f3e5e293034d4d4a3e199dd7b48a27826406",
+            "timestamp_ist": "2026-09-04T10:00:00.000315+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "whatsapp_utility",
+              "channel_considered": "whatsapp_utility",
+              "customer_ref": "cust_000394",
+              "day_offset": 1,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 7467.0,
+              "ladder_rung": 0,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "fdbc3686-4693-446d-9afc-7dcc51a75842",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "11ff6051c660188dbb9e0b094518f3e5e293034d4d4a3e199dd7b48a27826406",
+            "record_hash": "cd3f9abca76184a7e1f9b77a4cba36c8207165627ac770692cd531e728770a5f",
+            "timestamp_ist": "2026-09-04T10:00:00.000316+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": "2026-09-04T10:00:00+05:30",
+              "channel": "whatsapp_utility",
+              "consent_basis": "dpdp_s7a_voluntarily_provided",
+              "copy_gate_rejected_llm": null,
+              "cost_paise": 18,
+              "customer_ref": "cust_000394",
+              "debt_id": "debt_000394",
+              "llm_output_rejected": null,
+              "message_class": "service",
+              "rendered_text": "Your payment of Rs 499 was not completed. You can complete it here: https://rzp.io/rzp/t_000394",
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "template_ref": "template:static"
+            },
+            "event_id": "63917591-d258-48a4-955d-557faf4abee7",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "cd3f9abca76184a7e1f9b77a4cba36c8207165627ac770692cd531e728770a5f",
+            "record_hash": "2032a52391d3b6be0e08aa76f859637a977b1b6b87f8bfef0a331ef980c00a08",
+            "timestamp_ist": "2026-09-04T10:00:00.000317+05:30",
+            "type": "action"
+          },
+          {
+            "body": {
+              "customer_ref": "cust_000394",
+              "debt_id": "debt_000394",
+              "intent": "opt_out",
+              "parser_source": "override",
+              "promised_date": null,
+              "text": "STOP. do not message me again"
+            },
+            "event_id": "57dc9585-c9b1-442b-b8dd-ce5820108c07",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2032a52391d3b6be0e08aa76f859637a977b1b6b87f8bfef0a331ef980c00a08",
+            "record_hash": "7f5ec722456ced14a41137e2fd9def719339c8399c60b5ea86bd20a68be7bb1a",
+            "timestamp_ist": "2026-09-04T10:00:00.000318+05:30",
+            "type": "inbound"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "a400e209-f1b8-44b6-8209-61a9ee97dd9c",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "4e496594e6b5f15119ec0ab6c2071b9dd9e170eee447b37962a16f313fa5a606",
+            "record_hash": "4a6e1f3102d2be29cb1cef92721d47da8cc47a05c2d0dd3c35bad861123a5bb0",
+            "timestamp_ist": "2026-09-07T10:00:00.000099+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000394",
+              "day_offset": 4,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "09790ab5-a91b-4bd8-a399-2c22f6dd1fa7",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "4a6e1f3102d2be29cb1cef92721d47da8cc47a05c2d0dd3c35bad861123a5bb0",
+            "record_hash": "c74d9ee6d2f81cbbc29a39b48845b5abfdff5ece7c3eb0ceb0e14b19219b97e1",
+            "timestamp_ist": "2026-09-07T10:00:00.000100+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "6d313f1e-0b52-4b5b-ad79-3965e86cd7e6",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "4de09cd2ea077717ee307a6a1c3372ff866eabb994c092c6e1ec6a72260d4d4d",
+            "record_hash": "1c58b091086954b3ad13a8ac522302b530d732ddc3d01a9b04687e217d628ce7",
+            "timestamp_ist": "2026-09-08T10:00:00.000183+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 5,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "0dfa30ef-30e4-4f2d-a829-871cb447c836",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "1c58b091086954b3ad13a8ac522302b530d732ddc3d01a9b04687e217d628ce7",
+            "record_hash": "2acb1ef0888f7f7c87502e7ed954e392e1dfa955b5b8b6b211a5fc12e3654005",
+            "timestamp_ist": "2026-09-08T10:00:00.000184+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "c24296fc-1656-4028-824d-edca002e7061",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "9d857afa5b97433d499bdfe60ee178c9393965b751c9114e27dfd1ebc6bb5e3f",
+            "record_hash": "6acf38a9f7e716a339db059e5024a98939166eb8b2640e0ef3e05a9cc148c650",
+            "timestamp_ist": "2026-09-09T10:00:00.000208+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 6,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "52a5ccc4-15b3-4bcf-b41d-061c3a29db41",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "6acf38a9f7e716a339db059e5024a98939166eb8b2640e0ef3e05a9cc148c650",
+            "record_hash": "8ee5693ca685f68b38c5119d4d343686efa7c310be2d72cad4387ec8bd254ebf",
+            "timestamp_ist": "2026-09-09T10:00:00.000209+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "927e5a05-e672-4499-b93e-8e52365ff4a3",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2f1e4cc844b2bf301e443bcc2d0a5683c7225b81f832493b71b7b7f82c343a68",
+            "record_hash": "2452d4517d7d74a02cae4242b398f8b58549b0249db835dfe43c420d93736b21",
+            "timestamp_ist": "2026-09-10T10:00:00.000123+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 7,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "bec9a049-92a8-4682-9ef8-c48f795fb4f5",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2452d4517d7d74a02cae4242b398f8b58549b0249db835dfe43c420d93736b21",
+            "record_hash": "e29342741f595cf10d8be5f0a049654ce73b74847ac7d5efdafe6a3de94809e6",
+            "timestamp_ist": "2026-09-10T10:00:00.000124+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "beaf75c6-d374-40c2-8b18-3bd796b2d924",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2bc4a4711e463b23152ce8c7a8778c89cb053adaa288abe3aeee5e78f0b4bffb",
+            "record_hash": "129c30da7378d524ecfb676bf6890f3b431a7324d3e7828e2fe850122dcfa0a7",
+            "timestamp_ist": "2026-09-11T10:00:00.000081+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000394",
+              "day_offset": 8,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "83360bb4-1ed3-4017-879e-a694f4042642",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "129c30da7378d524ecfb676bf6890f3b431a7324d3e7828e2fe850122dcfa0a7",
+            "record_hash": "9671f21e8a6a56e3e5ff9ec11e5d69396e381e8264295036e3719f0c036ee8d0",
+            "timestamp_ist": "2026-09-11T10:00:00.000082+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "b45541b5-ca2b-483f-b4c1-9ebba0013257",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "62d91ea46e46cbfd6b5faa265974acd5623da989abceef766e2807829f5c1e84",
+            "record_hash": "e64e63be5a9163132a20bf6563990a8f4ca6f376097057d773e6661fb8a6f878",
+            "timestamp_ist": "2026-09-12T10:00:00.000130+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 9,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "5249c8fd-c408-49df-8681-a584eaa3d387",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "e64e63be5a9163132a20bf6563990a8f4ca6f376097057d773e6661fb8a6f878",
+            "record_hash": "e7bd9471b30262c38129f5e84ce598deced1cc537e8fa6100112989fad5102a9",
+            "timestamp_ist": "2026-09-12T10:00:00.000131+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "e5d0b7ce-e801-474c-b684-817de3bc14be",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "96632c14752a623c495e709362e2cb69d84a3c8dece4d6a7371298d3c2b9e371",
+            "record_hash": "33351e297b7882535650b12058046d66bec49f07c12ff23bf9e320ce11fc8948",
+            "timestamp_ist": "2026-09-13T10:00:00.000140+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 10,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "f6d6f42c-395d-4979-b50a-ee3d8a1c9b40",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "33351e297b7882535650b12058046d66bec49f07c12ff23bf9e320ce11fc8948",
+            "record_hash": "e267075552520837710cc8ff79c189be9c17c39ae976e455e917bd3c4f3a92f0",
+            "timestamp_ist": "2026-09-13T10:00:00.000141+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "50f9ee9a-7fef-4fe1-813c-b575c7daa533",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "a572c58f61d3c7bac94da25cc948ae73137b62608a9594b23d27d79d1d36a0f2",
+            "record_hash": "2c81a32d59e75ff8124b17729b9d182bc5eba18fb6203dca333bd307b64ec35d",
+            "timestamp_ist": "2026-09-14T10:00:00.000075+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 11,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "8f3868ad-b6f7-4184-a251-46933ee8417e",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2c81a32d59e75ff8124b17729b9d182bc5eba18fb6203dca333bd307b64ec35d",
+            "record_hash": "9c139373f778f4592ec5bbdfe9cb6f0c86f3700d29c119d70fbd474ee68dc016",
+            "timestamp_ist": "2026-09-14T10:00:00.000076+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "e5186f5f-89f6-4da0-a6bc-c33942821567",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "486b1de54773563dc77d5e43d9b1ffcec5bbdce0b9c5d568fcd3a26937f81d77",
+            "record_hash": "42f4e007ec90c16994d68372ecda4f085bbf4bf1cc94c2fc6e37760cca1a07f6",
+            "timestamp_ist": "2026-09-15T10:00:00.000017+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 12,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "c7af56f7-6676-461e-8291-0549a521ca11",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "42f4e007ec90c16994d68372ecda4f085bbf4bf1cc94c2fc6e37760cca1a07f6",
+            "record_hash": "4ca09b5c20aaefece1d36fab3618e902229de25be8a0dfbf70f8b28c6f59da4b",
+            "timestamp_ist": "2026-09-15T10:00:00.000018+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "a0c1719b-8afc-4b73-b3e3-6bf27fbca6fa",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "6d638a0696689e36450124dc06275f8ed7d91e90979c85418fbb7c7be04b4845",
+            "record_hash": "d92ea612c87733695e528a0dc20f4a326d97036785dc58d7f1b9ca3ab561eb24",
+            "timestamp_ist": "2026-09-16T10:00:00.000081+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000394",
+              "day_offset": 13,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "5d6fc9cb-8df9-4485-b075-6848b66b0f29",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "d92ea612c87733695e528a0dc20f4a326d97036785dc58d7f1b9ca3ab561eb24",
+            "record_hash": "6ee9c2494e44f456d284eda5e00f58eaed22e3241a0d876151844660126ae66f",
+            "timestamp_ist": "2026-09-16T10:00:00.000082+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "bc32fa6a-22c9-4a0e-b8a5-e7e87f900fe8",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "a1be44c013e714876e17359b8778cf8358df5db6daf0f494612cd8aa3f60fa9f",
+            "record_hash": "cb3ebe5e4f0dc7b6b19cad2806e9e231e8b9759119ad62749b5d5dc7fd848f29",
+            "timestamp_ist": "2026-09-17T10:00:00.000091+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 14,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "846c3db4-fc31-450b-90b5-28bd52c26a56",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "cb3ebe5e4f0dc7b6b19cad2806e9e231e8b9759119ad62749b5d5dc7fd848f29",
+            "record_hash": "9f24e7def46e88743fc19f4b19a00277b3674345182bf1a97b168bc6b57e6937",
+            "timestamp_ist": "2026-09-17T10:00:00.000092+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "97239a3a-0c46-4a97-8a17-759264af1ff3",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "b8a2ab89ddc3a3460d31f264903a4156d00f4af5e42aa550c9f136cf5e18ae2d",
+            "record_hash": "16f923c4c9245e985c068490a449554fe646ffdc6ae100bab6b12902e0fd917e",
+            "timestamp_ist": "2026-09-18T10:00:00.000096+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 15,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "78f093ba-ea5b-42ea-9d87-158055a14f34",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "16f923c4c9245e985c068490a449554fe646ffdc6ae100bab6b12902e0fd917e",
+            "record_hash": "57d0cc9038ffad291f5bc8fa2f8b6ce70749cf3399323e066784d0791b211b3a",
+            "timestamp_ist": "2026-09-18T10:00:00.000097+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "d10fa850-6c6f-4c2b-a14c-f092a57e69f0",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "f94e1ec7e309599f26788b02f2470ed263e3726ab490805bcc9a4d2da35f5af2",
+            "record_hash": "36db5bfca8ab7c7fca42623258b0c33241ab16e1dd4f1342cd32f6a5f386c6e0",
+            "timestamp_ist": "2026-09-19T10:00:00.000013+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 16,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "62f0920e-e23f-4a7b-b99e-e79284428de1",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "36db5bfca8ab7c7fca42623258b0c33241ab16e1dd4f1342cd32f6a5f386c6e0",
+            "record_hash": "b5f96871345a40f3d83e5121cfcb4126ad0dd7d106d65c06a210b324d60736d6",
+            "timestamp_ist": "2026-09-19T10:00:00.000014+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "9a60f55e-aba0-48aa-b008-eafa61b41745",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "a6f1ce90f58d689b04a0beb5609155c52745fff2f432833360520759c4927057",
+            "record_hash": "c0ad06c668350bb46a282367d22058f8872960eea3e2def6ebac49e2c30e8894",
+            "timestamp_ist": "2026-09-20T10:00:00.000069+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000394",
+              "day_offset": 17,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "fc4988af-fac6-4bc9-83ff-adfc0a2f49a8",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "c0ad06c668350bb46a282367d22058f8872960eea3e2def6ebac49e2c30e8894",
+            "record_hash": "21a26b8f16556599b27da0a3fe917674b4bf3de15210df6359a2f060a5aba684",
+            "timestamp_ist": "2026-09-20T10:00:00.000070+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "241af073-d07e-41dd-be68-8f703c0e2be3",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "0ed3d4cc90688d620bc8d9ffb792290ce990c81cf1a9d798fee4a92eb43d5bde",
+            "record_hash": "70a291dda2ebdf6b7863cc5b660a47245ffd2bd85c64f3a725e4920168a499d7",
+            "timestamp_ist": "2026-09-21T10:00:00.000073+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 18,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "f1bc5ffd-bfff-4264-a11f-bde9afbb7f08",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "70a291dda2ebdf6b7863cc5b660a47245ffd2bd85c64f3a725e4920168a499d7",
+            "record_hash": "a571c1e286d549b25bde6c92b3bf6743fef7adcb89bc3221ea8e9309bb345e47",
+            "timestamp_ist": "2026-09-21T10:00:00.000074+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "ea9ef809-6a40-4e57-85db-9cf8e8d75d3c",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "93b5ee3558c43262886302598e48396feb001d632ba80e6c4fc87770f3d9115a",
+            "record_hash": "e584ed5f8a4a2421472d078121bc9e7b83604aec24cbef89b1f59ae38a0222a4",
+            "timestamp_ist": "2026-09-22T10:00:00.000063+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 19,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "141bec9d-bc25-4db0-beda-0dc30f8c716a",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "e584ed5f8a4a2421472d078121bc9e7b83604aec24cbef89b1f59ae38a0222a4",
+            "record_hash": "f17c977c21c8c13adcbfc2e1a894ca552afeaccf402021594448aa4aec6e21be",
+            "timestamp_ist": "2026-09-22T10:00:00.000064+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "7a41b932-2fb8-4cca-85dc-395aa27f976c",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "abb04a66ea6287c7b9aa7ebc3552e2cd807a7e29424f3162fc8d41d528c39435",
+            "record_hash": "4dfd5cfa798eb56d8d47c499b6cae25e23b5dbfa1ce42617dd3916871b1b0457",
+            "timestamp_ist": "2026-09-23T10:00:00.000013+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000394",
+              "day_offset": 20,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "a3b92efa-c283-486d-9143-811e34177598",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "4dfd5cfa798eb56d8d47c499b6cae25e23b5dbfa1ce42617dd3916871b1b0457",
+            "record_hash": "73c8f85fc444790f178062c4efdf64f2dc4f212df3566767425f5b1f7f77a04d",
+            "timestamp_ist": "2026-09-23T10:00:00.000014+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000394",
+              "source": "payment_state_store"
+            },
+            "event_id": "cc91cb9f-5fb0-49b4-8b94-66edde880b19",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "cbcd7811feeb5dc1dfc37615cd07ca2f0d8d81f9005e27ea3cef82ac508f136e",
+            "record_hash": "2cbdd830c366cbe27a2448dc20806e09ebe25a65bc8f80d0e983c00ffd6d4c7a",
+            "timestamp_ist": "2026-09-24T10:00:00.000069+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000394",
+              "day_offset": 21,
+              "debt_id": "debt_000394",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 1,
+              "rules_fired": [
+                "not_opted_out"
+              ],
+              "rules_passed": [
+                "payment_not_already_received"
+              ],
+              "stop_reason": "opt_out"
+            },
+            "event_id": "6e94932b-97ac-4014-8664-60710d6f0617",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2cbdd830c366cbe27a2448dc20806e09ebe25a65bc8f80d0e983c00ffd6d4c7a",
+            "record_hash": "6fc7e9f19989c5d4a9d82b493329463d544ee5284f38fbb18be21c0fa6b85858",
+            "timestamp_ist": "2026-09-24T10:00:00.000070+05:30",
+            "type": "decision"
+          }
+        ],
+        "ladder_exhausted": [
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000038",
+              "source": "payment_state_store"
+            },
+            "event_id": "876163dd-c608-4b5f-b9af-e817417ce653",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "c8f5321083dd73b517de92afdca95ee64a9224a5387b5a264b83ec4dff81a558",
+            "record_hash": "f16241a83bac4b8dd34f89b2068b6ef49c6d53bb8edd5fa785768a416803808c",
+            "timestamp_ist": "2026-09-03T10:00:00.000016+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000038",
+              "day_offset": 0,
+              "debt_id": "debt_000038",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 0,
+              "rules_fired": [
+                "cause_is_retryable_now"
+              ],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining"
+              ],
+              "stop_reason": "cause_not_actionable"
+            },
+            "event_id": "10bf267e-eb31-4c29-a55a-fedcd921a728",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "f16241a83bac4b8dd34f89b2068b6ef49c6d53bb8edd5fa785768a416803808c",
+            "record_hash": "4a8ae21980c52e5b8cd85969e269eed348c9e167a59cc0618e73e117854f7dd2",
+            "timestamp_ist": "2026-09-03T10:00:00.000017+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000038",
+              "source": "payment_state_store"
+            },
+            "event_id": "f381db20-f4b5-4a94-ab55-45ce11a7a61c",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "60ffe37d665ace1e3118a21ce7438a517819d9559222945766c2be2829262ddd",
+            "record_hash": "30a89968c18a848493fd247b546e892f7c2b13ac903d79a41072e4caa2832098",
+            "timestamp_ist": "2026-09-04T10:00:00.000041+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": true,
+              "channel": "sms_service",
+              "channel_considered": "sms_service",
+              "customer_ref": "cust_000038",
+              "day_offset": 1,
+              "debt_id": "debt_000038",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 7463.0,
+              "ladder_rung": 1,
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "stop_reason": null
+            },
+            "event_id": "a93f8c3a-a7cb-48bc-8ade-3f65d82fea8e",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "30a89968c18a848493fd247b546e892f7c2b13ac903d79a41072e4caa2832098",
+            "record_hash": "9aeb74a677e186751b851525c89b5936a5877972c819edf4501bd6f95580a473",
+            "timestamp_ist": "2026-09-04T10:00:00.000042+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "at": "2026-09-04T10:00:00+05:30",
+              "channel": "sms_service",
+              "consent_basis": "dpdp_s7a_voluntarily_provided",
+              "copy_gate_rejected_llm": null,
+              "cost_paise": 22,
+              "customer_ref": "cust_000038",
+              "debt_id": "debt_000038",
+              "llm_output_rejected": null,
+              "message_class": "service",
+              "rendered_text": "Your payment of Rs 499 was not completed. You can complete it here: https://rzp.io/rzp/t_000038",
+              "rules_fired": [],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "no_active_promise_to_pay",
+                "channel_reachable",
+                "inside_contact_window_0800_1900_ist",
+                "under_7_contacts_in_7_days",
+                "under_per_channel_24h_cap",
+                "ladder_not_exhausted",
+                "expected_value_positive"
+              ],
+              "template_ref": "template:static"
+            },
+            "event_id": "d42e79d8-51d4-45c9-9ac2-cb5ee813458a",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "9aeb74a677e186751b851525c89b5936a5877972c819edf4501bd6f95580a473",
+            "record_hash": "a7996a3688de6cf7ba7e70e14102c49582f387bcb1f487dd9fe387c3ee61292c",
+            "timestamp_ist": "2026-09-04T10:00:00.000043+05:30",
+            "type": "action"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000038",
+              "source": "payment_state_store"
+            },
+            "event_id": "f37d7eb5-4331-4e00-befa-5d3bbb9112fc",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "4e4285992132595e2b4560cc51a220e1e0a74b0174357cd07ae04810261f4048",
+            "record_hash": "0810615961dc19287daf3ede15256a2fec6a20607d928ff1b076bf880a416e0b",
+            "timestamp_ist": "2026-09-07T10:00:00.000017+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000038",
+              "day_offset": 4,
+              "debt_id": "debt_000038",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 2,
+              "rules_fired": [
+                "cause_is_retryable_now"
+              ],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining"
+              ],
+              "stop_reason": "cause_not_actionable"
+            },
+            "event_id": "b0e624d6-ca69-4b4d-8a52-367ae0d74364",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "0810615961dc19287daf3ede15256a2fec6a20607d928ff1b076bf880a416e0b",
+            "record_hash": "ca0cca4e551bf49f440bcebe2347e0f221173a078969bcdef1b8331e38f9bf46",
+            "timestamp_ist": "2026-09-07T10:00:00.000018+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000038",
+              "source": "payment_state_store"
+            },
+            "event_id": "c581ee5a-3698-48bd-a933-fea88257a6c0",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "0c1daf217ed6e9f79621ca12808fcb9b48c9ed84a1e45575d3741feba9de50ba",
+            "record_hash": "72f351f902ea2a1b50b2f3f4e50add338e8730a05b97d164243c5ed9982d7df4",
+            "timestamp_ist": "2026-09-08T10:00:00.000016+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "human_call",
+              "channel_considered": "human_call",
+              "customer_ref": "cust_000038",
+              "day_offset": 5,
+              "debt_id": "debt_000038",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "human_call_below_amount_floor"
+              ],
+              "rules_passed": [],
+              "stop_reason": "escalation_ladder_exhausted"
+            },
+            "event_id": "6266a07f-ba82-40a5-aac9-6496701e38b1",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "72f351f902ea2a1b50b2f3f4e50add338e8730a05b97d164243c5ed9982d7df4",
+            "record_hash": "4a07d4f7389faef46dd6a760cb851029dc3691c058fbf58cf3d40e9e9b793988",
+            "timestamp_ist": "2026-09-08T10:00:00.000017+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000038",
+              "source": "payment_state_store"
+            },
+            "event_id": "5856d9a1-2e08-4b1e-b877-9fc39785b0f9",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "5c0220ec1b7e88a51f7c304e37e4fd728b3d3cd7358a411fec56a9b03cfacb75",
+            "record_hash": "2d9ab9c5bc2238bffeee4a99fe9f3c4a766027ffdf9c994d118083f2309fbd36",
+            "timestamp_ist": "2026-09-11T10:00:00.000009+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000038",
+              "day_offset": 8,
+              "debt_id": "debt_000038",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "cause_is_retryable_now"
+              ],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining"
+              ],
+              "stop_reason": "cause_not_actionable"
+            },
+            "event_id": "bb9d0ddf-5a42-45c8-85db-b1084f199a60",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "2d9ab9c5bc2238bffeee4a99fe9f3c4a766027ffdf9c994d118083f2309fbd36",
+            "record_hash": "eef9ecadfd83ea5876e50e6194901a34d4e0a1f0adbede7e4045c3c384f08d02",
+            "timestamp_ist": "2026-09-11T10:00:00.000010+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000038",
+              "source": "payment_state_store"
+            },
+            "event_id": "550a397e-fb00-491d-b41d-f7a01054c3ec",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "c4c233c5a2ced337a32ff6df6be6490928221ff35bc4f84825e480699b6d8146",
+            "record_hash": "cf9beb8caa26baa69fc461fd65effb9edcbabbaca861fb9bab8fdeeb74f582d7",
+            "timestamp_ist": "2026-09-16T10:00:00.000008+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000038",
+              "day_offset": 13,
+              "debt_id": "debt_000038",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "cause_is_retryable_now"
+              ],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining"
+              ],
+              "stop_reason": "cause_not_actionable"
+            },
+            "event_id": "8f7c6318-bba0-4116-ae5e-d6505227ca04",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "cf9beb8caa26baa69fc461fd65effb9edcbabbaca861fb9bab8fdeeb74f582d7",
+            "record_hash": "dc3cb9a26d57add0adfb103eef766af457d695872e9adc4359b2c311d99e29c7",
+            "timestamp_ist": "2026-09-16T10:00:00.000009+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000038",
+              "source": "payment_state_store"
+            },
+            "event_id": "1b1aa118-5820-4fec-9769-d6d370bf30f2",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "ec69a19d0aeb3cd95c6a01a8f8074000b0d047272ef98a2654fe88ee21cb8f6d",
+            "record_hash": "329611b22266806094f9fbde1ab8a241cc39bbb941c9fd1018ac6f25b67b8c3f",
+            "timestamp_ist": "2026-09-20T10:00:00.000005+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000038",
+              "day_offset": 17,
+              "debt_id": "debt_000038",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "cause_is_retryable_now"
+              ],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining"
+              ],
+              "stop_reason": "cause_not_actionable"
+            },
+            "event_id": "65c6e238-13c7-4714-a052-feb5d5ee5126",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "329611b22266806094f9fbde1ab8a241cc39bbb941c9fd1018ac6f25b67b8c3f",
+            "record_hash": "393f5e7924db871b459f5603146ef68f71efd43af182e495a724576d7caef4b7",
+            "timestamp_ist": "2026-09-20T10:00:00.000006+05:30",
+            "type": "decision"
+          },
+          {
+            "body": {
+              "already_paid": false,
+              "debt_id": "debt_000038",
+              "source": "payment_state_store"
+            },
+            "event_id": "64a24e0c-af0f-4ac0-a5a0-adb6a5830edd",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "7708e128aba2009d06ec4047e8589f8ede3ef4fa249d7d67f5a4c3a787c723f1",
+            "record_hash": "d150e5e60f155ce68528e9467f21942d1668ba59555849b8f5c61b7627fba6e6",
+            "timestamp_ist": "2026-09-24T10:00:00.000005+05:30",
+            "type": "state_recheck"
+          },
+          {
+            "body": {
+              "acted": false,
+              "channel": "retry",
+              "channel_considered": "retry",
+              "customer_ref": "cust_000038",
+              "day_offset": 21,
+              "debt_id": "debt_000038",
+              "diagnosis": "needs_customer_action",
+              "expected_value_paise": 0.0,
+              "ladder_rung": 3,
+              "rules_fired": [
+                "cause_is_retryable_now"
+              ],
+              "rules_passed": [
+                "payment_not_already_received",
+                "not_opted_out",
+                "no_open_dispute",
+                "no_hardship_flag",
+                "cause_is_actionable",
+                "retry_budget_remaining"
+              ],
+              "stop_reason": "cause_not_actionable"
+            },
+            "event_id": "f75e02b7-b470-40e8-839d-6121e6d655e6",
+            "model_version": "none",
+            "policy_version": "2026-09-02.2",
+            "prev_hash": "d150e5e60f155ce68528e9467f21942d1668ba59555849b8f5c61b7627fba6e6",
+            "record_hash": "296cac9e3fa2b448f551a82b458a1a1056cb0213452a4e89a8b5c7a0c16bb1e6",
+            "timestamp_ist": "2026-09-24T10:00:00.000006+05:30",
+            "type": "decision"
+          }
+        ]
+      }
+    }
+  }
+}
