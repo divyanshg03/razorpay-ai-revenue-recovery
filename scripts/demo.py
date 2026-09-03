@@ -40,12 +40,12 @@ import tempfile
 REPO = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
 
-from recovery.diagnosis.taxonomy import diagnose                       # noqa: E402
 from recovery.engine.machine import RecoveryEngine                     # noqa: E402
 from recovery.engine.policy import Policy, retry_schedule              # noqa: E402
+from recovery.evaluation.baselines import INCUMBENT_RETRY_DAYS         # noqa: E402
 from recovery.ledger.audit import AuditLedger                          # noqa: E402
 from recovery.llm.composer import DEFAULT_MODEL, compose               # noqa: E402
-from recovery.llm.copy_gate import Facts, Verdict, check               # noqa: E402
+from recovery.llm.copy_gate import Facts, check                        # noqa: E402
 from recovery.llm.parser import parse_reply                            # noqa: E402
 from recovery.models import (IST, Action, Channel, Customer, Debt,     # noqa: E402
                              MandateType, PaymentFailure)
@@ -166,44 +166,57 @@ def main() -> int:
     # -- 3 ------------------------------------------------------------------------------
     scene(3, "The retry schedule - coverage, not insistence")
     sched = retry_schedule(policy)
-    kv("incumbent (Razorpay)", "days 0, 1, 2, 3  then halt")
-    kv("this engine", f"days {', '.join(map(str, sched))}")
+    kv("incumbent (Razorpay)", f"days {', '.join(map(str, INCUMBENT_RETRY_DAYS))}  then halt"
+                               f"   ({len(INCUMBENT_RETRY_DAYS)} attempts)")
+    kv("this engine", f"days {', '.join(map(str, sched))}   ({len(sched)} attempts)")
     say()
-    say("Same order of magnitude of attempts. The difference is that four attempts inside")
-    say("four days can only catch a payday that has just happened, on a cycle roughly")
-    say("thirty days long. Spreading the same budget across the declared horizon is where")
-    say("the recovery comes from.")
+    say("Two differences, and only one of them is the interesting one.")
+    say()
+    say(f"The engine takes {len(sched)} attempts to the incumbent's {len(INCUMBENT_RETRY_DAYS)}. "
+        f"That is a real advantage and it is")
+    say("stated rather than buried: it is NOT the same budget. Retries are free in the frozen")
+    say("cost model, so the extra attempts cost nothing and the comparison is not net of them.")
+    say()
+    say("The one that carries the argument is coverage. Four attempts inside four days can")
+    say("only ever catch a payday that has just happened, on a cycle roughly thirty days")
+    say("long. Spreading attempts across the declared horizon is what reaches the rest.")
 
     # -- 4 ------------------------------------------------------------------------------
     scene(4, "Guardrails, then the decision")
-    decisions = engine.plan_day(debt, customer, now)
-    say("Hard stops are checked first and are absolute: already paid, opted out, disputed,")
-    say("bereavement or hardship. Then soft stops, then the contact-only rules.")
+    say("Guardrails run FIRST, and the hard stops among them are absolute: already paid,")
+    say("opted out, disputed, bereavement or hardship. Then soft stops, then contact rules,")
+    say("and only then does cost get a say. That order is load-bearing - until 3 Sept a cost")
+    say("rule could return ahead of the guardrails and log a statutory stop as a cost one.")
     say()
-    for d in decisions:
-        kv("act", str(d.act))
-        kv("channel", d.channel.value if d.channel else "-")
-        kv("stop_reason", d.stop_reason.value if d.stop_reason else "none")
-        kv("expected value", f"Rs {d.expected_value_paise / 100:,.2f}")
-        kv("rules fired", ", ".join(d.rules_fired) or "-")
-        kv("rules passed", ", ".join(d.rules_passed[:6]) + ("..." if len(d.rules_passed) > 6 else ""))
-        say()
-    say("Both lists are written to the ledger. A system that records only what it did, and")
-    say("not what it declined to do and why, cannot evidence its own stopping rules.")
 
-    # Day 0 is a silent retry, so walk the horizon until the ladder escalates to a contact.
-    # Retries are reported as failed, which is what advances the state - nothing here is
-    # fast-forwarded past the engine.
-    say()
-    say("Day 0 is a silent retry. Walking the horizon until the ladder escalates:")
-    say()
+    # ONE walk over the horizon. This scene used to call plan_day for day 0 and then the walk
+    # called it again for the same day, so both wrote to the ledger and scene 10 replayed the
+    # day-0 pair twice - an append-only trail showing one decision twice, in the very scene
+    # that exists to demonstrate replayability.
     contact = None
     contact_day = now
+    shown_detail = False
     for offset in range(policy.retry_horizon_days + 1):
         day = now + dt.timedelta(days=offset)
         for d in engine.plan_day(debt, customer, day):
             if not d.act:
                 continue
+            if not shown_detail:        # the first decision, in full
+                kv("day", str(offset))
+                kv("act", str(d.act))
+                kv("channel", d.channel.value if d.channel else "-")
+                kv("stop_reason", d.stop_reason.value if d.stop_reason else "none")
+                kv("expected value", f"Rs {d.expected_value_paise / 100:,.2f}")
+                kv("rules fired", ", ".join(d.rules_fired) or "-")
+                kv("rules passed",
+                   ", ".join(d.rules_passed[:6]) + ("..." if len(d.rules_passed) > 6 else ""))
+                say()
+                say("Both lists go to the ledger. A system that records only what it did, and")
+                say("not what it declined to do and why, cannot evidence its stopping rules.")
+                say()
+                say("Day 0 is a silent retry. Walking the horizon until the ladder escalates:")
+                say()
+                shown_detail = True
             say(f"day {offset:<3} {d.channel.value:<18} "
                 f"EV Rs {d.expected_value_paise / 100:,.2f}", indent=4)
             if d.channel is Channel.RETRY:
@@ -214,7 +227,8 @@ def main() -> int:
         if contact:
             break
     say()
-    say("Channels escalate and never loop back; the tone does not escalate with them.")
+    say("The ladder escalates by channel and never loops back. It is shown here only as far")
+    say("as its first contact, because the reply in scene 8 hard-stops this debt.")
 
     # -- 5 ------------------------------------------------------------------------------
     scene(5, "Composing the message")
@@ -242,10 +256,19 @@ def main() -> int:
         kv("reasons", "; ".join(msg.llm_gate.reasons))
         say()
         say("The template above was sent instead. This is the gate doing its job live.")
-    elif use_llm:
+    elif msg.source == "llm":
         say()
         say("The model's wording passed on this run. That is the common case, which is")
         say("exactly why the next scene probes the gate rather than trusting this one.")
+    elif use_llm:
+        # compose() swallows model and network errors and returns a template, so the --live
+        # FLAG staying true says nothing about whether a model was reached. Branching on the
+        # flag here used to print "the model's wording passed" on runs where no model ran -
+        # including the documented state of this machine, where the model is not pulled.
+        say()
+        say("--live was requested but no model output was used: Ollama answered the port and")
+        say("then the call did not succeed, so the template was composed instead. Nothing")
+        say("here was written by a model, and the gate had nothing of its to judge.")
     else:
         say()
         say("Templates were used, so there was nothing for the gate to reject here.")
@@ -295,11 +318,27 @@ def main() -> int:
     # -- 8 ------------------------------------------------------------------------------
     scene(8, "The customer replies")
     if contact:
-        ledger.record_action(Action(
-            debt_id=debt.debt_id, customer_ref=customer.ref, channel=channel, at=contact_day,
-            cost_paise=policy.cost_paise[channel], policy_version=policy.version,
-            rendered_text=msg.text, template_ref=msg.template_ref,
-            rules_fired=contact.rules_fired, rules_passed=contact.rules_passed))
+        # The gate's verdict travels WITH the action, exactly as engine_arm.py does it. The
+        # first version of this call passed neither `copy_gate_rejected` nor `llm_output`, so
+        # under --live scene 6 could announce the gate firing while the record scene 10
+        # replays showed nothing of it - the blindness audit.py names in its own comment: a
+        # gate nobody can see firing is indistinguishable from one that never fires.
+        rejected = None
+        if msg.gate_rejected_llm:
+            rejected = {"verdict": msg.llm_gate.verdict.value,
+                        "categories": msg.llm_gate.categories,
+                        "reasons": msg.llm_gate.reasons}
+        ledger.record_action(
+            Action(debt_id=debt.debt_id, customer_ref=customer.ref, channel=channel,
+                   at=contact_day, cost_paise=policy.cost_paise[channel],
+                   policy_version=policy.version, rendered_text=msg.text,
+                   template_ref=msg.template_ref, rules_fired=contact.rules_fired,
+                   rules_passed=contact.rules_passed),
+            copy_gate_rejected=rejected, llm_output=msg.llm_output)
+        # And the engine must learn the send happened, or its own caps do not know about it.
+        # Without this the contact counters stay empty and the same rung would fire again the
+        # next day, straight through max_whatsapp_per_24h and escalation_wait_days.
+        engine.apply_outcome(debt, contact, contact_day, False)
 
     for reply_text in ("I get paid on the 5th, will pay then",
                        "stop messaging me"):
@@ -312,30 +351,48 @@ def main() -> int:
         engine.record_reply(debt, customer, parsed, now, reply_text)
         say()
     say("Note `decided by`. Opt-out, dispute and hardship are decided by code overrides that")
-    say("outrank the model, because those three carry legal weight. The model is trusted to")
-    say("spot a date phrase; the DATE ITSELF is resolved by a pure function, never by the")
-    say("model, so it cannot invent one.")
+    say("outrank the model, because those three carry legal weight. Where a model IS used, it")
+    say("is trusted only to spot a date phrase; the DATE ITSELF is resolved by a pure")
+    say("function, never by the model, so it cannot invent one.")
+    if not use_llm:
+        say()
+        say("No model ran here, so `date phrase` shows the reply unchanged rather than an")
+        say("extracted span - the keyword fallback does not extract, it defers. Run with")
+        say("--live to see the model do the extraction the sentence above describes.")
 
     # -- 9 ------------------------------------------------------------------------------
     scene(9, "After an opt-out, and after payment")
-    later = now + dt.timedelta(days=3)
+    # Land on a day the schedule would otherwise act on - day 3 is neither a retry day nor
+    # past the escalation wait, so the engine had nothing planned and the opt-out had nothing
+    # to stop. A stopping rule is only demonstrated where an action was actually due.
+    later = now + dt.timedelta(days=max(d for d in retry_schedule(policy) if d <= 8))
     after_optout = engine.plan_day(debt, customer, later)
+    kv("day", str((later - now).days) + "  (a scheduled retry day)")
     kv("decisions now", str(len(after_optout)))
     for d in after_optout:
         kv("act", f"{d.act}   stop_reason={d.stop_reason.value if d.stop_reason else 'none'}")
     say()
-    say("Now the other direction. Razorpay's webhooks are at-least-once and unordered, so")
-    say("payment.captured can arrive AFTER payment.failed for the same transaction. The")
-    say("engine re-checks payment state immediately before every action:")
-    paid.add(debt.debt_id)
-    fresh_debt = Debt(debt_id="debt_demo_02", customer_ref="cust_demo_02",
-                      amount_paise=99_900, mandate_type=MandateType.EMANDATE,
-                      failed_at=now, failure=debt.failure)
-    paid.add(fresh_debt.debt_id)
-    for d in engine.plan_day(fresh_debt, Customer(ref="cust_demo_02"), later):
-        kv("act", f"{d.act}   stop_reason={d.stop_reason.value if d.stop_reason else 'none'}")
+    say("Now the other direction, on THIS debt - the one that has actually been through the")
+    say("loop. Razorpay's webhooks are at-least-once and unordered, so payment.captured can")
+    say("arrive AFTER payment.failed for the same transaction. That is the resurrection case,")
+    say("and it is why the engine re-reads payment state immediately before every action.")
     say()
-    say("Without that re-check we would dun people who have already paid.")
+    say("A late payment.captured lands for debt_demo_01, which has already failed, been")
+    say("retried twice and been contacted once:")
+    paid.add(debt.debt_id)
+
+    # Deliberately re-planned on a customer with real history rather than a freshly minted
+    # debt that was born settled. An earlier version demonstrated this on a brand-new debt
+    # with no retries and no contacts, which shows a flag being read and nothing about
+    # at-least-once or out-of-order delivery. There was no "after" in it.
+    resurrected = Customer(ref=customer.ref, has_whatsapp=True, has_sms=True)
+    for d in engine.plan_day(debt, resurrected, later + dt.timedelta(days=1)):
+        kv("act", f"{d.act}   stop_reason={d.stop_reason.value if d.stop_reason else 'none'}")
+        kv("rules fired", ", ".join(d.rules_fired) or "-")
+    say()
+    say("Without that re-check we would dun someone who has already paid. Note this outranks")
+    say("even the opt-out above: `payment_received` is checked first because a settled debt")
+    say("needs no further decision at all.")
 
     # -- 10 -----------------------------------------------------------------------------
     scene(10, "The audit trail")
@@ -344,8 +401,13 @@ def main() -> int:
     kv("records written", str(len(entries)))
     kv("hash chain intact", str(intact) + ("" if intact else f" (broken at {broken_at})"))
     say()
-    say("Every decision, action, re-check, inbound reply and outcome, in order, each stamped")
-    say("with the policy version that governed it. Replaying one debt:")
+    from collections import Counter
+    kinds = Counter(e["type"] for e in entries)
+    kv("record types", ", ".join(f"{k} {n}" for k, n in sorted(kinds.items())))
+    say()
+    say("Each in order, each stamped with the policy version that governed it. The types are")
+    say("counted from this run rather than listed from memory - an earlier version of this")
+    say("line advertised `outcome` records, of which the run writes none. Replaying one debt:")
     say()
     for e in ledger.replay_debt(debt.debt_id):
         body = e["body"]

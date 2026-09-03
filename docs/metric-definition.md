@@ -463,6 +463,44 @@ disclosure and what was deliberately left alone.
 A1/A4 run except `head_commit`. That identity is the whole evidence for calling these fixes
 non-behavioural, which is why the batch was re-run rather than argued about.
 
+### A8 - 4 Sept 2026 - a statutory stop was being logged as a cost decision
+
+Found by code review of the demo pull request. The demo itself was fine here; reviewing it
+sent someone into `machine.py`.
+
+**The defect.** `_decide` applied the human-call amount floor - a COST rule - and returned
+*before* `evaluate()` had run at all. So an opted-out, disputed or bereaved customer sitting
+on the human-call rung with a debt below the floor was recorded as
+`escalation_ladder_exhausted` with `rules_fired=["human_call_below_amount_floor"]` and
+`rules_passed=[]`: a cost reason standing in for a statutory one, and no evidence in the
+record that the statutory check had ever run.
+
+`guardrails.py` promises the opposite in its own docstring - that a customer who has opted out
+is never even evaluated for the contact window, and that the log shows the statutory reason
+rather than an incidental one. The shipped Phase 3 ledger contained **90 records** where that
+was untrue.
+
+**Severity, stated precisely.** This was an audit-evidence defect, not a compliance breach.
+Both paths return `act=False`, so nobody was ever contacted who should not have been, and
+replaying a full trail still showed the statutory reason on the surrounding records -
+`debt_000013` carried four `dispute_raised` decisions bracketing the mislabelled one. What was
+wrong is that the individual record attributed the stop to cost. A stopping rule you cannot
+evidence per-record is worth less than one you can, and "every decision reconstructable" is a
+claim this submission makes.
+
+**The fix.** Guardrails now run first; the cost floor applies only once the customer may
+lawfully be contacted at all. When the floor does fire it carries `verdict.rules_passed`, so
+the record shows which checks ran rather than an empty list.
+
+**Result: no money moved.** The headline, both confidence intervals, every arm recovery rate,
+the failure counts and the four-way residual decomposition are byte-identical. What changed is
+attribution, which is the point: `escalation_ladder_exhausted` fell from 757 to 642 in the
+primary cohort while `opt_out` rose 1,048 to 1,579, `dispute_raised` 761 to 991 and
+`bereavement_or_hardship` 464 to 630. Decision records rose from 18,455 to 20,017, because a
+guardrail evaluation that used to be skipped now happens and is logged. Guardrail invariants
+remain zero in all three cohorts, and the count of floor-rule records masking a statutory
+signal is now **0**, down from 90.
+
 ### A7 - 3 Sept 2026 - two limitations added, batch re-run, no figure changed
 
 Phase 4 packaging. Recorded because the batch ran again.

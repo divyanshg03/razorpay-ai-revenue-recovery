@@ -6,7 +6,7 @@
     "note": "The freeze is only meaningful if that commit precedes this result. Ancestry is checked, not asserted."
   },
   "generated_by": "scripts/run_batch.py -> recovery.evaluation.batch.run()",
-  "head_commit": "661295a",
+  "head_commit": "48f0f45",
   "policy_version": "2026-09-02.2",
   "n_customers": 5000,
   "bootstrap": {
@@ -125,17 +125,17 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 43303,
-      "decisions": 18455,
+      "records": 46271,
+      "decisions": 20017,
       "actions_taken": 4011,
-      "decisions_declined": 6068,
+      "decisions_declined": 7630,
       "stop_reasons": {
-        "escalation_ladder_exhausted": 1564,
+        "opt_out": 1579,
+        "promise_to_pay_active": 1544,
         "cause_not_actionable": 1507,
-        "opt_out": 1048,
-        "dispute_raised": 761,
-        "promise_to_pay_active": 724,
-        "bereavement_or_hardship": 464
+        "escalation_ladder_exhausted": 1379,
+        "dispute_raised": 991,
+        "bereavement_or_hardship": 630
       },
       "total_contact_cost_paise": 249442,
       "chain_intact": true,
@@ -203,12 +203,12 @@
         "retry_later": 177
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 757,
+        "escalation_ladder_exhausted": 642,
         "cause_not_actionable": 417,
         "opt_out": 105,
         "dispute_raised": 63,
-        "bereavement_or_hardship": 40,
-        "promise_to_pay_active": 17
+        "promise_to_pay_active": 46,
+        "bereavement_or_hardship": 40
       },
       "standing": {
         "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
@@ -328,17 +328,17 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 36633,
-      "decisions": 15377,
+      "records": 38097,
+      "decisions": 16145,
       "actions_taken": 4010,
-      "decisions_declined": 4549,
+      "decisions_declined": 5317,
       "stop_reasons": {
-        "escalation_ladder_exhausted": 1551,
+        "escalation_ladder_exhausted": 1364,
         "cause_not_actionable": 1156,
-        "opt_out": 596,
-        "promise_to_pay_active": 532,
-        "dispute_raised": 439,
-        "bereavement_or_hardship": 275
+        "promise_to_pay_active": 1029,
+        "opt_out": 857,
+        "dispute_raised": 550,
+        "bereavement_or_hardship": 361
       },
       "total_contact_cost_paise": 249420,
       "chain_intact": true,
@@ -406,11 +406,11 @@
         "needs_new_instrument": 214
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 1251,
+        "escalation_ladder_exhausted": 1096,
         "cause_not_actionable": 453,
+        "promise_to_pay_active": 106,
         "opt_out": 105,
         "dispute_raised": 63,
-        "promise_to_pay_active": 40,
         "bereavement_or_hardship": 40
       },
       "standing": {
@@ -531,17 +531,17 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 37748,
-      "decisions": 16321,
+      "records": 40714,
+      "decisions": 17896,
       "actions_taken": 3263,
-      "decisions_declined": 6003,
+      "decisions_declined": 7578,
       "stop_reasons": {
         "cause_not_actionable": 2082,
-        "escalation_ladder_exhausted": 1377,
-        "promise_to_pay_active": 903,
-        "opt_out": 767,
-        "dispute_raised": 514,
-        "bereavement_or_hardship": 360
+        "promise_to_pay_active": 1828,
+        "escalation_ladder_exhausted": 1214,
+        "opt_out": 1156,
+        "dispute_raised": 755,
+        "bereavement_or_hardship": 543
       },
       "total_contact_cost_paise": 229914,
       "chain_intact": true,
@@ -609,11 +609,11 @@
         "retry_later": 215
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 1105,
+        "escalation_ladder_exhausted": 964,
         "cause_not_actionable": 823,
+        "promise_to_pay_active": 116,
         "opt_out": 77,
         "dispute_raised": 51,
-        "promise_to_pay_active": 51,
         "bereavement_or_hardship": 35
       },
       "standing": {

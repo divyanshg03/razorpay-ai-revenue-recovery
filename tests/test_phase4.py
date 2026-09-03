@@ -269,12 +269,68 @@ def test_the_demo_runs_clean_offline_and_shows_the_gate_firing():
 
 
 def test_the_demo_uses_the_real_components_not_a_reimplementation():
-    """A demo that re-implements the system is a demo of the demo."""
-    src = (REPO / "scripts" / "demo.py").read_text(encoding="utf-8")
+    """A demo that re-implements the system is a demo of the demo.
+
+    The first version of this asserted on import STRINGS, which a dead import satisfies - and
+    two dead imports were indeed sitting there when a reviewer looked. It now parses the file
+    and requires every imported name to be referenced, so an import can no longer stand in as
+    evidence that a component is actually being exercised.
+    """
+    import ast
+
+    path = REPO / "scripts" / "demo.py"
+    src = path.read_text(encoding="utf-8")
     for module in ("recovery.engine.machine", "recovery.engine.policy",
                    "recovery.llm.copy_gate", "recovery.llm.composer",
-                   "recovery.llm.parser", "recovery.ledger.audit"):
+                   "recovery.llm.parser", "recovery.ledger.audit",
+                   "recovery.evaluation.baselines"):
         assert module in src, f"demo does not import {module}"
+
+    tree = ast.parse(src)
+    used = ({n.id for n in ast.walk(tree) if isinstance(n, ast.Name)} |
+            {n.attr for n in ast.walk(tree) if isinstance(n, ast.Attribute)})
+    dead = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            for alias in node.names:
+                name = alias.asname or alias.name.split(".")[0]
+                if name != "annotations" and name not in used:
+                    dead.append(name)
+    assert not dead, f"imported but never used, so nothing proves it runs: {dead}"
+
+
+def test_the_demo_reads_the_incumbent_schedule_from_the_code():
+    """The comparison's other half must not be a typed string.
+
+    `demo.py` hand-typed "days 0, 1, 2, 3" while reading its own schedule from
+    `retry_schedule()`, which made the incumbent row the one number on screen not taken from
+    the code - on the slide whose whole subject is the fairness of the comparison.
+    """
+    src = (REPO / "scripts" / "demo.py").read_text(encoding="utf-8")
+    assert "INCUMBENT_RETRY_DAYS" in src
+    assert '"days 0, 1, 2, 3' not in src, "the incumbent schedule is hand-typed again"
+
+
+def test_the_demo_never_claims_the_same_retry_budget_as_the_incumbent():
+    """The engine takes more attempts than the baseline, and must say so.
+
+    `retry_schedule()` yields six; the incumbent takes four. Claiming "the same budget" while
+    spread does the work is a fairness claim about the headline, and it was false.
+    """
+    from recovery.engine.policy import Policy, retry_schedule
+    from recovery.evaluation.baselines import INCUMBENT_RETRY_DAYS
+
+    assert len(retry_schedule(Policy())) > len(INCUMBENT_RETRY_DAYS), \
+        "if these ever match, revisit the wording below rather than deleting this test"
+
+    for path in (REPO / "scripts" / "demo.py", REPO / "src" / "recovery" / "engine" / "machine.py"):
+        text = path.read_text(encoding="utf-8")
+        for claim in ("the same budget", "the same number of attempts"):
+            # Permitted only where the file is explaining that the claim was wrong.
+            for line in text.splitlines():
+                if claim in line:
+                    assert "NOT the same" in line or "previously read" in line, \
+                        f"{path.name}: unqualified '{claim}'"
 
 
 def test_the_readme_diagram_is_present_and_renderable():
