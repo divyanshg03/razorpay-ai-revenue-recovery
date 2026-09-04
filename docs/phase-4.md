@@ -120,6 +120,19 @@ Only after 4.1–4.4 are green. Pre-flight, all mechanical:
 
 - **Pass** A scripted pre-flight check runs all of the above and exits non-zero on any hit.
 
+**The script exists: `scripts/preflight.py`, written 4 September 2026.** Writing it does not
+publish anything - it is the gate you run before deciding to. All ten checks currently pass,
+and a parameterised test plants a violation of each rule in turn and requires the sweep to
+catch it, because a sweep that only ever passes is a rubber stamp.
+
+Two things it found on its first run, both now fixed: no LICENSE (a public repo without one
+reserves all rights by default), and one prose use of the banned word in a Phase 0 artifact.
+Five of its other seven first-run findings were FALSE positives - ten-digit windows inside
+SHA-256 hashes read as phone numbers, a character window spilling across markdown table rows,
+and lines that state a rule read as breaking it. Those were fixed in the checker rather than
+tuned away, and the reasoning is recorded at each call site: the point at which a checker
+starts producing noise is the point at which people stop reading it.
+
 Note that the repo going public is what makes the A6 exposure analysis binding: while it stays
 private, a phone number in a pull-request ref is a latent problem; the moment it is public,
 it is a live one. Do not reorder 4.6 ahead of that sweep.

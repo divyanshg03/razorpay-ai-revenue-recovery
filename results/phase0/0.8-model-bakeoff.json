@@ -7,7 +7,7 @@
   "sms_char_limit": 160,
   "metric_notes": {
     "usable": "produced output AND not a refusal AND no banned language AND no placeholder. An empty string and a refusal both break no rule and both send nothing, so neither counts as success.",
-    "parsing_constrained_json": "Ollama format=json. This is what production uses, so it decides accuracy.",
+    "parsing_constrained_json": "Ollama format=json. This is what production uses, so it decides how reliably replies parse.",
     "parsing_native": "system prompt only. Instruction-following signal."
   },
   "summary": [

@@ -333,6 +333,56 @@ def test_the_demo_never_claims_the_same_retry_budget_as_the_incumbent():
                         f"{path.name}: unqualified '{claim}'"
 
 
+def test_preflight_passes_on_the_current_tree():
+    """Work item 4.6's gate. It must be green before the repository is made public."""
+    r = subprocess.run([sys.executable, "scripts/preflight.py"],
+                       capture_output=True, text=True, cwd=REPO, timeout=900)
+    assert r.returncode == 0, r.stdout[-3000:]
+
+
+#: Payloads are ASSEMBLED rather than written out, so this file does not itself contain a
+#: key-shaped string, a live-looking hostname or a non-placeholder phone number. Spelling
+#: them literally made `preflight` flag its own test file - correctly - and the temptation
+#: then is to exempt the tests from scanning, which is how a secret scanner gets a blind spot
+#: exactly where people paste examples.
+@pytest.mark.parametrize("label,payload", [
+    ("razorpay_key", "key = " + "rzp_" + "test_" + "ABCDEFGH12345678"),
+    ("anthropic_key", "token = " + "sk-" + "ant-" + "api03-" + "X" * 12),
+    ("zrok_hostname", "https://" + "rzp-wh-" + "deadbeef" + ".shares." + "zrok.io/webhook"),
+    ("real_phone", "contact: +" + "91" + "9" + "000000001"),
+    ("third_party_email", "write to " + "someone" + "@" + "gmail" + ".com"),
+    ("dpdp_claim", "This system is DPDP-" + "compliant today."),
+    ("rbi_numeric_cap", "RB" + "I limits you to 7 contacts per week."),
+    ("accuracy_metric", "We report " + "accur" + "acy as the headline metric."),
+])
+def test_preflight_actually_catches_each_violation(label, payload):
+    """A sweep that only ever passes is a rubber stamp.
+
+    Every check is exercised against a planted violation, because the first run of this
+    script produced seven findings and five of them were false positives - ten-digit windows
+    inside SHA-256 hashes, a character window spilling across markdown table rows, and lines
+    that state a rule being read as breaking it. Tuning that noise out is exactly where a
+    checker quietly stops checking, so each rule now has to prove it still bites.
+
+    The probe is force-added to the index because `preflight` reads tracked files, then
+    removed again. Failing loudly is the desired outcome here.
+    """
+    probe = REPO / "docs" / f"_preflight_probe_{label}.md"
+    rel = str(probe.relative_to(REPO)).replace("\\", "/")
+    try:
+        probe.write_text(f"# probe\n\n{payload}\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-f", rel], cwd=REPO, capture_output=True, check=True)
+        r = subprocess.run([sys.executable, "scripts/preflight.py"],
+                           capture_output=True, text=True, cwd=REPO, timeout=900)
+        assert r.returncode != 0, f"preflight passed despite a planted {label}"
+        assert probe.name in r.stdout, (
+            f"preflight failed but did not name the offending file for {label}:\n{r.stdout}")
+    finally:
+        subprocess.run(["git", "rm", "-q", "--cached", "--ignore-unmatch", rel],
+                       cwd=REPO, capture_output=True)
+        probe.unlink(missing_ok=True)
+
+
 def test_the_readme_diagram_is_present_and_renderable():
     """A mermaid block GitHub cannot parse renders as a wall of text on the front page."""
     text = README.read_text(encoding="utf-8")
