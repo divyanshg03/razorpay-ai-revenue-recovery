@@ -14,6 +14,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 import datetime as dt
+import json
 import socket
 
 import pytest
@@ -31,8 +32,8 @@ from recovery.ledger.audit import AuditLedger, RecordType
 from recovery.llm import composer
 from recovery.llm.copy_gate import Facts, Verdict, check
 from recovery.llm.parser import Intent, ParsedReply, parse_reply, resolve_date
-from recovery.models import (IST, Actionability, Channel, Customer, Debt, MandateType,
-                             PaymentFailure, StopReason)
+from recovery.models import (IST, Action, Actionability, Channel, Customer, Debt, Decision,
+                             MandateType, PaymentFailure, StopReason)
 
 SEED = 20260905
 START = dt.date(2026, 9, 3)
@@ -313,6 +314,175 @@ def test_the_cost_floor_still_applies_once_the_guardrails_pass(tmp_path):
         assert dec.act is False
         assert dec.stop_reason is StopReason.LADDER_EXHAUSTED
         assert "human_call_below_amount_floor" in dec.rules_fired
+# ---------------------------------------------------------------------------------------
+# the invariant checker itself must be able to FAIL
+# ---------------------------------------------------------------------------------------
+
+def _violating_ledger(path, kind: str) -> AuditLedger:
+    """Hand-build a ledger containing exactly one violation of `kind`."""
+    led = AuditLedger(path, P.version)
+    led.clock = lambda: at(10)          # deterministic, inside the contact window
+    d, c = "debt_v", "cust_v"
+
+    def action(hour=10, day=START):
+        led.record_action(Action(debt_id=d, customer_ref=c, channel=Channel.SMS_SERVICE,
+                                 at=at(hour, day=day), cost_paise=18,
+                                 policy_version=P.version, rendered_text="x"))
+
+    if kind == "contact_outside_window":
+        led.record_state_recheck(d, already_paid=False, source="t")
+        led.record_decision(d, c, Decision(act=True, channel=Channel.SMS_SERVICE), diagnosis="x")
+        action(hour=2)                                   # 02:00 - outside 08:00-19:00
+    elif kind == "action_without_state_recheck":
+        led.record_decision(d, c, Decision(act=True, channel=Channel.SMS_SERVICE), diagnosis="x")
+        action()                                         # no STATE_RECHECK at all
+    elif kind == "action_without_decision":
+        led.record_state_recheck(d, already_paid=False, source="t")
+        action()                                         # no DECISION that day
+    elif kind == "contact_after_stop_signal":
+        led.record_inbound(d, c, "STOP", "opt_out", None, "override")
+        led.record_state_recheck(d, already_paid=False, source="t")
+        led.record_decision(d, c, Decision(act=True, channel=Channel.SMS_SERVICE), diagnosis="x")
+        action(day=START + dt.timedelta(days=1))         # contact AFTER an opt-out
+    elif kind == "contact_after_payment":
+        led.record_outcome(d, c, 49900, note="paid")
+        led.record_state_recheck(d, already_paid=False, source="t")
+        led.record_decision(d, c, Decision(act=True, channel=Channel.SMS_SERVICE), diagnosis="x")
+        action(day=START + dt.timedelta(days=1))         # contact AFTER settlement
+    elif kind == "contact_cap_breach":
+        led.record_state_recheck(d, already_paid=False, source="t")
+        led.record_decision(d, c, Decision(act=True, channel=Channel.SMS_SERVICE), diagnosis="x")
+        for i in range(P.max_contacts_per_debt_7d + 2):  # more than the cap inside 7 days
+            action(day=START + dt.timedelta(days=i % 6))
+    elif kind == "contact_during_promise_to_pay":
+        led.record_inbound(d, c, "will pay on the 20th", "promise_to_pay",
+                           START + dt.timedelta(days=10), "fallback")
+        led.record_state_recheck(d, already_paid=False, source="t")
+        led.record_decision(d, c, Decision(act=True, channel=Channel.SMS_SERVICE), diagnosis="x")
+        action(day=START + dt.timedelta(days=5))         # inside the promise window
+    else:
+        raise AssertionError(kind)
+    return led
+
+
+@pytest.mark.parametrize("kind", [
+    "contact_outside_window", "action_without_state_recheck", "action_without_decision",
+    "contact_after_stop_signal", "contact_after_payment", "contact_cap_breach",
+    "contact_during_promise_to_pay",
+])
+def test_the_invariant_checker_can_actually_fail(tmp_path, kind):
+    """The checker had NO negative test, and that is the most dangerous gap a checker can have.
+
+    Every existing call site asserted its output was all-zero, and the one test that simulated
+    a violation monkeypatched `check_ledger` away. So hard-wiring the function to return zeros
+    - a checker that inspects nothing - passed the entire suite. If it ever broke, `batch.run`
+    would never raise and metrics.json would still ship `guardrails_all_zero: true`.
+
+    This is the layer the "compliant escalation, stopping rules, audit trail" claim rests on,
+    so each rule now gets a ledger that violates it and must be caught by name.
+    """
+    led = _violating_ledger(tmp_path / f"{kind}.jsonl", kind)
+    counts = check_ledger(led, max_contacts_7d=P.max_contacts_per_debt_7d,
+                          hardship_resume_days=P.hardship_default_resume_days)
+    assert counts[kind] > 0, f"{kind} went undetected: {counts}"
+
+
+def test_the_chain_check_is_wired_into_the_invariants(tmp_path):
+    """The eighth invariant, which needs a tampered file rather than a crafted sequence."""
+    path = tmp_path / "chain.jsonl"
+    led = AuditLedger(path, P.version)
+    for i in range(3):
+        led.record_decision(f"d{i}", f"c{i}", Decision(act=True), diagnosis="x")
+    rows = [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    rows[1]["policy_version"] = "forged"
+    path.write_text("\n".join(json.dumps(r, sort_keys=True) for r in rows) + "\n",
+                    encoding="utf-8")
+    assert check_ledger(AuditLedger(path, P.version))["ledger_chain_broken"] == 1
+
+
+def test_hardship_without_a_date_pauses_for_the_configured_period(tmp_path):
+    """No date given, so a POLICY pause rather than an indefinite stop.
+
+    An indefinite stop sounds like the kind option and is not: it buries the debt, and a
+    customer who needed a fortnight is never spoken to again. The pause length is a policy
+    choice - no regulator sets it. A 15-day pause was built and measured on 4 Sept 2026 and
+    reverted to 7: the longer pause cost 0.18 pp of recovery and Rs 4,931 of the headline,
+    and the call was to keep the money. Recorded in policy.py rather than reverted quietly.
+    A tenant may widen it but never narrow it.
+    """
+    led = AuditLedger(tmp_path / "h1.jsonl", P.version)
+    eng = RecoveryEngine(P, led, is_settled=lambda d: False)
+    c, d = customer(), debt()
+    eng.record_reply(d, c, parse_reply("my father passed away last week", today=START,
+                                       use_llm=False), at(10), "hardship")
+    assert c.bereaved_or_hardship
+    st = eng.state(d.debt_id)
+    assert st.hardship_resume_on == START + dt.timedelta(days=P.hardship_default_resume_days)
+    assert st.hard_stopped is None, "a paused hardship stop must not be latched shut"
+
+    # Silent for the whole pause, including on days the schedule would otherwise act.
+    for off in range(0, P.hardship_default_resume_days):
+        decs = eng.plan_day(d, c, at(10, day=START + dt.timedelta(days=off)))
+        assert not any(x.act for x in decs), f"contacted during the pause (day {off})"
+
+
+def test_a_tenant_can_widen_the_hardship_pause(tmp_path):
+    """The knob has to actually work, or "configurable" is a word in a docstring."""
+    long_pause = replace(P, hardship_default_resume_days=30)
+    led = AuditLedger(tmp_path / "h3.jsonl", long_pause.version)
+    eng = RecoveryEngine(long_pause, led, is_settled=lambda d: False)
+    c, d = customer(), debt()
+    eng.record_reply(d, c, parse_reply("my father passed away last week", today=START,
+                                       use_llm=False), at(10), "hardship")
+    assert eng.state(d.debt_id).hardship_resume_on == START + dt.timedelta(days=30)
+    for off in (7, 14, 21):
+        decs = eng.plan_day(d, c, at(10, day=START + dt.timedelta(days=off)))
+        assert not any(x.act for x in decs), f"the widened pause was ignored on day {off}"
+
+
+def test_a_customer_in_hardship_who_names_a_date_is_contacted_ON_that_date(tmp_path):
+    """Requested behaviour: hardship is not always "never again", it is often "not yet".
+
+    Someone who replies "I am in hospital, contact me after the 20th" has told us exactly
+    what they want. Treating that as an indefinite stop is not kindness - it buries the debt,
+    and the customer who asked to be contacted later never is. The default remains an
+    indefinite stop; only a date THEY supplied lifts it, and never before that date.
+
+    Regression detail worth keeping: this worked when `evaluate()` was called directly and
+    FAILED in sequence, because `machine.plan_day` latched any BEREAVEMENT stop into
+    `state.hard_stopped`. The first evaluation before the resume date buried the file and the
+    callback never happened. A dated hardship stop is temporary by construction and must not
+    be latched.
+    """
+    led = AuditLedger(tmp_path / "h2.jsonl", P.version)
+    eng = RecoveryEngine(P, led, is_settled=lambda d: False)
+    c, d = customer(), debt()
+    resume = START + dt.timedelta(days=17)
+    eng.record_reply(d, c, parse_reply(f"I am in hospital, please contact me after the "
+                                       f"{resume.day}th", today=START, use_llm=False),
+                     at(10), "hardship")
+    st = eng.state(d.debt_id)
+    assert st.hardship_resume_on == resume, st.hardship_resume_on
+    assert st.hard_stopped is None, "a dated hardship stop must not be latched shut"
+
+    # Silent before the date - including on days the schedule would otherwise act.
+    for off in (5, 13):
+        decs = eng.plan_day(d, c, at(10, day=START + dt.timedelta(days=off)))
+        assert not any(x.act for x in decs), f"contacted before the date they gave (day {off})"
+        assert any(x.stop_reason is StopReason.BEREAVEMENT for x in decs)
+
+    # And contactable on it.
+    decs = eng.plan_day(d, c, at(10, day=resume))
+    assert any(x.act for x in decs), "did not contact on the date the customer asked for"
+
+
+def test_opt_out_and_dispute_never_carry_a_resume_date(tmp_path):
+    """Only hardship is a scheduling preference. An objection under DPDP s.7(a) is not, and a
+    dispute must be closed by a human rather than by a timer."""
+    for reply, flag in [("stop messaging me, remove me", "opted_out"),
+                        ("I did not authorise this, I am disputing it", "disputed")]:
+        parsed = parse_reply(reply, today=START, use_llm=False)
+        assert parsed.promised_date is None, (reply, parsed.intent, parsed.promised_date)
 
 
 def test_human_call_floor_is_the_measured_one_not_the_original(tmp_path):

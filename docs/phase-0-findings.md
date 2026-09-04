@@ -280,34 +280,35 @@ Test mode only, no cleanup required. Ids are in the evidence files.
       Decided 25 Aug 2026, recorded as hard rule 6 in `CLAUDE.md`. Note the AI claim for this
       track rests on the decisioning layer — propensity, uplift against the holdout,
       cost-sensitive thresholds — which needs no inference API at all.
-- [ ] **Activation request filed** for Subscriptions + recurring payments + payment-link
-      cap raise. One ticket covering all three, **drafted ready to send** in
-      `docs/support-ticket-draft.md`. **Owner: Divyansh — this is the only Phase 0 item an
-      agent cannot do.**
+- [x] **Activation request filed** for Subscriptions + recurring payments + payment-link
+      cap raise. One ticket covering all three, drafted in `docs/support-ticket-draft.md` and
+      **filed 2 Sept 2026 — Razorpay ticket #20706328**, acknowledged by auto-reply. No
+      substantive response as of 4 Sept, so the simulator remains the cohort source.
 - [x] **Gate 0.7** — metric and holdout **frozen 31 Aug 2026** in `docs/metric-definition.md`,
       before any batch was run. Git ancestry is the proof and a test will assert it.
 - [x] **Gate 0.6** — RBI circulars read at source 31 Aug 2026, archived, and three citation
       errors plus one unsupported claim corrected in `docs/compliance-india.md`.
-- [~] **Gate 0.4** — receiver logic proven locally 31 Aug 2026 (7/7). **zrok tunnel and
-      dashboard registration still outstanding**; no Razorpay-originated event has been
-      received yet.
-- [ ] **`CLAUDE.md` scope line updated** — it still states the premise as "failed UPI
-      Autopay / eMandate recurring charges", which this account cannot execute end to end.
+- [x] **Gate 0.4** — receiver logic proven locally (7/7), then proven **end to end**: a
+      Razorpay-originated `payment.failed` was received over the zrok tunnel on 2 Sept 2026
+      and is archived in `results/phase0/0.4c-received-events.jsonl`. The tunnel and the
+      dashboard registration are both done.
+- [x] **`CLAUDE.md` scope line updated** — the premise is now stated as failed recurring
+      collection *modelled by a seeded simulator*, with the gating recorded, rather than as
+      something this account can execute end to end.
 
-**Phase 0 status: substantially complete, not closed.** 0.6 and 0.7 are done; 0.4 is partial;
-0.2 stays blocked without browser automation; 0.3 is void by design. What remains before the
-go/no-go in `docs/phase-0.md` can be signed:
+**Phase 0 status: CLOSED, 2 Sept 2026.** 0.4, 0.6 and 0.7 are done; 0.2 is resolved as
+documentation-derived and declared as such; 0.3 is void by design.
 
-1. File the support ticket (you).
-2. Run the zrok leg of 0.4, or accept it as partial and say so in the README.
-3. Decide 0.2 — either drive one browser checkout failure to confirm the error-field shape, or
-   seed the taxonomy from Razorpay's published 121-reason enumeration and declare it as
-   documentation-derived rather than observed.
-4. Answer the open question in `docs/phase-0.md`: is 5 Sept the submission deadline or the
-   entry deadline?
-
-**Schedule reality, recorded because the honesty rules apply to the plan too.** The Phase 0
-window was 24–25 Aug and it is now 31 Aug, with Phases 1 and 2 nominally already spent and no
-product code written. Against the original plan this is roughly six days behind with five
-remaining. Phases 1–3 need rescoping to fit, and that rescoping should be a deliberate written
-decision rather than something discovered on 4 September.
+> **Corrected 4 Sept 2026.** This decision record was updated at the top of the file when each
+> gate closed and left stale down here, so for two days it contradicted its own gate table:
+> the table recorded gate 0.4 as passed and the ticket as filed, while the list below still
+> said no Razorpay-originated event had been received and the ticket was unsent. Every
+> contradiction resolved in the *pessimistic* direction, so nothing was ever overclaimed — but
+> a panel reading this section aloud would have got the opposite of the table. Raised by an
+> external review. The items above are now reconciled with what actually happened.
+>
+> The open question this section used to end on — *"is 5 Sept the submission deadline or the
+> entry deadline?"* — was answered in `docs/phase-0.md` on 2 Sept: **5 September is the
+> application close**. The schedule paragraph that followed was written on 31 August and was
+> never updated; it is removed rather than left to imply the project is six days behind, which
+> it no longer is. Phases 1 through 4 all shipped.

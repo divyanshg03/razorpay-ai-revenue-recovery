@@ -42,6 +42,10 @@ class DebtState:
     retries_made: int = 0
     ladder_rung: int = 0
     promise_to_pay_until: dt.date | None = None
+    #: Set only when a customer in hardship NAMES a date on which contact is welcome again.
+    #: Until that date arrives the hardship stop holds; on and after it, contact resumes.
+    #: Absent a date the stop is indefinite, which is the default and the safe direction.
+    hardship_resume_on: dt.date | None = None
     hard_stopped: StopReason | None = None
     last_contact_day: dt.date | None = None
 
@@ -91,7 +95,12 @@ def evaluate(customer: Customer, debt: Debt, diagnosis: Diagnosis, state: DebtSt
 
     # Bereavement / hardship. POLICY CHOICE. The one case where a wrong answer is
     # unforgivable, so it is a code-level stop and never delegated to a model.
-    stop = check("no_hardship_flag", not customer.bereaved_or_hardship, StopReason.BEREAVEMENT)
+    # Hardship holds indefinitely UNLESS the customer named a date to be contacted on. Then
+    # it holds until that date and lifts on it. `>=` rather than `==` so a missed day (a
+    # weekend, an outage) does not silently bury the file forever.
+    hardship_holds = customer.bereaved_or_hardship and not (
+        state.hardship_resume_on is not None and now.date() >= state.hardship_resume_on)
+    stop = check("no_hardship_flag", not hardship_holds, StopReason.BEREAVEMENT)
     if stop:
         return GuardrailVerdict(False, stop, fired, passed)
 

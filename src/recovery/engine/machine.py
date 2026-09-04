@@ -152,7 +152,15 @@ class RecoveryEngine:
             decisions.append(decision)
             if decision.stop_reason in (StopReason.PAID, StopReason.OPTED_OUT,
                                         StopReason.DISPUTED, StopReason.BEREAVEMENT):
-                state.hard_stopped = decision.stop_reason
+                # Latching turns a stop into a permanent one, which is right for payment,
+                # objection and dispute. It is WRONG for a hardship stop that carries a
+                # customer-named resume date, because that stop is temporary by
+                # construction: the first evaluation before the date would latch the file
+                # shut and the callback the customer asked for would never happen. Caught in
+                # testing - the dated stop worked in isolation and failed in sequence.
+                if not (decision.stop_reason is StopReason.BEREAVEMENT
+                        and state.hardship_resume_on is not None):
+                    state.hard_stopped = decision.stop_reason
                 break
         return decisions
 
@@ -233,7 +241,18 @@ class RecoveryEngine:
             state.hard_stopped = StopReason.DISPUTED
         elif parsed.intent is Intent.HARDSHIP:
             customer.bereaved_or_hardship = True
-            state.hard_stopped = StopReason.BEREAVEMENT
+            # `hard_stopped` is deliberately NOT set on either branch: it is checked before
+            # the dated rule and would override the customer's own answer, latching the file
+            # shut on the first evaluation before the resume date.
+            if parsed.promised_date and parsed.promised_date > now.date():
+                # They told us when to come back. Their date always wins.
+                state.hardship_resume_on = parsed.promised_date
+            else:
+                # No date given, so a POLICY pause rather than an indefinite stop. An
+                # indefinite stop buries the debt and never contacts a customer who only
+                # needed a fortnight; the length is a policy choice and is configurable.
+                state.hardship_resume_on = now.date() + dt.timedelta(
+                    days=self.policy.hardship_default_resume_days)
         elif parsed.intent is Intent.PROMISE_TO_PAY:
             # A promise without a resolvable date still earns silence - a short one.
             state.promise_to_pay_until = parsed.promised_date or (now.date() + dt.timedelta(days=3))

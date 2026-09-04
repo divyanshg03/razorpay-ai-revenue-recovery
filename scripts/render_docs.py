@@ -42,8 +42,8 @@ METRICS = REPO / "results" / "metrics.json"
 #: Which generated block belongs to which file. One block may appear in several files.
 TARGETS: dict[str, tuple[str, ...]] = {
     "docs/phase-3.md": ("phase3-results",),
-    "README.md": ("readme-headline", "readme-failures", "readme-limitations",
-                  "readme-reproduce"),
+    "README.md": ("readme-headline", "readme-control", "readme-failures",
+                  "readme-limitations", "readme-reproduce"),
 }
 
 
@@ -189,6 +189,23 @@ def render_readme_headline(m: dict) -> str:
         f"| Metric frozen at | `{md['frozen_at_commit']}`, ancestry verified: "
         f"{str(md['is_ancestor_of_head']).lower()} |",
         "",
+        _wrap("All three pre-registered readouts, not just the largest. The 21-day window is "
+              "the primary; the other two were declared in the frozen definition before any "
+              "result existed and are reported whatever they say:"),
+        "",
+        "| Readout | Net incremental | 95% CI |",
+        "|---|---|---|",
+        f"| **21-day (primary)** | **{_rs(m['headline']['net_incremental_rupees'])}** | "
+        f"{_rs(m['headline']['ci95_rupees'][0])} – {_rs(m['headline']['ci95_rupees'][1])} |",
+        f"| 14-day (secondary) | "
+        f"{_rs(m['secondary_cohort_14d']['primary']['net_incremental_total_rupees'])} | "
+        f"{_rs(m['secondary_cohort_14d']['primary']['ci95_total_rupees'][0])} – "
+        f"{_rs(m['secondary_cohort_14d']['primary']['ci95_total_rupees'][1])} |",
+        f"| Shifted-parameter cohort | "
+        f"{_rs(m['shifted_parameter_cohort']['primary']['net_incremental_total_rupees'])} | "
+        f"{_rs(m['shifted_parameter_cohort']['primary']['ci95_total_rupees'][0])} – "
+        f"{_rs(m['shifted_parameter_cohort']['primary']['ci95_total_rupees'][1])} |",
+        "",
         _wrap(
         f"Arm A does nothing. Arm B is Razorpay's own T+0..T+3 ladder, reimplemented. Arm C "
         f"is the engine. The headline is **C against B** - beating do-nothing proves nothing, "
@@ -266,8 +283,47 @@ def render_readme_reproduce(m: dict) -> str:
     ])
 
 
+def render_readme_control(m: dict) -> str:
+    """Arm D. The control that separates the calendar from the decisioning."""
+    ctl = m["primary_cohort_21d"].get("spread_retry_control")
+    if not ctl:
+        return "_(arm D not present in this artifact)_"
+    sp, dc = ctl["spacing_is_worth__D_vs_B"], ctl["decisioning_is_worth__C_vs_D"]
+    arms = m["primary_cohort_21d"]["arms"]
+    lines = [
+        "| Arm | What it does | Recovery |",
+        "|---|---|---|",
+        f"| A | nothing at all | {_pct(arms['A']['recovery_rate'])} |",
+        f"| B | Razorpay's ladder, days 0,1,2,3 | {_pct(arms['B']['recovery_rate'])} |",
+        f"| **D** | **the retry calendar and nothing else** | "
+        f"**{_pct(arms['D']['recovery_rate'])}** |",
+        f"| C | the full engine | {_pct(arms['C']['recovery_rate'])} |",
+        "",
+        "| | Net incremental |",
+        "|---|---|",
+        f"| Spacing is worth (D vs B) | {_rs(sp['net_incremental_total_rupees'])} |",
+        f"| Decisioning is worth (C vs D) | {_rs(dc['net_incremental_total_rupees'])} |",
+        "",
+        _wrap(
+        "Arm D retries on the engine's own schedule and does nothing else - no diagnosis, no "
+        "message, no guardrails, no ledger, no model. It runs on arm C's customers, so it is "
+        "a counterfactual rather than a randomised arm."),
+        "",
+        _wrap(
+        "**Read the second row honestly: it is negative.** In this simulator the decisioning "
+        "layer COSTS recovery and buys compliance. Arm D never speaks to anyone, so it never "
+        "hears an opt-out, a dispute or a declaration of hardship to honour - and it retries "
+        "causes that in reality need the customer to act, which the simulator lets a silent "
+        "retry fix. It is not a shippable policy; it is unlawful. It is here because without "
+        "it, C vs B cannot say whether the money came from the calendar or from the "
+        "intelligence, and the earlier version of this README credited the intelligence."),
+    ]
+    return "\n".join(lines)
+
+
 RENDERERS = {
     "phase3-results": render_phase3_results,
+    "readme-control": render_readme_control,
     "readme-headline": render_readme_headline,
     "readme-failures": render_readme_failures,
     "readme-limitations": render_readme_limitations,

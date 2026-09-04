@@ -74,32 +74,75 @@ than asserting it.
 <!-- generated:readme-headline -->
 | | |
 |---|---|
-| **Net incremental recovery** | **Rs 935,664** |
-| 95% CI | Rs 786,951 – Rs 1,074,095 |
-| Per treated customer | Rs 334.40 |
+| **Net incremental recovery** | **Rs 957,156** |
+| 95% CI | Rs 807,479 – Rs 1,094,821 |
+| Per treated customer | Rs 342.09 |
 | Compared against | engine (C) vs Razorpay's T+0..T+3 ladder (B) |
-| Cost per incremental rupee | Rs 0.0027 |
-| Recovery rate, A / B / C | 2.00% / 25.25% / 66.51% |
+| Cost per incremental rupee | Rs 0.0026 |
+| Recovery rate, A / B / C | 2.00% / 25.25% / 67.41% |
 | Cohort | 5,000 simulated customers, seed 20260905 |
 | Interval method | percentile, stratified by arm, 10,000 resamples |
 | Metric frozen at | `8d14dbe`, ancestry verified: true |
+
+All three pre-registered readouts, not just the largest. The 21-day window is the primary; the
+other two were declared in the frozen definition before any result existed and are reported
+whatever they say:
+
+| Readout | Net incremental | 95% CI |
+|---|---|---|
+| **21-day (primary)** | **Rs 957,156** | Rs 807,479 – Rs 1,094,821 |
+| 14-day (secondary) | Rs 491,301 | Rs 348,590 – Rs 625,406 |
+| Shifted-parameter cohort | Rs 424,913 | Rs 276,849 – Rs 568,238 |
 
 Arm A does nothing. Arm B is Razorpay's own T+0..T+3 ladder, reimplemented. Arm C is the
 engine. The headline is **C against B** - beating do-nothing proves nothing, since every
 recovery vendor beats doing nothing. All three intervals exclude zero.
 <!-- /generated:readme-headline -->
 
+## Where the money actually comes from
+
+The headline compares the engine against Razorpay's ladder, and those two differ in **two**
+ways at once: the retry calendar *and* the whole decisioning layer. So that comparison alone
+cannot say which of them produced the recovery. Arm D holds the calendar fixed and strips
+everything else away, which separates them.
+
+<!-- generated:readme-control -->
+| Arm | What it does | Recovery |
+|---|---|---|
+| A | nothing at all | 2.00% |
+| B | Razorpay's ladder, days 0,1,2,3 | 25.25% |
+| **D** | **the retry calendar and nothing else** | **80.38%** |
+| C | the full engine | 67.41% |
+
+| | Net incremental |
+|---|---|
+| Spacing is worth (D vs B) | Rs 1,260,370 |
+| Decisioning is worth (C vs D) | Rs -303,215 |
+
+Arm D retries on the engine's own schedule and does nothing else - no diagnosis, no message, no
+guardrails, no ledger, no model. It runs on arm C's customers, so it is a counterfactual rather
+than a randomised arm.
+
+**Read the second row honestly: it is negative.** In this simulator the decisioning layer COSTS
+recovery and buys compliance. Arm D never speaks to anyone, so it never hears an opt-out, a
+dispute or a declaration of hardship to honour - and it retries causes that in reality need the
+customer to act, which the simulator lets a silent retry fix. It is not a shippable policy; it
+is unlawful. It is here because without it, C vs B cannot say whether the money came from the
+calendar or from the intelligence, and the earlier version of this README credited the
+intelligence.
+<!-- /generated:readme-control -->
+
 ## What it failed to recover
 
 A recovery system that reports only its wins is a marketing asset, not an engineering one.
 
 <!-- generated:readme-failures -->
-The engine did not recover 937 of 2,798 debts (33.49%), leaving Rs 744,363 on the table. That
+The engine did not recover 912 of 2,798 debts (32.59%), leaving Rs 722,838 on the table. That
 total is four different things, and only one of them is a defect:
 
 | Why it was not recovered | Customers | Rupees |
 |---|---|---|
-| Stopped by a guardrail — **the system was right to stop** | 208 | Rs 185,742 |
+| Stopped by a guardrail — **the system was right to stop** | 183 | Rs 164,217 |
 | No money in the window at all — **unreachable by any policy** | 267 | Rs 200,233 |
 | Funded, but never attempted — **a defect; must stay 0** | 0 | Rs 0 |
 | Attempted while funded, still unpaid — the honest residual | 462 | Rs 358,388 |

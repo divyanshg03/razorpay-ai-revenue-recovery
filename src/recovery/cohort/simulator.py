@@ -294,7 +294,17 @@ class SimulatedCohort:
         ("paying tomorrow", 0.03),                     # promise to pay, relative
         ("STOP. do not message me again", 0.025),      # opt-out: statutory stop
         ("I already paid this, check your records", 0.015),  # dispute
-        ("my father passed away last week, I need some time", 0.01),  # hardship
+        # Hardship, split WITHOUT changing the total rate: 0.01 before, 0.005 + 0.005 now.
+        # Real hardship replies frequently name a date - "I am in hospital, try me after the
+        # 20th" - and the engine can honour that. Modelling only the undated form meant the
+        # callback path was unreachable in a 5,000-customer batch.
+        #
+        # Disclosed plainly because it cuts one way: arms A and B never send a message, so
+        # they never receive a reply, so this can only ever help arm C. The total hardship
+        # incidence is deliberately untouched so the change is a fidelity improvement rather
+        # than a rate increase. See amendment A10.
+        ("my father passed away last week, I need some time", 0.005),        # hardship, undated
+        ("I am in hospital, please contact me after the {payday}th", 0.005),  # hardship, dated
     )
 
     def reply_to_contact(self, debt: Debt, day: dt.date) -> str | None:
@@ -319,7 +329,7 @@ class SimulatedCohort:
             customer.opted_out = True
         elif "already paid" in low or "check your records" in low:
             customer.disputed = True
-        elif "passed away" in low:
+        elif "passed away" in low or "in hospital" in low:
             customer.bereaved_or_hardship = True
 
     def honour_promise(self, debt: Debt, day: dt.date, promised: dt.date | None) -> bool:

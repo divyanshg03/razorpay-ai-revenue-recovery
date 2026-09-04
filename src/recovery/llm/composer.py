@@ -134,7 +134,10 @@ def _ask(model: str, actionability: Actionability, facts: Facts, timeout: float)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             out = json.loads(r.read())
-        return _strip(out["message"]["content"]), time.perf_counter() - t
+        content = out.get("message", {}).get("content")
+        if not isinstance(content, str):
+            return None, time.perf_counter() - t   # null or non-string content: no output
+        return _strip(content), time.perf_counter() - t
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, KeyError, OSError):
         return None, time.perf_counter() - t
 

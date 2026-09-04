@@ -32,7 +32,8 @@ from ..engine.policy import Policy, retry_schedule
 from ..ledger.audit import AuditLedger
 from ..models import Arm
 from .assignment import SEED, assign
-from .baselines import ArmOutcome, run_do_nothing, run_incumbent_ladder
+from .baselines import (ArmOutcome, run_do_nothing, run_incumbent_ladder,
+                        run_spread_retry_control)
 from .engine_arm import run_engine
 from .invariants import check_ledger
 from .metrics import (BOOTSTRAP_RESAMPLES, BOOTSTRAP_SEED, by_cause, by_debt_size_tercile,
@@ -114,6 +115,14 @@ def run_arms(cohort_seed: int, n: int, start: dt.date, window: int, policy: Poli
     out_b = run_incumbent_ladder(cb, _partition(cb, assignment.refs_in(Arm.INCUMBENT_LADDER)),
                                  start, window)
 
+    # Arm D - the spread-retry CONTROL. Runs on arm C's own customers, because it is a
+    # counterfactual ("what if we kept only the calendar?") rather than a randomised arm.
+    # That is why it is excluded from the assignment counts and labelled a diagnostic.
+    cd = SimulatedCohort(seed=cohort_seed, n_customers=n, start=start, shifted=shifted)
+    control_refs = assignment.refs_in(Arm.ENGINE)
+    out_d = run_spread_retry_control(cd, _partition(cd, control_refs), start, window,
+                                     retry_schedule(policy))
+
     # Arm C - the engine. Only this arm writes a ledger; it is the only one that decides.
     cc = SimulatedCohort(seed=cohort_seed, n_customers=n, start=start, shifted=shifted)
     engine_refs = assignment.refs_in(Arm.ENGINE)
@@ -128,7 +137,7 @@ def run_arms(cohort_seed: int, n: int, start: dt.date, window: int, policy: Poli
     # `cc` goes back to the caller so the residual can be decomposed against generative
     # truth - see metrics.failure_list. Reporting only; the engine has already finished and
     # never had access to it.
-    return ({"A": out_a, "B": out_b, "C": out_c}, ledger,
+    return ({"A": out_a, "B": out_b, "C": out_c, "D": out_d}, ledger,
             {"counts": assignment.counts(), "shares": assignment.shares(),
              "excluded": len(assignment.excluded),
              "excluded_reasons": _count(assignment.excluded.values()),
@@ -162,6 +171,41 @@ def _residual_predicates(cohort: SimulatedCohort, start: dt.date, window: int, p
     return ever_funded, funded_on_attempt_day
 
 
+def _control_block(engine, incumbent, control, resamples: int) -> dict:
+    """Arm D, and what it means. This is the number that makes the headline interpretable.
+
+    Arm C differs from arm B in TWO ways at once - the retry calendar and the whole
+    decisioning layer - so C vs B cannot say which one produced the money. Arm D holds the
+    calendar at arm C's and strips everything else, on arm C's own customers.
+
+    Read it as: D vs B is what SPACING is worth. C vs D is what DECISIONING is worth. The
+    second is expected to be NEGATIVE in this simulator, and reporting it as negative is the
+    point - the engine declines to contact people who opted out, disputed or declared
+    hardship, and arm D does not, because arm D never speaks to anyone and so never hears an
+    objection to honour.
+    """
+    if not control:
+        return {}
+    vs_incumbent = compare("calendar alone vs incumbent (arm D vs B)", control, incumbent,
+                           "D", "B", resamples=resamples)
+    vs_engine = compare("decisioning layer, on top of the calendar (arm C vs D)", engine,
+                        control, "C", "D", resamples=resamples)
+    return {
+        "what_this_is":
+            "A COUNTERFACTUAL, not a randomised arm, and not a shippable policy. It retries "
+            "on the engine's schedule and does nothing else: no diagnosis, no contact, no "
+            "guardrails, no ledger, no model. It ignores opt-outs, disputes and hardship, "
+            "which is unlawful. It exists only to separate the calendar from the decisioning.",
+        "runs_on": "arm C's own customers, so it is excluded from the assignment counts",
+        "arm_D": vars(summarise(control)),
+        "spacing_is_worth__D_vs_B": vs_incumbent.as_dict(),
+        "decisioning_is_worth__C_vs_D": vs_engine.as_dict(),
+        "honest_reading":
+            "If C vs D is negative, the decisioning layer costs recovery and buys compliance. "
+            "That is a real finding and is reported rather than suppressed.",
+    }
+
+
 def _cohort_block(arms, assignment_info, ledger, policy, window, seed, shifted, cohort=None,
                   start=None, resamples: int = BOOTSTRAP_RESAMPLES):
     """`resamples` is threaded in rather than defaulted here on purpose.
@@ -174,8 +218,10 @@ def _cohort_block(arms, assignment_info, ledger, policy, window, seed, shifted, 
     misreported it. A figure that describes its own provenance has to actually be that
     figure's provenance.
     """
-    inv = check_ledger(ledger, policy.max_contacts_per_debt_7d)
+    inv = check_ledger(ledger, policy.max_contacts_per_debt_7d,
+                       policy.hardship_default_resume_days)
     a, b, c = arms["A"], arms["B"], arms["C"]
+    d = arms.get("D") or []
     primary = compare("engine vs incumbent ladder (PRIMARY)", c, b, "C", "B",
                       resamples=resamples)
     secondary = compare("engine vs do-nothing (context only)", c, a, "C", "A",
@@ -192,6 +238,7 @@ def _cohort_block(arms, assignment_info, ledger, policy, window, seed, shifted, 
         "ledger": ledger.summary(),
         "subgroup_by_diagnosed_cause": by_cause(c),
         "subgroup_by_debt_size_tercile": by_debt_size_tercile(c),
+        "spread_retry_control": _control_block(c, b, d, resamples),
         "failure_list": failure_list(c, *(_residual_predicates(cohort, start, window, policy)
                                           if cohort is not None and start is not None
                                           else (None, None))),
