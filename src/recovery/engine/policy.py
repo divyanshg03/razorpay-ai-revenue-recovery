@@ -55,6 +55,17 @@ class Policy:
     #: retries a free lunch. Networks and issuers throttle repeated mandate execution, so
     #: the count is bounded as a policy choice. Spread across the window rather than
     #: clustered — that is the whole difference from the incumbent's T+0..T+3.
+    #: Hardship pause when the customer names NO date. POLICY CHOICE, not a legal rule -
+    #: no regulator sets this number, and the compliance docs say so. An indefinite stop
+    #: sounds kinder than it is: it buries the debt, and a customer who only needed a
+    #: fortnight is never contacted again. Seven days is the configured pause; a dated reply
+    #: always wins over it, and a tenant may only widen this, never narrow it.
+    #:
+    #: Stated plainly because it is the least comfortable number in this file: seven days
+    #: after "my father passed away last week" is short. It is exposed here rather than
+    #: hard-coded so a tenant with a stricter bereavement policy can raise it in one place.
+    hardship_default_resume_days: int = 7
+
     max_retries_per_debt: int = 6
     retry_spacing_days: int = 3
     retry_horizon_days: int = 21

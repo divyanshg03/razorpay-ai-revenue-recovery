@@ -29,7 +29,7 @@ from ..ledger.audit import AuditLedger
 from ..llm.composer import compose
 from ..llm.copy_gate import Facts
 from ..llm.parser import Intent, parse_reply
-from ..models import IST, Action, Channel, Customer, Debt
+from ..models import IST, Action, Channel, Customer, Debt, Decision
 from .baselines import ArmOutcome
 
 #: Sends go out mid-morning. Inside the window by construction; the guardrail still checks.
@@ -106,6 +106,23 @@ def run_engine(cohort: SimulatedCohort, debts: list[Debt], customers: list[Custo
                     rejected = {"verdict": msg.llm_gate.verdict.value,
                                 "categories": msg.llm_gate.categories,
                                 "reasons": msg.llm_gate.reasons}
+                # FAIL CLOSED on the message actually being sent. The gate's verdict was
+                # consulted only for the DISCARDED llm candidate; nothing checked the text
+                # that goes out. `compose()` returns a template carrying a REJECTED verdict
+                # rather than raising, so a rejected template shipped silently. Latent today
+                # only because every caller passes merchant="" - a merchant literally named
+                # "Urgent Care Clinic" trips false_urgency and would have been sent.
+                if not msg.gate.ok:
+                    ledger.record_decision(
+                        debt.debt_id, customer.ref,
+                        Decision(act=False, channel=decision.channel,
+                                 rules_fired=["copy_gate_blocked_the_send"]),
+                        diagnosis=diag.actionability.value,
+                        extra={"gate_verdict": msg.gate.verdict.value,
+                               "gate_categories": sorted(msg.gate.categories),
+                               "gate_reasons": msg.gate.reasons})
+                    continue
+
                 ledger.record_action(
                     Action(debt_id=debt.debt_id, customer_ref=customer.ref,
                            channel=decision.channel, at=now, cost_paise=cost,

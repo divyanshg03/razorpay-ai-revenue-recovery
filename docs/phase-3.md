@@ -13,25 +13,25 @@ this file and the artifact disagree.
 <!-- generated:phase3-results -->
 | | Net incremental (net of contact cost) | 95% CI |
 |---|---|---|
-| **Headline — 21d, engine vs Razorpay's ladder** | **Rs 935,664** | Rs 786,951 – Rs 1,074,095 |
-| Secondary — 14d window | Rs 483,145 | Rs 341,385 – Rs 617,311 |
-| Shifted-parameter cohort | Rs 418,066 | Rs 270,375 – Rs 561,353 |
+| **Headline — 21d, engine vs Razorpay's ladder** | **Rs 957,156** | Rs 807,479 – Rs 1,094,821 |
+| Secondary — 14d window | Rs 491,301 | Rs 348,590 – Rs 625,406 |
+| Shifted-parameter cohort | Rs 424,913 | Rs 276,849 – Rs 568,238 |
 
-Rs 334.40 per treated customer. Arm A 2.00%, arm B 25.25%, arm C 66.51% — a 41.26 pp lift over
-the incumbent, at a cost of **Rs 0.0027 per incremental rupee recovered**. All three intervals
+Rs 342.09 per treated customer. Arm A 2.00%, arm B 25.25%, arm C 67.41% — a 42.16 pp lift over
+the incumbent, at a cost of **Rs 0.0026 per incremental rupee recovered**. All three intervals
 exclude zero.
 
 On the shifted cohort — built to be harder, with fewer insufficient-funds cases and more dead
-instruments — arm B rises to 34.54% while arm C reaches 53.36%, an 18.82 pp lift. The edge
+instruments — arm B rises to 34.54% while arm C reaches 53.54%, a 19.0 pp lift. The edge
 narrows under a distribution the engine was not built against, which is what that cohort exists
 to test.
 
-**And it reports what it failed to recover:** 937 of 2,798 customers (33.49%), Rs 744,363 left
+**And it reports what it failed to recover:** 912 of 2,798 customers (32.59%), Rs 722,838 left
 on the table. That total is four different things and only one of them is a defect:
 
 | Why it was not recovered | Customers | Rupees |
 |---|---|---|
-| Stopped by a guardrail — **correct behaviour** | 208 | Rs 185,742 |
+| Stopped by a guardrail — **correct behaviour** | 183 | Rs 164,217 |
 | No money in the window at all — **unreachable by any policy** | 267 | Rs 200,233 |
 | Funded, but never attempted — **defect, must stay 0** | 0 | Rs 0 |
 | Attempted while funded, still unpaid — the honest residual | 462 | Rs 358,388 |

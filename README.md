@@ -74,12 +74,12 @@ than asserting it.
 <!-- generated:readme-headline -->
 | | |
 |---|---|
-| **Net incremental recovery** | **Rs 935,664** |
-| 95% CI | Rs 786,951 – Rs 1,074,095 |
-| Per treated customer | Rs 334.40 |
+| **Net incremental recovery** | **Rs 957,156** |
+| 95% CI | Rs 807,479 – Rs 1,094,821 |
+| Per treated customer | Rs 342.09 |
 | Compared against | engine (C) vs Razorpay's T+0..T+3 ladder (B) |
-| Cost per incremental rupee | Rs 0.0027 |
-| Recovery rate, A / B / C | 2.00% / 25.25% / 66.51% |
+| Cost per incremental rupee | Rs 0.0026 |
+| Recovery rate, A / B / C | 2.00% / 25.25% / 67.41% |
 | Cohort | 5,000 simulated customers, seed 20260905 |
 | Interval method | percentile, stratified by arm, 10,000 resamples |
 | Metric frozen at | `8d14dbe`, ancestry verified: true |
@@ -94,12 +94,12 @@ recovery vendor beats doing nothing. All three intervals exclude zero.
 A recovery system that reports only its wins is a marketing asset, not an engineering one.
 
 <!-- generated:readme-failures -->
-The engine did not recover 937 of 2,798 debts (33.49%), leaving Rs 744,363 on the table. That
+The engine did not recover 912 of 2,798 debts (32.59%), leaving Rs 722,838 on the table. That
 total is four different things, and only one of them is a defect:
 
 | Why it was not recovered | Customers | Rupees |
 |---|---|---|
-| Stopped by a guardrail — **the system was right to stop** | 208 | Rs 185,742 |
+| Stopped by a guardrail — **the system was right to stop** | 183 | Rs 164,217 |
 | No money in the window at all — **unreachable by any policy** | 267 | Rs 200,233 |
 | Funded, but never attempted — **a defect; must stay 0** | 0 | Rs 0 |
 | Attempted while funded, still unpaid — the honest residual | 462 | Rs 358,388 |

@@ -36,7 +36,8 @@ def _ts(s: str) -> dt.datetime:
     return dt.datetime.fromisoformat(s).astimezone(IST)
 
 
-def check_ledger(ledger: AuditLedger, max_contacts_7d: int = 7) -> dict[str, int]:
+def check_ledger(ledger: AuditLedger, max_contacts_7d: int = 7,
+                 hardship_resume_days: int = 7) -> dict[str, int]:
     entries = ledger.read()
     actions = [e for e in entries if e["type"] == RecordType.ACTION.value]
     rechecks = [e for e in entries if e["type"] == RecordType.STATE_RECHECK.value]
@@ -61,15 +62,59 @@ def check_ledger(ledger: AuditLedger, max_contacts_7d: int = 7) -> dict[str, int
             v["action_without_state_recheck"] += 1
 
     # 3. no action after a stop signal from the customer
-    stop_from = {}
+    #
+    # One exception, and it is the customer's own instruction rather than ours: a HARDSHIP
+    # reply that NAMES A DATE ("I am in hospital, contact me after the 20th") is a request to
+    # be contacted later, not a request never to be contacted. Silence after such a reply
+    # does not respect the customer, it buries their debt. So a contact is permitted on or
+    # after the date they gave, and forbidden before it.
+    #
+    # Where no date is given, a POLICY pause applies instead - `hardship_resume_days`,
+    # passed in rather than imported. An indefinite stop sounds kinder than it is: it buries
+    # the debt and never contacts a customer who only needed a fortnight.
+    #
+    # The exception is deliberately narrow, and applies only to `hardship`. `opt_out` and
+    # `dispute` never earn it: an objection under DPDP s.7(a) is not a scheduling preference,
+    # and a dispute is closed by a human rather than by a timer. A later opt-out or dispute
+    # also CANCELS any hardship pause already in flight.
+    #
+    # Note this check re-derives the rule from the LEDGER ALONE, as the whole invariants
+    # module does - it never imports the engine, so it is a genuine independent check of the
+    # engine's behaviour rather than a restatement of it. When the hardship callback was
+    # added on 4 Sept 2026 this invariant fired 6 times and the batch refused to write, which
+    # is the fail-closed design doing its job on a feature its author had just written.
+    # Each action is judged against the signals that existed AT THE TIME IT WAS SENT. An
+    # earlier version collapsed every inbound record first and then judged every action
+    # against the final state, which let a LATER opt-out retroactively condemn an EARLIER
+    # contact that was entirely proper when it went out. That is a real distinction, not a
+    # technicality: the question an auditor asks is "should you have sent this, then?"
+    signals: dict[str, list[tuple[dt.datetime, str, dt.date | None]]] = defaultdict(list)
     for i in inbound:
-        if i["body"]["intent"] in ("opt_out", "dispute", "hardship"):
-            t = _ts(i["timestamp_ist"])
-            ref = i["body"]["customer_ref"]
-            stop_from[ref] = min(stop_from.get(ref, t), t)
+        intent, ref = i["body"]["intent"], i["body"]["customer_ref"]
+        if intent not in ("opt_out", "dispute", "hardship"):
+            continue
+        t = _ts(i["timestamp_ist"])
+        resume = None
+        if intent == "hardship":
+            # Their date if they named one; otherwise the configured pause. The pause length
+            # is passed IN as a policy value rather than imported from the engine, exactly as
+            # `max_contacts_7d` already is - this module checks behaviour against a stated
+            # rule and must never import the thing it is checking.
+            promised = i["body"].get("promised_date")
+            resume = (dt.date.fromisoformat(promised) if promised
+                      else t.date() + dt.timedelta(days=hardship_resume_days))
+        signals[ref].append((t, intent, resume))
+
     for a in actions:
-        ref = a["body"]["customer_ref"]
-        if ref in stop_from and _ts(a["body"]["at"]) > stop_from[ref]:
+        ref, at = a["body"]["customer_ref"], _ts(a["body"]["at"])
+        prior = [s for s in signals.get(ref, []) if s[0] < at]
+        if not prior:
+            continue
+        if any(intent in ("opt_out", "dispute") for _, intent, _ in prior):
+            v["contact_after_stop_signal"] += 1        # permanent, and never lifts
+            continue
+        _, _, resume = max(prior, key=lambda s: s[0])  # the latest hardship governs
+        if resume is not None and at.date() < resume:
             v["contact_after_stop_signal"] += 1
 
     # 4. no action after the debt is settled

@@ -184,7 +184,12 @@ def _ask_llm(reply: str, model: str, timeout: float) -> dict | None:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             out = json.loads(r.read())
         return json.loads(out["message"]["content"])
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, KeyError, OSError):
+    # TypeError covers `content: null`, which json.loads rejects with a TypeError rather than
+    # a JSONDecodeError and so escaped the original tuple. Every failure here means "no usable
+    # model answer", and every one of them must land on the keyword fallback rather than
+    # ending the batch.
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, KeyError, TypeError,
+            OSError):
         return None
 
 
@@ -202,11 +207,27 @@ def parse_reply(reply: str, today: dt.date, model: str = DEFAULT_MODEL,
     """Classify a reply. Overrides first, model second, keywords last; dates always in code."""
     forced = override_intent(reply)
     if forced is not None:
-        return ParsedReply(forced, None, None, source="override")
+        # A hardship reply often names a date when contact would be welcome again - "call me
+        # after the 15th", "try me next month". Honouring that is the customer exercising
+        # control over their own file, not us overriding their hardship: the default remains
+        # an indefinite stop, and only a date THEY supplied lifts it, never earlier.
+        #
+        # Opt-out and dispute get no such treatment. An objection under DPDP s.7(a) is not a
+        # scheduling preference, and a dispute must be resolved by a human rather than by a
+        # timer. Only HARDSHIP carries a date out of this branch.
+        phrase = reply if forced is Intent.HARDSHIP else None
+        date = resolve_date(phrase, today) if phrase else None
+        return ParsedReply(forced, date, phrase, source="override")
 
     if use_llm:
         raw = _ask_llm(reply, model, timeout)
-        if raw:
+        # `format: "json"` guarantees VALID json, not an OBJECT. A model may answer with an
+        # array, a bare string or a number, and `.get` on any of those raises AttributeError.
+        # Four of eight plausible responses crashed here, and because parse_reply runs per
+        # reply inside run_engine, one bad response aborted a 5,000-customer batch with the
+        # ledger half written. A malformed reply must degrade to the keyword fallback, which
+        # is what the fallback is for.
+        if isinstance(raw, dict):
             intent_text = str(raw.get("intent", "other")).strip().lower()
             phrase = raw.get("date_phrase")
             phrase = str(phrase).strip() if phrase not in (None, "", "null") else None

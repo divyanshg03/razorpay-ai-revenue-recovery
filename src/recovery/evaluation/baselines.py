@@ -84,6 +84,46 @@ def run_do_nothing(cohort: SimulatedCohort, debts: list[Debt], start: dt.date,
     return outcomes
 
 
+def run_spread_retry_control(cohort: SimulatedCohort, debts: list[Debt], start: dt.date,
+                             window_days: int, days: tuple[int, ...]) -> list[ArmOutcome]:
+    """Arm D. Retry on the engine's OWN schedule and do nothing else whatsoever.
+
+    No diagnosis, no guardrails, no contact, no ladder, no ledger, no model, no cost. Four
+    lines of behaviour. It exists to answer the one question arms A, B and C cannot:
+
+        how much of the engine's result is DECISIONING, and how much is just the calendar?
+
+    Arm B differs from arm C in two ways at once - the retry SPACING (0,1,2,3 against
+    0,4,8,13,17,21) and the entire decisioning layer - so C vs B cannot separate them. Arm D
+    holds the spacing fixed at arm C's and removes everything else. C minus D is therefore
+    what the decisioning layer is worth, and D minus B is what the calendar is worth.
+
+    Added 4 Sept 2026 after an external review pointed out that the submission credited the
+    decisioning layer for a result the spacing produces. It is the control that makes the
+    headline interpretable, and it was missing. See amendment A10.
+
+    It is deliberately NOT a candidate policy. It ignores opt-outs, disputes and hardship,
+    which is unlawful, and it retries causes a silent retry can never fix. It is a
+    measurement instrument, and `metrics.json` labels it as one.
+    """
+    outcomes = []
+    for debt in debts:
+        d = diagnose(debt.failure)
+        out = ArmOutcome(debt.debt_id, debt.customer_ref, debt.amount_paise,
+                         cause_bucket=d.bucket.value, actionability=d.actionability.value)
+        for day_offset in days:
+            if day_offset > window_days:
+                break
+            day = start + dt.timedelta(days=day_offset)
+            out.retries += 1
+            if cohort.attempt_charge(debt, day, d.actionability):
+                out.recovered_paise = debt.amount_paise
+                out.settled_on_day = day_offset
+                break
+        outcomes.append(out)
+    return outcomes
+
+
 def run_incumbent_ladder(cohort: SimulatedCohort, debts: list[Debt], start: dt.date,
                          window_days: int) -> list[ArmOutcome]:
     """Arm B. Retry T+0..T+3 then stop. No customer contact, so no contact cost.

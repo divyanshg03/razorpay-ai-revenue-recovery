@@ -70,18 +70,31 @@ class GateResult:
 # Grouped by the regulatory category each maps to. Stems rather than whole words where the
 # v0 lexicon missed inflections.
 BANNED: dict[str, re.Pattern] = {
+    # Widened 4 Sept 2026 after a review found 16 of 17 realistic non-compliant messages
+    # passing. The v1 lexicon matched the words a marketer would use; it missed the words a
+    # collections agent actually writes. "Pay Rs 499 now and we will waive this month's
+    # charge" is the TRAI mixed-content trigger in one sentence and it sailed through.
     "discount_or_offer": re.compile(
-        r"\b(discount|cashback|cash back|coupon|promo\s?code|% ?off|percent off|rupees off|"
+        r"\b(discount|cashback|cash back|coupon|promo\s?code|% ?off|percent off|percent back|"
+        r"rupees off|waiv(e|er|ed|ing)|writ(e|ing) off|write-off|settle for|settlement offer|"
+        r"reduc(e|ed|tion) (your|the) (amount|due|balance)|no (charge|fee)|"
         r"offer|bonus|reward|incentive|free month|extra data|upgrade|voucher|deal)\b", re.I),
     "false_urgency": re.compile(
-        r"\b(hurry|act now|act fast|right away|immediately|urgent(ly)?|last chance|"
-        r"final (notice|warning|reminder)|expir(e|es|ing|y)|limited[- ]time|"
-        r"don'?t delay|before it'?s too late|asap|today only|within \d+ (hours?|minutes?))\b", re.I),
+        r"\b(hurry|act (now|fast|quickly|immediately)|right away|immediately|urgent(ly)?|"
+        r"last chance|final (notice|warning|reminder)|expir(e|es|ing|y)|limited[- ]time|"
+        r"don'?t delay|before it'?s too late|asap|today only|"
+        r"(with)?in the next \d+\s*(hours?|minutes?|days?)|within \d+\s*(hours?|minutes?|days?)|"
+        r"before (midnight|end of day|eod|today|tomorrow)|"
+        r"only \d+\s*(hours?|days?|minutes?)\s*(left|remain)|"
+        r"\d+\s*(hours?|days?)\s*(left|remaining|to go))\b", re.I),
     "scarcity": re.compile(
         r"\b(only a few|running out|while stocks? last|exclusive|limited (slots?|seats?|spots?))\b",
         re.I),
     "threat_or_shaming": re.compile(
         r"\b(legal action|legal notice|consequences|will be reported|report(ed)? to|"
+        r"credit bureau|credit report|recovery agent|collections? agenc(y|ies)|"
+        r"hand(ed)? (over )?to collections|account will be (closed|frozen|suspended)|"
+        r"default(ed|er|ers|ing)?|embarrass(ing|ment|ed)?|shame(ful)?|irresponsible|"
         r"penalt(y|ies)|late fee|fine|suspen(d|ded|sion)|terminat(e|ed|ion)|blacklist|"
         r"blocked|disconnect(ed|ion)?|cancel(led|lation)|lose access|police|court|"
         r"credit score|cibil)\b", re.I),
@@ -90,6 +103,18 @@ BANNED: dict[str, re.Pattern] = {
 REFUSAL = re.compile(
     r"^\s*(i (cannot|can'?t|won'?t|am unable|'m unable|will not)|sorry[,.]? (i|but)|"
     r"unfortunately[,.]? i|as an ai)", re.I)
+#: The model leaking its own scaffolding into the message body. A composer prompt that asks
+#: for JSON elsewhere in the system means a model will sometimes answer this one in JSON too,
+#: and `[{"intent":"promise_to_pay"}] https://rzp.io/...` passed every other rule here: it has
+#: the right link, no banned word, and no fabricated number. Sending it to a customer would be
+#: the most obviously broken thing this system could do.
+MACHINE_OUTPUT = re.compile(
+    r'^\s*[\[{]'            # starts with a JSON array or object
+    r'|"[a-z_]+"\s*:'       # a quoted key followed by a colon
+    r'|^\s*```'             # a fenced code block
+    r'|\}\s*\]?\s*$',       # ends by closing an object or array
+    re.I | re.M)
+
 PLACEHOLDER = re.compile(r"\[(date|link|name|amount|url|customer|merchant|x+)\]|\{\{.*?\}\}|<[a-z_ ]+>", re.I)
 # Any date-like token. Dates in a payment notice are facts the model does not have.
 DATE_LIKE = re.compile(
@@ -124,6 +149,9 @@ def check(text: str, facts: Facts, limit: int = SMS_LIMIT) -> GateResult:
         if hits:
             categories[name] = hits
 
+    if MACHINE_OUTPUT.search(text):
+        categories["machine_output"] = sorted({m.group(0).strip()
+                                               for m in MACHINE_OUTPUT.finditer(text)})[:4]
     if PLACEHOLDER.search(text):
         categories["placeholder"] = sorted({m.group(0) for m in PLACEHOLDER.finditer(text)})
     if DATE_LIKE.search(text):

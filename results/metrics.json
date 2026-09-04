@@ -6,7 +6,7 @@
     "note": "The freeze is only meaningful if that commit precedes this result. Ancestry is checked, not asserted."
   },
   "generated_by": "scripts/run_batch.py -> recovery.evaluation.batch.run()",
-  "head_commit": "3fd7612",
+  "head_commit": "c2c21bc",
   "policy_version": "2026-09-02.2",
   "n_customers": 5000,
   "bootstrap": {
@@ -16,12 +16,12 @@
   },
   "headline": {
     "comparison": "engine (C) vs Razorpay's T+0..T+3 ladder (B)",
-    "net_incremental_rupees": 935664.07,
+    "net_incremental_rupees": 957155.53,
     "ci95_rupees": [
-      786950.97,
-      1074095.45
+      807478.7,
+      1094820.8
     ],
-    "per_customer_rupees": 334.4,
+    "per_customer_rupees": 342.09,
     "note": "Net of contact cost. C vs A is context only and is NOT the headline."
   },
   "primary_cohort_21d": {
@@ -67,52 +67,60 @@
       },
       "C": {
         "n": 2798,
-        "recovered_paise": 154253900,
-        "contact_cost_paise": 249442,
-        "recovery_rate": 0.6651,
-        "mean_recovered_paise": 55130.057183702644,
-        "mean_cost_paise": 89.15010721944246
+        "recovered_paise": 156406400,
+        "contact_cost_paise": 252796,
+        "recovery_rate": 0.6741,
+        "mean_recovered_paise": 55899.35668334525,
+        "mean_cost_paise": 90.34882058613296
+      },
+      "D": {
+        "n": 2798,
+        "recovered_paise": 186475100,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.8038,
+        "mean_recovered_paise": 66645.85418155826,
+        "mean_cost_paise": 0.0
       }
     },
     "primary": {
       "label": "engine vs incumbent ladder (PRIMARY)",
       "treat_arm": "C",
       "control_arm": "B",
-      "net_incremental_per_customer_rupees": 334.4,
-      "net_incremental_total_rupees": 935664.07,
+      "net_incremental_per_customer_rupees": 342.09,
+      "net_incremental_total_rupees": 957155.53,
       "ci95_per_customer_rupees": [
-        281.25,
-        383.88
+        288.59,
+        391.29
       ],
       "ci95_total_rupees": [
-        786950.97,
-        1074095.45
+        807478.7,
+        1094820.8
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.6651,
+      "treat_recovery_rate": 0.6741,
       "control_recovery_rate": 0.2525,
-      "lift_pp": 41.26
+      "lift_pp": 42.16
     },
     "secondary_vs_do_nothing": {
       "label": "engine vs do-nothing (context only)",
       "treat_arm": "C",
       "control_arm": "A",
-      "net_incremental_per_customer_rupees": 530.97,
-      "net_incremental_total_rupees": 1485645.91,
+      "net_incremental_per_customer_rupees": 538.65,
+      "net_incremental_total_rupees": 1507137.37,
       "ci95_per_customer_rupees": [
-        497.82,
-        564.9
+        505.46,
+        573.0
       ],
       "ci95_total_rupees": [
-        1392896.15,
-        1580602.7
+        1414280.83,
+        1603248.08
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.6651,
+      "treat_recovery_rate": 0.6741,
       "control_recovery_rate": 0.02,
-      "lift_pp": 64.51
+      "lift_pp": 65.41
     },
-    "cost_per_incremental_rupee": 0.0027,
+    "cost_per_incremental_rupee": 0.0026,
     "guardrail_invariants": {
       "contact_outside_window": 0,
       "action_without_state_recheck": 0,
@@ -125,19 +133,19 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 46271,
-      "decisions": 20017,
-      "actions_taken": 4011,
-      "decisions_declined": 7630,
+      "records": 45847,
+      "decisions": 19791,
+      "actions_taken": 4026,
+      "decisions_declined": 7344,
       "stop_reasons": {
         "opt_out": 1579,
         "promise_to_pay_active": 1544,
-        "cause_not_actionable": 1507,
-        "escalation_ladder_exhausted": 1379,
+        "cause_not_actionable": 1517,
+        "escalation_ladder_exhausted": 1399,
         "dispute_raised": 991,
-        "bereavement_or_hardship": 630
+        "bereavement_or_hardship": 314
       },
-      "total_contact_cost_paise": 249442,
+      "total_contact_cost_paise": 252796,
       "chain_intact": true,
       "chain_broken_at": null
     },
@@ -149,25 +157,25 @@
       },
       "needs_funds": {
         "n": 1523,
-        "recovery_rate": 0.7748,
-        "recovered_rupees": 974220.0
+        "recovery_rate": 0.7833,
+        "recovered_rupees": 984707.0
       },
       "needs_new_instrument": {
         "n": 277,
-        "recovery_rate": 0.3502,
-        "recovered_rupees": 74453.0
+        "recovery_rate": 0.361,
+        "recovered_rupees": 80100.0
       },
       "retry_later": {
         "n": 709,
-        "recovery_rate": 0.7504,
-        "recovered_rupees": 450918.0
+        "recovery_rate": 0.763,
+        "recovered_rupees": 456309.0
       }
     },
     "subgroup_by_debt_size_tercile": {
       "low": {
         "n": 975,
-        "recovery_rate": 0.6533,
-        "recovered_rupees": 151463.0,
+        "recovery_rate": 0.6626,
+        "recovered_rupees": 153704.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -175,8 +183,8 @@
       },
       "mid": {
         "n": 1005,
-        "recovery_rate": 0.6697,
-        "recovered_rupees": 414127.0,
+        "recovery_rate": 0.6786,
+        "recovered_rupees": 418918.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -184,42 +192,93 @@
       },
       "high": {
         "n": 818,
-        "recovery_rate": 0.6736,
-        "recovered_rupees": 976949.0,
+        "recovery_rate": 0.6822,
+        "recovered_rupees": 991442.0,
         "cut_points_rupees": [
           299.0,
           799.0
         ]
       }
     },
+    "spread_retry_control": {
+      "what_this_is": "A COUNTERFACTUAL, not a randomised arm, and not a shippable policy. It retries on the engine's schedule and does nothing else: no diagnosis, no contact, no guardrails, no ledger, no model. It ignores opt-outs, disputes and hardship, which is unlawful. It exists only to separate the calendar from the decisioning.",
+      "runs_on": "arm C's own customers, so it is excluded from the assignment counts",
+      "arm_D": {
+        "n": 2798,
+        "recovered_paise": 186475100,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.8038,
+        "mean_recovered_paise": 66645.85418155826,
+        "mean_cost_paise": 0.0
+      },
+      "spacing_is_worth__D_vs_B": {
+        "label": "calendar alone vs incumbent (arm D vs B)",
+        "treat_arm": "D",
+        "control_arm": "B",
+        "net_incremental_per_customer_rupees": 450.45,
+        "net_incremental_total_rupees": 1260370.49,
+        "ci95_per_customer_rupees": [
+          397.07,
+          502.17
+        ],
+        "ci95_total_rupees": [
+          1110992.87,
+          1405068.19
+        ],
+        "excludes_zero": true,
+        "treat_recovery_rate": 0.8038,
+        "control_recovery_rate": 0.2525,
+        "lift_pp": 55.13
+      },
+      "decisioning_is_worth__C_vs_D": {
+        "label": "decisioning layer, on top of the calendar (arm C vs D)",
+        "treat_arm": "C",
+        "control_arm": "D",
+        "net_incremental_per_customer_rupees": -108.37,
+        "net_incremental_total_rupees": -303214.96,
+        "ci95_per_customer_rupees": [
+          -152.72,
+          -63.85
+        ],
+        "ci95_total_rupees": [
+          -427313.94,
+          -178640.32
+        ],
+        "excludes_zero": true,
+        "treat_recovery_rate": 0.6741,
+        "control_recovery_rate": 0.8038,
+        "lift_pp": -12.97
+      },
+      "honest_reading": "If C vs D is negative, the decisioning layer costs recovery and buys compliance. That is a real finding and is reported rather than suppressed."
+    },
     "failure_list": {
-      "n_not_recovered": 937,
-      "share_not_recovered": 0.3349,
-      "unrecovered_rupees": 744363.0,
+      "n_not_recovered": 912,
+      "share_not_recovered": 0.3259,
+      "unrecovered_rupees": 722838.0,
       "by_diagnosed_cause": {
-        "needs_funds": 343,
+        "needs_funds": 330,
         "needs_customer_action": 237,
-        "needs_new_instrument": 180,
-        "retry_later": 177
+        "needs_new_instrument": 177,
+        "retry_later": 168
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 642,
-        "cause_not_actionable": 417,
+        "escalation_ladder_exhausted": 648,
+        "cause_not_actionable": 414,
         "opt_out": 105,
         "dispute_raised": 63,
         "promise_to_pay_active": 46,
-        "bereavement_or_hardship": 40
+        "bereavement_or_hardship": 15
       },
       "standing": {
         "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
         "counts": {
-          "stopped_by_a_guardrail_correct": 208,
+          "stopped_by_a_guardrail_correct": 183,
           "no_money_in_the_window_unreachable": 267,
           "funded_but_never_attempted_DEFECT": 0,
           "attempted_while_funded_still_unpaid": 462
         },
         "rupees": {
-          "stopped_by_a_guardrail_correct": 185742.0,
+          "stopped_by_a_guardrail_correct": 164217.0,
           "no_money_in_the_window_unreachable": 200233.0,
           "funded_but_never_attempted_DEFECT": 0.0,
           "attempted_while_funded_still_unpaid": 358388.0
@@ -270,50 +329,58 @@
       },
       "C": {
         "n": 2798,
-        "recovered_paise": 107674900,
-        "contact_cost_paise": 249420,
-        "recovery_rate": 0.465,
-        "mean_recovered_paise": 38482.80914939242,
-        "mean_cost_paise": 89.14224446032881
+        "recovered_paise": 108493800,
+        "contact_cost_paise": 252752,
+        "recovery_rate": 0.4689,
+        "mean_recovered_paise": 38775.48248749106,
+        "mean_cost_paise": 90.33309506790565
+      },
+      "D": {
+        "n": 2798,
+        "recovered_paise": 123099200,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.539,
+        "mean_recovered_paise": 43995.42530378842,
+        "mean_cost_paise": 0.0
       }
     },
     "primary": {
       "label": "engine vs incumbent ladder (PRIMARY)",
       "treat_arm": "C",
       "control_arm": "B",
-      "net_incremental_per_customer_rupees": 172.68,
-      "net_incremental_total_rupees": 483145.26,
+      "net_incremental_per_customer_rupees": 175.59,
+      "net_incremental_total_rupees": 491300.94,
       "ci95_per_customer_rupees": [
-        122.01,
-        220.63
+        124.59,
+        223.52
       ],
       "ci95_total_rupees": [
-        341385.31,
-        617310.72
+        348590.37,
+        625405.71
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.465,
+      "treat_recovery_rate": 0.4689,
       "control_recovery_rate": 0.2469,
-      "lift_pp": 21.81
+      "lift_pp": 22.2
     },
     "secondary_vs_do_nothing": {
       "label": "engine vs do-nothing (context only)",
       "treat_arm": "C",
       "control_arm": "A",
-      "net_incremental_per_customer_rupees": 367.39,
-      "net_incremental_total_rupees": 1027957.94,
+      "net_incremental_per_customer_rupees": 370.31,
+      "net_incremental_total_rupees": 1036113.62,
       "ci95_per_customer_rupees": [
-        337.38,
-        398.21
+        340.21,
+        400.99
       ],
       "ci95_total_rupees": [
-        943987.43,
-        1114180.25
+        951895.95,
+        1121983.65
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.465,
+      "treat_recovery_rate": 0.4689,
       "control_recovery_rate": 0.0148,
-      "lift_pp": 45.02
+      "lift_pp": 45.41
     },
     "cost_per_incremental_rupee": 0.0051,
     "guardrail_invariants": {
@@ -328,19 +395,19 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 38097,
-      "decisions": 16145,
-      "actions_taken": 4010,
-      "decisions_declined": 5317,
+      "records": 37973,
+      "decisions": 16076,
+      "actions_taken": 4024,
+      "decisions_declined": 5209,
       "stop_reasons": {
-        "escalation_ladder_exhausted": 1364,
-        "cause_not_actionable": 1156,
+        "escalation_ladder_exhausted": 1380,
+        "cause_not_actionable": 1160,
         "promise_to_pay_active": 1029,
         "opt_out": 857,
         "dispute_raised": 550,
-        "bereavement_or_hardship": 361
+        "bereavement_or_hardship": 233
       },
-      "total_contact_cost_paise": 249420,
+      "total_contact_cost_paise": 252752,
       "chain_intact": true,
       "chain_broken_at": null
     },
@@ -352,8 +419,8 @@
       },
       "needs_funds": {
         "n": 1523,
-        "recovery_rate": 0.5404,
-        "recovered_rupees": 680977.0
+        "recovery_rate": 0.545,
+        "recovered_rupees": 686870.0
       },
       "needs_new_instrument": {
         "n": 277,
@@ -362,15 +429,15 @@
       },
       "retry_later": {
         "n": 709,
-        "recovery_rate": 0.5148,
-        "recovered_rupees": 303685.0
+        "recovery_rate": 0.5205,
+        "recovered_rupees": 305981.0
       }
     },
     "subgroup_by_debt_size_tercile": {
       "low": {
         "n": 975,
-        "recovery_rate": 0.4605,
-        "recovered_rupees": 105901.0,
+        "recovery_rate": 0.4646,
+        "recovered_rupees": 107097.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -378,8 +445,8 @@
       },
       "mid": {
         "n": 1005,
-        "recovery_rate": 0.4617,
-        "recovered_rupees": 283736.0,
+        "recovery_rate": 0.4657,
+        "recovered_rupees": 285732.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -387,42 +454,93 @@
       },
       "high": {
         "n": 818,
-        "recovery_rate": 0.4743,
-        "recovered_rupees": 687112.0,
+        "recovery_rate": 0.478,
+        "recovered_rupees": 692109.0,
         "cut_points_rupees": [
           299.0,
           799.0
         ]
       }
     },
+    "spread_retry_control": {
+      "what_this_is": "A COUNTERFACTUAL, not a randomised arm, and not a shippable policy. It retries on the engine's schedule and does nothing else: no diagnosis, no contact, no guardrails, no ledger, no model. It ignores opt-outs, disputes and hardship, which is unlawful. It exists only to separate the calendar from the decisioning.",
+      "runs_on": "arm C's own customers, so it is excluded from the assignment counts",
+      "arm_D": {
+        "n": 2798,
+        "recovered_paise": 123099200,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.539,
+        "mean_recovered_paise": 43995.42530378842,
+        "mean_cost_paise": 0.0
+      },
+      "spacing_is_worth__D_vs_B": {
+        "label": "calendar alone vs incumbent (arm D vs B)",
+        "treat_arm": "D",
+        "control_arm": "B",
+        "net_incremental_per_customer_rupees": 228.69,
+        "net_incremental_total_rupees": 639882.46,
+        "ci95_per_customer_rupees": [
+          178.41,
+          277.19
+        ],
+        "ci95_total_rupees": [
+          499183.14,
+          775564.54
+        ],
+        "excludes_zero": true,
+        "treat_recovery_rate": 0.539,
+        "control_recovery_rate": 0.2469,
+        "lift_pp": 29.21
+      },
+      "decisioning_is_worth__C_vs_D": {
+        "label": "decisioning layer, on top of the calendar (arm C vs D)",
+        "treat_arm": "C",
+        "control_arm": "D",
+        "net_incremental_per_customer_rupees": -53.1,
+        "net_incremental_total_rupees": -148581.52,
+        "ci95_per_customer_rupees": [
+          -92.22,
+          -14.19
+        ],
+        "ci95_total_rupees": [
+          -258039.8,
+          -39709.76
+        ],
+        "excludes_zero": true,
+        "treat_recovery_rate": 0.4689,
+        "control_recovery_rate": 0.539,
+        "lift_pp": -7.01
+      },
+      "honest_reading": "If C vs D is negative, the decisioning layer costs recovery and buys compliance. That is a real finding and is reported rather than suppressed."
+    },
     "failure_list": {
-      "n_not_recovered": 1497,
-      "share_not_recovered": 0.535,
-      "unrecovered_rupees": 1210153.0,
+      "n_not_recovered": 1486,
+      "share_not_recovered": 0.5311,
+      "unrecovered_rupees": 1201964.0,
       "by_diagnosed_cause": {
-        "needs_funds": 700,
-        "retry_later": 344,
+        "needs_funds": 693,
+        "retry_later": 340,
         "needs_customer_action": 239,
         "needs_new_instrument": 214
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 1096,
+        "escalation_ladder_exhausted": 1107,
         "cause_not_actionable": 453,
         "promise_to_pay_active": 106,
         "opt_out": 105,
         "dispute_raised": 63,
-        "bereavement_or_hardship": 40
+        "bereavement_or_hardship": 29
       },
       "standing": {
         "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
         "counts": {
-          "stopped_by_a_guardrail_correct": 208,
+          "stopped_by_a_guardrail_correct": 197,
           "no_money_in_the_window_unreachable": 907,
           "funded_but_never_attempted_DEFECT": 65,
           "attempted_while_funded_still_unpaid": 317
         },
         "rupees": {
-          "stopped_by_a_guardrail_correct": 184242.0,
+          "stopped_by_a_guardrail_correct": 176053.0,
           "no_money_in_the_window_unreachable": 729243.0,
           "funded_but_never_attempted_DEFECT": 52685.0,
           "attempted_while_funded_still_unpaid": 243983.0
@@ -473,50 +591,58 @@
       },
       "C": {
         "n": 2813,
-        "recovered_paise": 124339900,
-        "contact_cost_paise": 229914,
-        "recovery_rate": 0.5336,
-        "mean_recovered_paise": 44201.88410949164,
-        "mean_cost_paise": 81.73266974760043
+        "recovered_paise": 125029400,
+        "contact_cost_paise": 234736,
+        "recovery_rate": 0.5354,
+        "mean_recovered_paise": 44446.99608958407,
+        "mean_cost_paise": 83.44685389264131
+      },
+      "D": {
+        "n": 2813,
+        "recovered_paise": 128369200,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.5539,
+        "mean_recovered_paise": 45634.26946320654,
+        "mean_cost_paise": 0.0
       }
     },
     "primary": {
       "label": "engine vs incumbent ladder (PRIMARY)",
       "treat_arm": "C",
       "control_arm": "B",
-      "net_incremental_per_customer_rupees": 148.62,
-      "net_incremental_total_rupees": 418066.03,
+      "net_incremental_per_customer_rupees": 151.05,
+      "net_incremental_total_rupees": 424912.81,
       "ci95_per_customer_rupees": [
-        96.12,
-        199.56
+        98.42,
+        202.0
       ],
       "ci95_total_rupees": [
-        270374.61,
-        561353.35
+        276848.6,
+        568237.86
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.5336,
+      "treat_recovery_rate": 0.5354,
       "control_recovery_rate": 0.3454,
-      "lift_pp": 18.82
+      "lift_pp": 19.0
     },
     "secondary_vs_do_nothing": {
       "label": "engine vs do-nothing (context only)",
       "treat_arm": "C",
       "control_arm": "A",
-      "net_incremental_per_customer_rupees": 428.34,
-      "net_incremental_total_rupees": 1204919.67,
+      "net_incremental_per_customer_rupees": 430.77,
+      "net_incremental_total_rupees": 1211766.45,
       "ci95_per_customer_rupees": [
-        398.19,
-        459.12
+        400.44,
+        461.68
       ],
       "ci95_total_rupees": [
-        1120100.86,
-        1291499.45
+        1126449.91,
+        1298694.96
       ],
       "excludes_zero": true,
-      "treat_recovery_rate": 0.5336,
+      "treat_recovery_rate": 0.5354,
       "control_recovery_rate": 0.0178,
-      "lift_pp": 51.58
+      "lift_pp": 51.76
     },
     "cost_per_incremental_rupee": 0.0055,
     "guardrail_invariants": {
@@ -531,32 +657,32 @@
     },
     "guardrails_all_zero": true,
     "ledger": {
-      "records": 40714,
-      "decisions": 17896,
-      "actions_taken": 3263,
-      "decisions_declined": 7578,
+      "records": 40290,
+      "decisions": 17679,
+      "actions_taken": 3276,
+      "decisions_declined": 7293,
       "stop_reasons": {
-        "cause_not_actionable": 2082,
-        "promise_to_pay_active": 1828,
-        "escalation_ladder_exhausted": 1214,
+        "cause_not_actionable": 2097,
+        "promise_to_pay_active": 1837,
+        "escalation_ladder_exhausted": 1235,
         "opt_out": 1156,
         "dispute_raised": 755,
-        "bereavement_or_hardship": 543
+        "bereavement_or_hardship": 213
       },
-      "total_contact_cost_paise": 229914,
+      "total_contact_cost_paise": 234736,
       "chain_intact": true,
       "chain_broken_at": null
     },
     "subgroup_by_diagnosed_cause": {
       "needs_customer_action": {
         "n": 340,
-        "recovery_rate": 0.2088,
-        "recovered_rupees": 43479.0
+        "recovery_rate": 0.2118,
+        "recovered_rupees": 44278.0
       },
       "needs_funds": {
         "n": 984,
-        "recovery_rate": 0.7215,
-        "recovered_rupees": 593190.0
+        "recovery_rate": 0.7256,
+        "recovered_rupees": 599286.0
       },
       "needs_new_instrument": {
         "n": 692,
@@ -572,8 +698,8 @@
     "subgroup_by_debt_size_tercile": {
       "low": {
         "n": 967,
-        "recovery_rate": 0.5429,
-        "recovered_rupees": 120375.0,
+        "recovery_rate": 0.545,
+        "recovered_rupees": 120673.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -581,8 +707,8 @@
       },
       "mid": {
         "n": 1042,
-        "recovery_rate": 0.5317,
-        "recovered_rupees": 333446.0,
+        "recovery_rate": 0.5336,
+        "recovered_rupees": 335044.0,
         "cut_points_rupees": [
           299.0,
           799.0
@@ -590,45 +716,96 @@
       },
       "high": {
         "n": 804,
-        "recovery_rate": 0.5249,
-        "recovered_rupees": 789578.0,
+        "recovery_rate": 0.5261,
+        "recovered_rupees": 794577.0,
         "cut_points_rupees": [
           299.0,
           799.0
         ]
       }
     },
+    "spread_retry_control": {
+      "what_this_is": "A COUNTERFACTUAL, not a randomised arm, and not a shippable policy. It retries on the engine's schedule and does nothing else: no diagnosis, no contact, no guardrails, no ledger, no model. It ignores opt-outs, disputes and hardship, which is unlawful. It exists only to separate the calendar from the decisioning.",
+      "runs_on": "arm C's own customers, so it is excluded from the assignment counts",
+      "arm_D": {
+        "n": 2813,
+        "recovered_paise": 128369200,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.5539,
+        "mean_recovered_paise": 45634.26946320654,
+        "mean_cost_paise": 0.0
+      },
+      "spacing_is_worth__D_vs_B": {
+        "label": "calendar alone vs incumbent (arm D vs B)",
+        "treat_arm": "D",
+        "control_arm": "B",
+        "net_incremental_per_customer_rupees": 163.76,
+        "net_incremental_total_rupees": 460658.17,
+        "ci95_per_customer_rupees": [
+          111.48,
+          214.45
+        ],
+        "ci95_total_rupees": [
+          313580.91,
+          603236.82
+        ],
+        "excludes_zero": true,
+        "treat_recovery_rate": 0.5539,
+        "control_recovery_rate": 0.3454,
+        "lift_pp": 20.85
+      },
+      "decisioning_is_worth__C_vs_D": {
+        "label": "decisioning layer, on top of the calendar (arm C vs D)",
+        "treat_arm": "C",
+        "control_arm": "D",
+        "net_incremental_per_customer_rupees": -12.71,
+        "net_incremental_total_rupees": -35745.36,
+        "ci95_per_customer_rupees": [
+          -54.92,
+          29.41
+        ],
+        "ci95_total_rupees": [
+          -154496.1,
+          82737.2
+        ],
+        "excludes_zero": false,
+        "treat_recovery_rate": 0.5354,
+        "control_recovery_rate": 0.5539,
+        "lift_pp": -1.85
+      },
+      "honest_reading": "If C vs D is negative, the decisioning layer costs recovery and buys compliance. That is a real finding and is reported rather than suppressed."
+    },
     "failure_list": {
-      "n_not_recovered": 1312,
-      "share_not_recovered": 0.4664,
-      "unrecovered_rupees": 1098838.0,
+      "n_not_recovered": 1307,
+      "share_not_recovered": 0.4646,
+      "unrecovered_rupees": 1091943.0,
       "by_diagnosed_cause": {
         "needs_new_instrument": 554,
-        "needs_funds": 274,
-        "needs_customer_action": 269,
+        "needs_funds": 270,
+        "needs_customer_action": 268,
         "retry_later": 215
       },
       "by_stop_reason": {
-        "escalation_ladder_exhausted": 964,
-        "cause_not_actionable": 823,
-        "promise_to_pay_active": 116,
+        "escalation_ladder_exhausted": 985,
+        "cause_not_actionable": 822,
+        "promise_to_pay_active": 117,
         "opt_out": 77,
         "dispute_raised": 51,
-        "bereavement_or_hardship": 35
+        "bereavement_or_hardship": 29
       },
       "standing": {
         "note": "The residual is not one number. Buckets 1 and 2 are not defects; bucket 3 is, and must stay at zero.",
         "counts": {
-          "stopped_by_a_guardrail_correct": 163,
+          "stopped_by_a_guardrail_correct": 157,
           "no_money_in_the_window_unreachable": 674,
           "funded_but_never_attempted_DEFECT": 0,
-          "attempted_while_funded_still_unpaid": 475
+          "attempted_while_funded_still_unpaid": 476
         },
         "rupees": {
-          "stopped_by_a_guardrail_correct": 149237.0,
+          "stopped_by_a_guardrail_correct": 142043.0,
           "no_money_in_the_window_unreachable": 556726.0,
           "funded_but_never_attempted_DEFECT": 0.0,
-          "attempted_while_funded_still_unpaid": 392875.0
+          "attempted_while_funded_still_unpaid": 393174.0
         }
       }
     }
