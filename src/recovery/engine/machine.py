@@ -15,8 +15,17 @@ it CAN see:
 
 1. **The diagnosis.** A dead instrument is never retried blind; a cause the merchant cannot
    act on is dropped; a funds problem is a timing problem.
-2. **Spread.** Retries at 0, 3, 6, 9, 12, 15 days instead of 0, 1, 2, 3 — the same number of
-   attempts, five times the coverage of a monthly salary cycle.
+2. **Spread.** Retries at 0, 4, 8, 13, 17, 21 days instead of the incumbent's 0, 1, 2, 3.
+   Two things differ and only one of them is the argument: this is **six attempts against
+   four**, which is a real and separate advantage and is stated rather than folded into the
+   next sentence; and the six are spread across the declared horizon, which takes coverage of
+   a monthly salary cycle from 21/30 to 27/30. Retries are free in the frozen cost model, so
+   the extra two attempts cost nothing and the comparison is not net of them.
+
+   This paragraph previously read "the same number of attempts" over the pre-A1 schedule
+   0, 3, 6, 9, 12, 15 — wrong count and wrong schedule. It was the fairness claim for the
+   headline comparison, so it is corrected here and in `scripts/demo.py` rather than left to
+   a reader to catch.
 3. **Listening.** A promise-to-pay is honoured with silence and then a retry on the date;
    an opt-out ends everything; a dispute goes to a human.
 
@@ -149,17 +158,34 @@ class RecoveryEngine:
 
     def _decide(self, debt: Debt, customer: Customer, diag: Diagnosis, state: DebtState,
                 channel: Channel, now: dt.datetime, settled: bool) -> Decision:
-        # Human escalation below the floor is never worth it; treat the rung as absent.
-        if channel is Channel.HUMAN_CALL and \
-                debt.outstanding_paise < self.policy.min_amount_for_human_call_paise:
-            state.ladder_rung = len(self.policy.ladder)
-            return Decision(act=False, channel=channel, stop_reason=StopReason.LADDER_EXHAUSTED,
-                            rules_fired=["human_call_below_amount_floor"])
-
+        # ORDER MATTERS, and it used to be wrong. The human-call amount floor is a COST rule,
+        # and it used to return here before `evaluate()` had run at all. So an opted-out,
+        # disputed or bereaved customer sitting on the human-call rung with a small debt was
+        # logged as `escalation_ladder_exhausted` / `human_call_below_amount_floor`, with
+        # `rules_passed=[]` - a cost decision standing in for a statutory one, and no evidence
+        # in the record that the statutory check had run.
+        #
+        # Nobody was ever contacted: both paths return act=False, so this was an
+        # audit-evidence defect rather than a compliance breach, and replaying a full trail
+        # still showed the statutory reason on the surrounding records. But `guardrails.py`
+        # promises in its own docstring that "a customer who has opted out is never even
+        # evaluated for the contact window - the log shows the statutory reason, not an
+        # incidental one", and the shipped Phase 3 ledger contained 90 records where that was
+        # not true. A stopping rule you cannot evidence per-record is worth less than one you
+        # can. Found 3 Sept 2026 by review; see amendment A8.
         verdict = evaluate(customer, debt, diag, state, channel, now, self.policy, settled)
         if not verdict.allowed:
             return Decision(act=False, channel=channel, stop_reason=verdict.stop_reason,
                             rules_fired=verdict.rules_fired, rules_passed=verdict.rules_passed)
+
+        # Only once the customer may lawfully be contacted at all does cost get a say. Human
+        # escalation below the floor is never worth it; treat the rung as absent.
+        if channel is Channel.HUMAN_CALL and \
+                debt.outstanding_paise < self.policy.min_amount_for_human_call_paise:
+            state.ladder_rung = len(self.policy.ladder)
+            return Decision(act=False, channel=channel, stop_reason=StopReason.LADDER_EXHAUSTED,
+                            rules_fired=[*verdict.rules_fired, "human_call_below_amount_floor"],
+                            rules_passed=verdict.rules_passed)
 
         ev = expected_value_paise(self.policy, diag.actionability, debt.outstanding_paise,
                                   len(state.contacts), channel)

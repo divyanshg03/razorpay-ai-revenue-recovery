@@ -265,6 +265,56 @@ def test_ladder_escalates_one_rung_per_wait_and_then_stops(tmp_path):
     assert seen == list(P.ladder)  # each rung once, in order, then nothing
 
 
+@pytest.mark.parametrize("flag,expected", [
+    ("opted_out", StopReason.OPTED_OUT),
+    ("disputed", StopReason.DISPUTED),
+    ("bereaved_or_hardship", StopReason.BEREAVEMENT),
+])
+def test_a_statutory_stop_is_never_logged_as_a_cost_decision(tmp_path, flag, expected):
+    """Regression, 3 Sept 2026. The human-call amount floor is a COST rule, and it used to
+    return BEFORE the guardrails had run at all.
+
+    So an opted-out, disputed or bereaved customer sitting on the human-call rung with a
+    small debt was recorded as `escalation_ladder_exhausted` / `human_call_below_amount_floor`
+    with `rules_passed=[]` - a cost reason standing in for a statutory one, and no evidence in
+    the record that the statutory check had ever run. The shipped Phase 3 ledger contained 90
+    such records.
+
+    Nobody was ever contacted - both paths return act=False - so this was an audit-evidence
+    defect rather than a compliance breach. But `guardrails.py` promises in its own docstring
+    that the log shows the statutory reason rather than an incidental one, and a stopping rule
+    you cannot evidence per-record is worth less than one you can.
+    """
+    led = AuditLedger(tmp_path / f"{flag}.jsonl", P.version)
+    eng = RecoveryEngine(P, led, is_settled=lambda d: False)
+    d = debt(amount=99900)                      # below the human-call floor
+    eng.state(d.debt_id).ladder_rung = len(P.ladder) - 1   # the human rung
+    c = customer(**{flag: True})
+
+    seen = [dec for dec in eng.plan_day(d, c, at(10, day=START + dt.timedelta(days=7)))
+            if dec.channel is Channel.HUMAN_CALL]
+    assert seen, "the human rung was never evaluated"
+    for dec in seen:
+        assert dec.stop_reason is expected, dec.stop_reason
+        assert "human_call_below_amount_floor" not in dec.rules_fired
+        assert dec.rules_passed, "no evidence the statutory check ran"
+
+
+def test_the_cost_floor_still_applies_once_the_guardrails_pass(tmp_path):
+    """The fix must not disable the floor for customers who may lawfully be contacted."""
+    led = AuditLedger(tmp_path / "clean.jsonl", P.version)
+    eng = RecoveryEngine(P, led, is_settled=lambda d: False)
+    d = debt(amount=99900)
+    eng.state(d.debt_id).ladder_rung = len(P.ladder) - 1
+    seen = [dec for dec in eng.plan_day(d, customer(), at(10, day=START + dt.timedelta(days=7)))
+            if dec.channel is Channel.HUMAN_CALL]
+    assert seen
+    for dec in seen:
+        assert dec.act is False
+        assert dec.stop_reason is StopReason.LADDER_EXHAUSTED
+        assert "human_call_below_amount_floor" in dec.rules_fired
+
+
 def test_human_call_floor_is_the_measured_one_not_the_original(tmp_path):
     """Pins the 2 Sept decision: the floor moved Rs 500 -> Rs 2,000 because the human rung
     was 91.7% of modelled spend for no measurable recovery.
