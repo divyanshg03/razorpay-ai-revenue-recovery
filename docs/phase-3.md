@@ -175,8 +175,23 @@ Tests:
 
 ## Explicitly not in Phase 3
 
-No README prose. No hand-typed figure anywhere. No tuning of policy or simulator after the
-first look at a result — that door closed at `8d14dbe`.
+No README prose. No hand-typed figure anywhere.
+
+> **Correction, 4 Sept 2026.** This line previously read *"No tuning of policy or simulator
+> after the first look at a result — that door closed at `8d14dbe`."* **That was false**, and
+> the git log disproves it in three commits. `8d14dbe` is the metric freeze; the first batch
+> is `2427f27`, nine hours later. Between them, three commits tuned `policy.py` against
+> measured outcomes: the equal-touch ladder (`ea7e9ef`), its reversion on the evidence that
+> the gap was noise (`45f649b`), and the human-call floor raised to Rs 2,000 (`48e3368`,
+> whose own message says *"Measured, not guessed"*). The door closed at `2427f27`, not
+> `8d14dbe`, and those runs were not recorded in the amendments as §6 requires.
+>
+> What the tuning was worth, measured after the fact: a Rs 500 floor gives Rs 923,873, the
+> shipped Rs 2,000 gives Rs 935,664, and Rs 5,000 gives Rs 947,379 — about 1.3% of the
+> headline. **The variant that paid the most was rejected**, for the reason recorded in
+> `policy.py`: the simulator understates what a human call is worth, so tuning toward it would
+> be optimising the model rather than the product. That defuses "tuned to the outcome"; it does
+> not excuse the sentence, which is corrected rather than deleted.
 
 ## The honest expectation
 

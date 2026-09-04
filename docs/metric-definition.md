@@ -13,6 +13,19 @@ Why this exists: choosing an assignment unit, a window, a cost model or a baseli
 seeing outcomes is indistinguishable from choosing the definition that flatters the number,
 and it is the single easiest thing for a panel to catch.
 
+> **What the ancestry does and does not prove.** The claim is deliberately about ANCESTRY, not
+> chronology, and the distinction is worth stating rather than leaving for a reviewer to find.
+> The Phase 0 commits — including this freeze — carry author timestamps inside a single
+> 55-second window on 2 September, while the documents date the work to 24–31 August. The
+> repository history was rewritten twice (amendment A6, and an earlier zrok scrub), and a
+> rewrite re-stamps commits, so **commit dates here no longer track when the work was done**.
+>
+> What survives is the ordering, and it is checked rather than asserted: `git ls-tree` at
+> `8d14dbe` returns no `src/` at all, so the metric was frozen when no engine code existed,
+> and `batch.py` verifies the ancestry with `git merge-base --is-ancestor` at generation time.
+> Read the dated evidence artifacts in `results/phase0/` for chronology; read the DAG for
+> order. Disclosed 4 Sept 2026 after an external review raised it.
+
 ---
 
 ## 1. The experiment
@@ -462,6 +475,67 @@ disclosure and what was deliberately left alone.
 **Result: no number changed.** Every value in `results/metrics.json` is byte-identical to the
 A1/A4 run except `head_commit`. That identity is the whole evidence for calling these fixes
 non-behavioural, which is why the batch was re-run rather than argued about.
+
+### A10 - 4 Sept 2026 - a control arm added, hardship callbacks, and a false claim withdrawn
+
+Three independent reviewers audited the whole repository. This records what changed as a
+result. **A result had been observed**, throughout; the superseded headline was Rs 935,664.07.
+
+**The finding that mattered: the wrong counterfactual.** The submission credited the
+decisioning layer for a result the retry CALENDAR produces. Arm B differs from arm C in two
+ways at once - the spacing and the entire decisioning layer - so C vs B could never separate
+them, and no arm in the experiment could. A four-line retry loop on arm C's own schedule
+recovers 80.38% against the engine's 67.41%.
+
+**Arm D now exists.** It retries on the engine's schedule and does nothing else: no diagnosis,
+no contact, no guardrails, no ledger, no model. It runs on arm C's own customers, so it is a
+counterfactual rather than a randomised arm, is excluded from the assignment counts, and is
+labelled in the artifact as not a shippable policy - it ignores opt-outs, disputes and
+hardship, which is unlawful. The decomposition is now published:
+
+| | Net incremental | Lift |
+|---|---|---|
+| Spacing is worth (D vs B) | Rs 1,260,370 | +55.13 pp |
+| Decisioning is worth (C vs D) | **-Rs 303,215** | **-12.97 pp** |
+
+The second row is negative and is reported as negative. Arm D never speaks to anyone, so it
+never hears an objection to honour, and it retries causes that in reality need the customer to
+act. The defensible claim is **spacing buys the money, decisioning buys the compliance** - which
+is what the data says, and is not what the README said. This is the single most important
+change in this file.
+
+**Hardship callbacks, and one simulator change.** A hardship reply naming a date now schedules
+a callback on that date; an undated one gets a configurable 7-day pause instead of an
+indefinite stop. To make the path reachable the simulator's hardship reply weight was split
+0.005 / 0.005 dated / undated, leaving **total hardship incidence unchanged at 0.01**.
+
+Disclosed because it cuts one way: arms A, B and D never send a message, so only arm C can
+receive a reply, so only arm C can benefit. It is a fidelity improvement rather than a rate
+increase, and it was taken as a deliberate decision after the alternative - leaving the feature
+unmeasurable - was put and declined. Worth +0.90 pp to arm C.
+
+**A false claim withdrawn.** `docs/phase-3.md` stated *"No tuning of policy or simulator after
+the first look at a result - that door closed at 8d14dbe."* The git log disproves it: three
+commits between the freeze and the first batch tuned `policy.py` on measured outcomes, and
+those runs were never recorded here as §6 requires. Measured after the fact, the tuning is
+worth about 1.3% of the headline, and **the variant that paid most was rejected** for a stated
+reason. That defuses "tuned to the outcome"; it does not excuse the sentence, which is
+corrected in place rather than deleted.
+
+**Also corrected.** The RBI quotation in `docs/compliance-india.md` had been "corrected" by
+gate 0.6 into an error - the phrase *"for recovery of overdue loans"* IS in RBI/2022-23/108
+paragraph 2, and it is the scope limiter that ties quiet hours to loan recovery. Restoring it
+narrows the rule and therefore strengthens this project's merchant-versus-lender argument.
+`results/phase0/0.6-rbi-primary-sources.md` carried the same truncation under a "verbatim"
+label and is fixed. The retry-success probability (P = 1.0 given funds) is now documented and
+graded in `PARAMETERS.md` §3b with a sensitivity table, having previously been the one
+parameter with no entry and the one the result rests on. The commit-date caveat is disclosed
+at the head of this document: two history rewrites mean commit dates no longer track when work
+was done, so the freeze claim rests on ancestry and on an empty `src/` at `8d14dbe`, not on
+timestamps.
+
+**Result of this run: Rs 957,156**, up from Rs 935,664.07, entirely from the hardship work.
+Arm C 66.51% -> 67.41%. Guardrail invariants zero in all three cohorts. 173 tests pass.
 
 ### A9 - 4 Sept 2026 - the hash chain did not cover the fields the ledger's claims rest on
 

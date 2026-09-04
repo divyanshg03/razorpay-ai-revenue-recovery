@@ -143,6 +143,35 @@ looked at. That check is asserted in the tests, not left to judgement.
 
 ---
 
+## 3b. Retry success given funds — P = 1.0, grade D (assumption, no source)
+
+**Added 4 Sept 2026 after an external review pointed out this was the one parameter with no
+entry, and the one the result rests on.**
+
+`simulator.attempt_charge` sets `paid = True` unconditionally once funds are available and the
+instrument is alive. So **P(charge succeeds | customer has money) = 1.0**. There is no source
+for that, because it is not a measured figure — it is a simplifying assumption, and it should
+have been graded and disclosed here from the start alongside every other input.
+
+It matters because recovery in this simulator is essentially a set-cover problem: does your
+attempt schedule intersect the window in which the customer has money? At P = 1.0 a single
+well-timed attempt always converts, which is what makes retry *spacing* so dominant (see the
+arm D control in `results/metrics.json`).
+
+Measured sensitivity, holding everything else fixed:
+
+| P(succeeds \| funded) | Arm B | Arm C | Net incremental |
+|---|---|---|---|
+| **1.0 (shipped)** | 25.25% | 67.41% | Rs 957,156 |
+| 0.7 | 22.68% | 54.18% | ~Rs 736,000 (−21%) |
+| 0.4 | 18.21% | 40.06% | ~Rs 500,000 (−47%) |
+
+The irony is worth recording: §1 of this document cites NPCI's figures showing UPI Autopay
+success falling from ~50% to ~30% in order to justify the cohort existing at all — and then
+models the retry itself as never failing. The direction of the error is toward *overstating*
+absolute recovery in every arm. It does not flip the ranking of the arms, because all of them
+face the same coin.
+
 ## 4. What is NOT modelled, and would change the answer
 
 - **Cross-channel deliverability.** WhatsApp/SMS delivery is assumed to succeed. In reality

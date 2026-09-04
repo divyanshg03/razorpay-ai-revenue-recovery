@@ -84,10 +84,53 @@ than asserting it.
 | Interval method | percentile, stratified by arm, 10,000 resamples |
 | Metric frozen at | `8d14dbe`, ancestry verified: true |
 
+All three pre-registered readouts, not just the largest. The 21-day window is the primary; the
+other two were declared in the frozen definition before any result existed and are reported
+whatever they say:
+
+| Readout | Net incremental | 95% CI |
+|---|---|---|
+| **21-day (primary)** | **Rs 957,156** | Rs 807,479 – Rs 1,094,821 |
+| 14-day (secondary) | Rs 491,301 | Rs 348,590 – Rs 625,406 |
+| Shifted-parameter cohort | Rs 424,913 | Rs 276,849 – Rs 568,238 |
+
 Arm A does nothing. Arm B is Razorpay's own T+0..T+3 ladder, reimplemented. Arm C is the
 engine. The headline is **C against B** - beating do-nothing proves nothing, since every
 recovery vendor beats doing nothing. All three intervals exclude zero.
 <!-- /generated:readme-headline -->
+
+## Where the money actually comes from
+
+The headline compares the engine against Razorpay's ladder, and those two differ in **two**
+ways at once: the retry calendar *and* the whole decisioning layer. So that comparison alone
+cannot say which of them produced the recovery. Arm D holds the calendar fixed and strips
+everything else away, which separates them.
+
+<!-- generated:readme-control -->
+| Arm | What it does | Recovery |
+|---|---|---|
+| A | nothing at all | 2.00% |
+| B | Razorpay's ladder, days 0,1,2,3 | 25.25% |
+| **D** | **the retry calendar and nothing else** | **80.38%** |
+| C | the full engine | 67.41% |
+
+| | Net incremental |
+|---|---|
+| Spacing is worth (D vs B) | Rs 1,260,370 |
+| Decisioning is worth (C vs D) | Rs -303,215 |
+
+Arm D retries on the engine's own schedule and does nothing else - no diagnosis, no message, no
+guardrails, no ledger, no model. It runs on arm C's customers, so it is a counterfactual rather
+than a randomised arm.
+
+**Read the second row honestly: it is negative.** In this simulator the decisioning layer COSTS
+recovery and buys compliance. Arm D never speaks to anyone, so it never hears an opt-out, a
+dispute or a declaration of hardship to honour - and it retries causes that in reality need the
+customer to act, which the simulator lets a silent retry fix. It is not a shippable policy; it
+is unlawful. It is here because without it, C vs B cannot say whether the money came from the
+calendar or from the intelligence, and the earlier version of this README credited the
+intelligence.
+<!-- /generated:readme-control -->
 
 ## What it failed to recover
 

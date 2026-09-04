@@ -190,7 +190,12 @@ registration.
 - It cannot survive the machine being off or fully asleep. Neither triggers Razorpay's 24-hour
   disable unless the gap is that long, but a multi-day absence would.
 
-## Still outstanding — needs a human
+## Setup steps that need a human
+
+*(Both are DONE as of 2 Sept 2026 — the webhook is registered and a Razorpay-originated event
+has been received. They are kept as instructions for anyone reproducing the setup, not as
+outstanding work. This heading previously read "Still outstanding", which contradicted the
+gate table in `docs/phase-0-findings.md`; corrected 4 Sept 2026.)*
 
 - **Register the webhook** in the Razorpay Dashboard: Test mode → Account & Settings → Webhooks
   → + Add New Webhook. URL and secret above; events `payment.failed` and `payment.captured`;

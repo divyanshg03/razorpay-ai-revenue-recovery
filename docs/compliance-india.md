@@ -35,8 +35,25 @@ one of the strongest arguments for boxing the LLM in.
 **The 08:00–19:00 contact window is real**, and is the rule *currently in force*, from
 RBI/2022-23/108 (12 Aug 2022), paragraph 2. Verbatim, REs shall ensure agents do not resort
 to *"persistently calling the borrower and/ or calling the borrower before 8:00 a.m. and
-after 7:00 p.m."* (The earlier note here appended *"for recovery of overdue loans"* inside
-the quotation marks; that phrase is not in the circular.) Also prohibited, verbatim:
+after 7:00 p.m. **for recovery of overdue loans**"*.
+
+> **Correction, 4 Sept 2026.** This paragraph previously ended the quotation at *"7:00 p.m."*
+> and added a note claiming *"for recovery of overdue loans"* was **not** in the circular.
+> That note was wrong: the phrase is in paragraph 2, and gate 0.6 corrected a correct reading
+> into an error. Raised by an external review, which fetched the circular and checked.
+>
+> It matters more than a stray clause, because that phrase is the **scope limiter**. It ties
+> the 08:00–19:00 window to the recovery of *overdue loans*, which is exactly the
+> lender-versus-merchant boundary this document argues elsewhere — and a failed mandate on a
+> subscription is not an overdue loan. So restoring it **narrows** the rule and therefore
+> *strengthens* the claim made here: the window is adopted as a product invariant by choice,
+> not because it binds a plain merchant. Deleting it had quietly moved the argument in the
+> direction that flattered us.
+>
+> `results/phase0/0.6-rbi-primary-sources.md` reproduced the same truncated fragment while
+> labelling it "verbatim", and is corrected too.
+
+Also prohibited, verbatim:
 *"intimidation or harassment of any kind, either verbal or physical"*, acts *"intended to
 humiliate publicly or intrude upon the privacy of the debtors' family members, referees and
 friends"*, *"sending inappropriate messages either on mobile or through social media"*,
