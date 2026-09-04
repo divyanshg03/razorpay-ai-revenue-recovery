@@ -534,6 +534,14 @@ at the head of this document: two history rewrites mean commit dates no longer t
 was done, so the freeze claim rests on ancestry and on an empty `src/` at `8d14dbe`, not on
 timestamps.
 
+**One policy value was built, measured and reverted.** The undated hardship pause was raised
+from 7 days to 15, on the reasoning that a message arriving eight days after a bereavement can
+read as indifference. Measured, the longer pause costs arm C 0.18 pp and the headline Rs 4,931,
+because fewer callbacks land inside the 21-day window. It was reverted to 7 and the money was
+kept. Recorded here and in `policy.py` rather than reverted quietly, because "we chose a
+shorter pause over a gentler one for Rs 4,931" is exactly the kind of trade a panel is
+entitled to ask about, and it is not visible from the shipped value alone.
+
 **Result of this run: Rs 957,156**, up from Rs 935,664.07, entirely from the hardship work.
 Arm C 66.51% -> 67.41%. Guardrail invariants zero in all three cohorts. 173 tests pass.
 

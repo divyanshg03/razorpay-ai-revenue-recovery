@@ -405,8 +405,10 @@ def test_hardship_without_a_date_pauses_for_the_configured_period(tmp_path):
 
     An indefinite stop sounds like the kind option and is not: it buries the debt, and a
     customer who needed a fortnight is never spoken to again. The pause length is a policy
-    choice - no regulator sets it - and it is configurable precisely because seven days after
-    a bereavement is short, and a tenant may want longer. It may only be widened.
+    choice - no regulator sets it. A 15-day pause was built and measured on 4 Sept 2026 and
+    reverted to 7: the longer pause cost 0.18 pp of recovery and Rs 4,931 of the headline,
+    and the call was to keep the money. Recorded in policy.py rather than reverted quietly.
+    A tenant may widen it but never narrow it.
     """
     led = AuditLedger(tmp_path / "h1.jsonl", P.version)
     eng = RecoveryEngine(P, led, is_settled=lambda d: False)

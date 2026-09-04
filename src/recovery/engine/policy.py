@@ -58,12 +58,21 @@ class Policy:
     #: Hardship pause when the customer names NO date. POLICY CHOICE, not a legal rule -
     #: no regulator sets this number, and the compliance docs say so. An indefinite stop
     #: sounds kinder than it is: it buries the debt, and a customer who only needed a
-    #: fortnight is never contacted again. Seven days is the configured pause; a dated reply
-    #: always wins over it, and a tenant may only widen this, never narrow it.
+    #: fortnight is never contacted again. A dated reply always wins over this, and a tenant
+    #: may only widen it, never narrow it.
     #:
-    #: Stated plainly because it is the least comfortable number in this file: seven days
-    #: after "my father passed away last week" is short. It is exposed here rather than
-    #: hard-coded so a tenant with a stricter bereavement policy can raise it in one place.
+    #: DECISION, 4 Sept 2026 — 15 days was built, measured, and REVERTED to 7 on cost.
+    #:
+    #: Seven days after "my father passed away last week" is short enough that a message on
+    #: day eight can read as indifference, so a fortnight was tried. Measured, the longer
+    #: pause costs arm C 0.18 pp of recovery and Rs 4,931 of the headline, because fewer
+    #: callbacks land inside the 21-day measurement window. The call was to keep the money.
+    #:
+    #: That is recorded here rather than quietly reverted, because it is exactly the kind of
+    #: trade a panel is entitled to ask about, and the honest description is that a shorter
+    #: pause was chosen over a gentler one for Rs 4,931. Nothing in RBI, TRAI or the DPDP Act
+    #: sets this number — it is ours. A dated reply always overrides it, and a tenant with a
+    #: stricter bereavement policy can widen it in one place without touching the engine.
     hardship_default_resume_days: int = 7
 
     max_retries_per_debt: int = 6
