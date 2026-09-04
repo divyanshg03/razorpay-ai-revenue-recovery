@@ -6,7 +6,7 @@
     "note": "The freeze is only meaningful if that commit precedes this result. Ancestry is checked, not asserted."
   },
   "generated_by": "scripts/run_batch.py -> recovery.evaluation.batch.run()",
-  "head_commit": "48f0f45",
+  "head_commit": "3fd7612",
   "policy_version": "2026-09-02.2",
   "n_customers": 5000,
   "bootstrap": {

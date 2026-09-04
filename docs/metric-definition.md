@@ -463,6 +463,38 @@ disclosure and what was deliberately left alone.
 A1/A4 run except `head_commit`. That identity is the whole evidence for calling these fixes
 non-behavioural, which is why the batch was re-run rather than argued about.
 
+### A9 - 4 Sept 2026 - the hash chain did not cover the fields the ledger's claims rest on
+
+Raised in the same review as A8 and deliberately held back from that fix, because folding an
+integrity change into a response to unrelated findings is how it goes unread.
+
+**The defect.** The digest was `sha256(prev_hash + body)`. Every field outside `body` was
+therefore unprotected. Forging each in turn, five out of five went undetected with
+`verify_chain()` still returning intact: `policy_version`, `timestamp_ist`, `type`, `event_id`,
+`model_version`.
+
+Those are not incidental fields. `policy_version` is what "every decision reconstructable under
+the policy version that applied at the time" means. `timestamp_ist` is what "replayable in
+order" means, and the replay invariants compare timestamps to decide whether a contact followed
+a payment. `type` is what those invariants dispatch on, so an ACTION relabelled as a DECISION
+would disappear from the contact-after-payment check entirely.
+
+**The fix.** The digest now covers the whole record except `record_hash` itself. `prev_hash`
+lives inside the record, so the chain link is preserved. All seven fields plus deletion and
+reordering are now detected, and a parameterised test asserts each one rather than
+spot-checking.
+
+**Result: no figure changed.** Every value in `results/metrics.json` is byte-identical except
+`head_commit`. What changed is `results/phase3/ledger-extract.json`, which carries the
+chain-head hash of each ledger so a regenerated copy can be proved identical - those hashes are
+necessarily different now, because the hash function is. The three ledgers still verify intact
+and all guardrail invariants remain zero.
+
+**Scope, stated honestly.** This is not cryptographic custody and never was. Anyone who can
+rewrite the file can recompute the chain. What it buys is that silent, casual edits are
+detectable, which is the realistic threat for a submission artifact - and it now buys that for
+the whole record rather than for one field of it.
+
 ### A8 - 4 Sept 2026 - a statutory stop was being logged as a cost decision
 
 Found by code review of the demo pull request. The demo itself was fine here; reviewing it

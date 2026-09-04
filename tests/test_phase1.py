@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import datetime as dt
 
+import json
+
 import pytest
 
 from recovery.cohort.simulator import SimulatedCohort
@@ -191,6 +193,64 @@ def test_ledger_chain_detects_tampering(tmp_path):
 
     intact, broken_at = AuditLedger(path, "v1").verify_chain()
     assert not intact and broken_at == 2
+
+
+@pytest.mark.parametrize("field,forged", [
+    ("policy_version", "policy-v99"),
+    ("timestamp_ist", "1999-01-01T00:00:00+05:30"),
+    # Relabelling a DECISION as an ACTION is the interesting one: the replay invariants
+    # dispatch on `type`, so this is how a contact could be hidden from them.
+    ("type", "action"),
+    ("event_id", "00000000-0000-0000-0000-000000000000"),
+    ("model_version", "some-other-model"),
+    ("prev_hash", "f" * 64),
+    ("body", {"debt_id": "debt_0", "recovered_paise": 999_999}),
+])
+def test_every_field_of_a_record_is_covered_by_the_chain(tmp_path, field, forged):
+    """Regression, 4 Sept 2026. The digest used to be `sha256(prev_hash + body)`, so every
+    field OUTSIDE `body` was unprotected. Forging each in turn, five out of five went
+    undetected: policy_version, timestamp_ist, type, event_id, model_version.
+
+    That gap sat directly under the claims this ledger exists to support. "Every decision
+    reconstructable under the policy version that applied at the time" leans on
+    `policy_version`. "Replayable in order" leans on `timestamp_ist`. And `type` is what the
+    replay invariants dispatch on, so an ACTION relabelled as a DECISION would slip past the
+    check for contacting someone after they had already paid.
+
+    None of it ever changed a figure. But tamper-evidence you have to qualify is worth much
+    less than tamper-evidence you do not, so this is parameterised over every field rather
+    than spot-checking one.
+    """
+    path = tmp_path / "audit.jsonl"
+    led = AuditLedger(path, policy_version="v1", model_version="llama3.1:8b")
+    for i in range(3):
+        led.record_decision(f"debt_{i}", f"cust_{i}", Decision(act=True), diagnosis="x")
+    assert led.verify_chain() == (True, None)
+
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert field in rows[0], f"{field} is not a field of a record; update this test"
+    rows[0][field] = forged
+    path.write_text("\n".join(json.dumps(r, sort_keys=True) for r in rows) + "\n", encoding="utf-8")
+
+    intact, broken_at = AuditLedger(path, "v1").verify_chain()
+    assert not intact and broken_at == 0, f"forging {field} went undetected"
+
+
+def test_chain_detects_deletion_and_reordering(tmp_path):
+    """Both are edits the chain must catch, and neither touches a field's contents."""
+    path = tmp_path / "audit.jsonl"
+    led = AuditLedger(path, policy_version="v1")
+    for i in range(4):
+        led.record_decision(f"debt_{i}", f"cust_{i}", Decision(act=True), diagnosis="x")
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+    dropped = tmp_path / "dropped.jsonl"
+    dropped.write_text("\n".join(json.dumps(r) for r in rows[1:]) + "\n", encoding="utf-8")
+    assert AuditLedger(dropped, "v1").verify_chain()[0] is False
+
+    shuffled = tmp_path / "shuffled.jsonl"
+    shuffled.write_text("\n".join(json.dumps(r) for r in reversed(rows)) + "\n", encoding="utf-8")
+    assert AuditLedger(shuffled, "v1").verify_chain()[0] is False
 
 
 def test_ledger_resumes_an_existing_chain_after_restart(tmp_path):
