@@ -21,8 +21,15 @@ reconstructable from the file alone.
 
 ## Tamper evidence
 
-Each record carries the SHA-256 of the previous record. Editing or deleting any line breaks
-the chain from that point on, and `verify_chain()` reports the first index where it breaks.
+Each record carries the SHA-256 of **the whole previous record**, itself included in the next
+one's digest. Editing, deleting or reordering any line breaks the chain from that point on,
+and `verify_chain()` reports the first index where it breaks.
+
+The digest covers every field except `record_hash` itself. That is narrower than it sounds and
+worth stating: until 4 Sept 2026 it covered `prev_hash + body` only, which left
+`policy_version`, `timestamp_ist`, `type`, `event_id` and `model_version` rewritable with the
+chain still reporting intact — the exact fields the claims above rest on. See `_hash`.
+
 This is not cryptographic custody — anyone who can rewrite the file can recompute the chain —
 but it makes silent, casual edits detectable, which is the realistic threat for a submission
 artifact.
@@ -141,9 +148,28 @@ class AuditLedger:
         return self._fixed_now or dt.datetime.now(IST)
 
     @staticmethod
-    def _hash(prev_hash: str, body: dict) -> str:
-        # sort_keys so the digest does not depend on dict ordering.
-        payload = prev_hash + json.dumps(body, sort_keys=True, separators=(",", ":"))
+    def _hash(entry: dict) -> str:
+        """Digest the WHOLE record except its own hash.
+
+        This used to be `sha256(prev_hash + body)`, which left every field outside `body`
+        unprotected: `policy_version`, `timestamp_ist`, `type`, `event_id` and
+        `model_version` could all be rewritten and `verify_chain()` still returned intact.
+        Verified by forging each one in turn - five out of five went undetected.
+
+        That gap sat directly under the claims the ledger exists to support. "Every decision
+        reconstructable under the policy version that applied at the time" leans on
+        `policy_version`; "replayable in order" leans on `timestamp_ist`; and `type` is what
+        the replay invariants dispatch on, so an ACTION relabelled as a DECISION would slip
+        past the check for contacting someone after they paid. None of it changed a figure,
+        and tamper-evidence you have to qualify is worth much less than tamper-evidence you
+        do not.
+
+        `prev_hash` lives inside the entry, so hashing the whole record still chains it.
+        `sort_keys` keeps the digest independent of dict ordering. Found 4 Sept 2026 by
+        review; see amendment A9.
+        """
+        material = {k: v for k, v in entry.items() if k != "record_hash"}
+        payload = json.dumps(material, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(payload.encode()).hexdigest()
 
     def _append(self, record_type: RecordType, body: dict) -> dict:
@@ -159,7 +185,7 @@ class AuditLedger:
                 "body": _jsonable(body),
                 "prev_hash": self._last_hash,
             }
-            entry["record_hash"] = self._hash(self._last_hash, entry["body"])
+            entry["record_hash"] = self._hash(entry)   # covers every field but itself
             with self.path.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps(entry, sort_keys=True) + "\n")
             self._last_hash = entry["record_hash"]
@@ -261,12 +287,17 @@ class AuditLedger:
                 if line.strip()]
 
     def verify_chain(self) -> tuple[bool, int | None]:
-        """Returns (intact, first_broken_index). Detects edits and deletions."""
+        """Returns (intact, first_broken_index).
+
+        Detects edits, deletions and reordering, across EVERY field of every record - not
+        just `body`. See `_hash`: the digest used to cover `prev_hash + body` only, so the
+        metadata the ledger's own claims rest on could be rewritten freely.
+        """
         prev = GENESIS_HASH
         for i, entry in enumerate(self.read()):
             if entry.get("prev_hash") != prev:
                 return False, i
-            if entry.get("record_hash") != self._hash(prev, entry["body"]):
+            if entry.get("record_hash") != self._hash(entry):
                 return False, i
             prev = entry["record_hash"]
         return True, None
