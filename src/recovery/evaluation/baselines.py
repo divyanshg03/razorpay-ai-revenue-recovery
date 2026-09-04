@@ -34,7 +34,7 @@ from dataclasses import dataclass, field
 
 from ..cohort.simulator import SimulatedCohort
 from ..diagnosis.taxonomy import diagnose
-from ..models import Debt
+from ..models import Actionability, Debt
 
 #: Razorpay's documented schedule: T+0, T+1, T+2, T+3, then halted.
 INCUMBENT_RETRY_DAYS = (0, 1, 2, 3)
@@ -85,7 +85,8 @@ def run_do_nothing(cohort: SimulatedCohort, debts: list[Debt], start: dt.date,
 
 
 def run_spread_retry_control(cohort: SimulatedCohort, debts: list[Debt], start: dt.date,
-                             window_days: int, days: tuple[int, ...]) -> list[ArmOutcome]:
+                             window_days: int, days: tuple[int, ...],
+                             respect_diagnosis: bool = False) -> list[ArmOutcome]:
     """Arm D. Retry on the engine's OWN schedule and do nothing else whatsoever.
 
     No diagnosis, no guardrails, no contact, no ladder, no ledger, no model, no cost. Four
@@ -103,14 +104,30 @@ def run_spread_retry_control(cohort: SimulatedCohort, debts: list[Debt], start: 
     headline interpretable, and it was missing. See amendment A10.
 
     It is deliberately NOT a candidate policy. It ignores opt-outs, disputes and hardship,
-    which is unlawful, and it retries causes a silent retry can never fix. It is a
-    measurement instrument, and `metrics.json` labels it as one.
+    which is unlawful. It is a measurement instrument, and `metrics.json` labels it as one.
+
+    ## Two variants, because the blind one flatters itself
+
+    `respect_diagnosis=False` retries EVERY cause, including `needs_customer_action` - a
+    payment that failed because the customer must re-authenticate. The simulator lets a silent
+    retry fix those; reality does not, and saying so is the entire premise of the diagnosis
+    layer. That is the modelling gap amendment A2 identified and deliberately declined to
+    exploit on the engine's behalf, and it is worth 9.33 pp to this control.
+
+    Publishing only the blind variant would mean attacking our own engine with an artifact we
+    had already refused to profit from, which is not scepticism, it is just an inconsistent
+    standard. So both run. `respect_diagnosis=True` is the one to compare against the engine:
+    it is what a spacing-only strategy would actually achieve.
     """
+    retryable = (Actionability.RETRY_LATER, Actionability.NEEDS_FUNDS)
     outcomes = []
     for debt in debts:
         d = diagnose(debt.failure)
         out = ArmOutcome(debt.debt_id, debt.customer_ref, debt.amount_paise,
                          cause_bucket=d.bucket.value, actionability=d.actionability.value)
+        if respect_diagnosis and d.actionability not in retryable:
+            outcomes.append(out)          # a silent retry could never fix this cause
+            continue
         for day_offset in days:
             if day_offset > window_days:
                 break

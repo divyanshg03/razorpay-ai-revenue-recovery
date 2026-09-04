@@ -6,7 +6,7 @@
     "note": "The freeze is only meaningful if that commit precedes this result. Ancestry is checked, not asserted."
   },
   "generated_by": "scripts/run_batch.py -> recovery.evaluation.batch.run()",
-  "head_commit": "08e326f",
+  "head_commit": "12df68c",
   "policy_version": "2026-09-02.2",
   "n_customers": 5000,
   "bootstrap": {
@@ -79,6 +79,14 @@
         "contact_cost_paise": 0,
         "recovery_rate": 0.8038,
         "mean_recovered_paise": 66645.85418155826,
+        "mean_cost_paise": 0.0
+      },
+      "D_diagnosed": {
+        "n": 2798,
+        "recovered_paise": 166286200,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.7105,
+        "mean_recovered_paise": 59430.37884203002,
         "mean_cost_paise": 0.0
       }
     },
@@ -249,6 +257,34 @@
         "control_recovery_rate": 0.8038,
         "lift_pp": -12.97
       },
+      "arm_D_diagnosed": {
+        "n": 2798,
+        "recovered_paise": 166286200,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.7105,
+        "mean_recovered_paise": 59430.37884203002,
+        "mean_cost_paise": 0.0
+      },
+      "decisioning_is_worth__C_vs_D_diagnosed": {
+        "label": "decisioning layer vs a diagnosis-respecting calendar (C vs D')",
+        "treat_arm": "C",
+        "control_arm": "D_diagnosed",
+        "net_incremental_per_customer_rupees": -36.21,
+        "net_incremental_total_rupees": -101325.96,
+        "ci95_per_customer_rupees": [
+          -80.13,
+          7.63
+        ],
+        "ci95_total_rupees": [
+          -224204.16,
+          21339.62
+        ],
+        "excludes_zero": false,
+        "treat_recovery_rate": 0.6741,
+        "control_recovery_rate": 0.7105,
+        "lift_pp": -3.64
+      },
+      "which_comparison_to_use": "C vs D_diagnosed. The blind D retries causes a silent retry cannot fix in reality - the same simulator gap amendment A2 declined to exploit for the engine - and it is worth 9.33 pp to the control. Comparing against blind D would hold the control to a lower standard than the engine.",
       "honest_reading": "If C vs D is negative, the decisioning layer costs recovery and buys compliance. That is a real finding and is reported rather than suppressed."
     },
     "failure_list": {
@@ -341,6 +377,14 @@
         "contact_cost_paise": 0,
         "recovery_rate": 0.539,
         "mean_recovered_paise": 43995.42530378842,
+        "mean_cost_paise": 0.0
+      },
+      "D_diagnosed": {
+        "n": 2798,
+        "recovered_paise": 108697800,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.4725,
+        "mean_recovered_paise": 38848.39170836312,
         "mean_cost_paise": 0.0
       }
     },
@@ -511,6 +555,34 @@
         "control_recovery_rate": 0.539,
         "lift_pp": -7.01
       },
+      "arm_D_diagnosed": {
+        "n": 2798,
+        "recovered_paise": 108697800,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.4725,
+        "mean_recovered_paise": 38848.39170836312,
+        "mean_cost_paise": 0.0
+      },
+      "decisioning_is_worth__C_vs_D_diagnosed": {
+        "label": "decisioning layer vs a diagnosis-respecting calendar (C vs D')",
+        "treat_arm": "C",
+        "control_arm": "D_diagnosed",
+        "net_incremental_per_customer_rupees": -1.63,
+        "net_incremental_total_rupees": -4567.52,
+        "ci95_per_customer_rupees": [
+          -40.45,
+          37.24
+        ],
+        "ci95_total_rupees": [
+          -113167.22,
+          104202.32
+        ],
+        "excludes_zero": false,
+        "treat_recovery_rate": 0.4689,
+        "control_recovery_rate": 0.4725,
+        "lift_pp": -0.36
+      },
+      "which_comparison_to_use": "C vs D_diagnosed. The blind D retries causes a silent retry cannot fix in reality - the same simulator gap amendment A2 declined to exploit for the engine - and it is worth 9.33 pp to the control. Comparing against blind D would hold the control to a lower standard than the engine.",
       "honest_reading": "If C vs D is negative, the decisioning layer costs recovery and buys compliance. That is a real finding and is reported rather than suppressed."
     },
     "failure_list": {
@@ -603,6 +675,14 @@
         "contact_cost_paise": 0,
         "recovery_rate": 0.5539,
         "mean_recovered_paise": 45634.26946320654,
+        "mean_cost_paise": 0.0
+      },
+      "D_diagnosed": {
+        "n": 2813,
+        "recovered_paise": 111612900,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.4696,
+        "mean_recovered_paise": 39677.532883043015,
         "mean_cost_paise": 0.0
       }
     },
@@ -773,6 +853,34 @@
         "control_recovery_rate": 0.5539,
         "lift_pp": -1.85
       },
+      "arm_D_diagnosed": {
+        "n": 2813,
+        "recovered_paise": 111612900,
+        "contact_cost_paise": 0,
+        "recovery_rate": 0.4696,
+        "mean_recovered_paise": 39677.532883043015,
+        "mean_cost_paise": 0.0
+      },
+      "decisioning_is_worth__C_vs_D_diagnosed": {
+        "label": "decisioning layer vs a diagnosis-respecting calendar (C vs D')",
+        "treat_arm": "C",
+        "control_arm": "D_diagnosed",
+        "net_incremental_per_customer_rupees": 46.86,
+        "net_incremental_total_rupees": 131817.64,
+        "ci95_per_customer_rupees": [
+          5.34,
+          88.74
+        ],
+        "ci95_total_rupees": [
+          15010.2,
+          249636.9
+        ],
+        "excludes_zero": true,
+        "treat_recovery_rate": 0.5354,
+        "control_recovery_rate": 0.4696,
+        "lift_pp": 6.58
+      },
+      "which_comparison_to_use": "C vs D_diagnosed. The blind D retries causes a silent retry cannot fix in reality - the same simulator gap amendment A2 declined to exploit for the engine - and it is worth 9.33 pp to the control. Comparing against blind D would hold the control to a lower standard than the engine.",
       "honest_reading": "If C vs D is negative, the decisioning layer costs recovery and buys compliance. That is a real finding and is reported rather than suppressed."
     },
     "failure_list": {

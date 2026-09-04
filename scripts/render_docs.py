@@ -284,41 +284,60 @@ def render_readme_reproduce(m: dict) -> str:
 
 
 def render_readme_control(m: dict) -> str:
-    """Arm D. The control that separates the calendar from the decisioning."""
+    """Arms D and D'. The controls that separate the calendar from the decisioning."""
     ctl = m["primary_cohort_21d"].get("spread_retry_control")
     if not ctl:
-        return "_(arm D not present in this artifact)_"
-    sp, dc = ctl["spacing_is_worth__D_vs_B"], ctl["decisioning_is_worth__C_vs_D"]
+        return "_(controls not present in this artifact)_"
     arms = m["primary_cohort_21d"]["arms"]
+    sp = ctl["spacing_is_worth__D_vs_B"]
+    fair = ctl.get("decisioning_is_worth__C_vs_D_diagnosed") or {}
+    blind = ctl["decisioning_is_worth__C_vs_D"]
     lines = [
         "| Arm | What it does | Recovery |",
         "|---|---|---|",
         f"| A | nothing at all | {_pct(arms['A']['recovery_rate'])} |",
         f"| B | Razorpay's ladder, days 0,1,2,3 | {_pct(arms['B']['recovery_rate'])} |",
-        f"| **D** | **the retry calendar and nothing else** | "
-        f"**{_pct(arms['D']['recovery_rate'])}** |",
+        f"| D | the calendar alone, retrying every cause | {_pct(arms['D']['recovery_rate'])} |",
+        f"| **D'** | **the calendar alone, respecting the diagnosis** | "
+        f"**{_pct(arms['D_diagnosed']['recovery_rate'])}** |",
         f"| C | the full engine | {_pct(arms['C']['recovery_rate'])} |",
         "",
-        "| | Net incremental |",
-        "|---|---|",
-        f"| Spacing is worth (D vs B) | {_rs(sp['net_incremental_total_rupees'])} |",
-        f"| Decisioning is worth (C vs D) | {_rs(dc['net_incremental_total_rupees'])} |",
+        _wrap(
+        "**Better timing is worth "
+        f"{_rs(sp['net_incremental_total_rupees'])} ({sp['lift_pp']:+.2f} pp).** That is the "
+        "finding. Razorpay's ladder does not fail because it is unintelligent; it fails "
+        "because four attempts inside four days sit in one broke week of a monthly salary "
+        "cycle. A retry loop with no diagnosis, no message, no guardrails and no model beats "
+        "it by more than the entire engine does."),
         "",
         _wrap(
-        "Arm D retries on the engine's own schedule and does nothing else - no diagnosis, no "
-        "message, no guardrails, no ledger, no model. It runs on arm C's customers, so it is "
-        "a counterfactual rather than a randomised arm."),
-        "",
-        _wrap(
-        "**Read the second row honestly: it is negative.** In this simulator the decisioning "
-        "layer COSTS recovery and buys compliance. Arm D never speaks to anyone, so it never "
-        "hears an opt-out, a dispute or a declaration of hardship to honour - and it retries "
+        f"**Against that, the decisioning layer costs "
+        f"{_rs(abs(fair.get('net_incremental_total_rupees', 0)))}** "
+        f"({fair.get('lift_pp', 0):+.2f} pp). Published as a negative number, because it is "
+        "one. Use D' rather than D for this comparison: the blind control also recovers "
         "causes that in reality need the customer to act, which the simulator lets a silent "
-        "retry fix. It is not a shippable policy; it is unlawful. It is here because without "
-        "it, C vs B cannot say whether the money came from the calendar or from the "
-        "intelligence, and the earlier version of this README credited the intelligence."),
+        "retry fix. That is the same gap amendment A2 declined to exploit for the engine, and "
+        "using it against the engine would just be an inconsistent standard. It is worth "
+        f"{_rs(abs(blind['net_incremental_total_rupees']) - abs(fair.get('net_incremental_total_rupees', 0)))} "
+        "of the difference between the two comparisons."),
+        "",
+        _wrap(
+        "**So why not ship D'?** Because it is not a product. It never replaces a dead "
+        "instrument, which only a message can do and which is where 97 of this cohort's "
+        "recoveries come from. It has no answer to an opt-out, a dispute or a bereavement, "
+        "because it never speaks and so never hears one. And it cannot tell a card that "
+        "expired in March from an account that was briefly short, so it burns attempts on "
+        "instruments that can never be charged."),
+        "",
+        _wrap(
+        "The engine exists to make aggressive timing **safe to deploy**. The calendar is the "
+        "lever; compliance is the constraint on pulling it. Those two sentences are the "
+        "submission, and the controls above are what let us say them with a number rather "
+        "than an assertion."),
     ]
     return "\n".join(lines)
+
+
 
 
 RENDERERS = {

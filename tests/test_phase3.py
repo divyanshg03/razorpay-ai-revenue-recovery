@@ -206,7 +206,7 @@ def test_arms_are_disjoint_and_cover_the_included_population(tmp_path):
     arms, _, info, _c = run_arms(SEED, 900, START, 21, Policy(), tmp_path / "l.jsonl")
     # A, B and C only. Arm D is a COUNTERFACTUAL on arm C's own customers, so it is
     # deliberately not disjoint from C and is not part of the randomised assignment.
-    arms = {k: v for k, v in arms.items() if k in ("A", "B", "C")}
+    arms = {k: v for k, v in arms.items() if k in ("A", "B", "C")}   # D and D' are controls
     refs = {k: {o.customer_ref for o in v} for k, v in arms.items()}
     assert not (refs["A"] & refs["B"]) and not (refs["B"] & refs["C"]) and not (refs["A"] & refs["C"])
     assert sum(len(v) for v in refs.values()) == sum(info["counts"].values())

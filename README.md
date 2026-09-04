@@ -1,8 +1,22 @@
 # AI Revenue Recovery — failed recurring collections
 
-**Razorpay AI Buildathon, Track 03.** A decisioning layer that decides who to contact about a
-failed recurring payment, when, on which channel, and — more often than is comfortable — whom
-to leave alone entirely.
+**Razorpay AI Buildathon, Track 03.**
+
+We built a decisioning layer for failed recurring collections, measured it against a randomised
+holdout, and then measured the one control that would tell us whether it was actually doing the
+work. It was not.
+
+> **The money is in the calendar. The engine is what lets you take it lawfully.**
+
+Razorpay retries a failed mandate four times on consecutive days. That fails not because it is
+unintelligent but because four attempts inside four days sit in a single broke week of a
+monthly salary cycle. Spreading the same kind of attempts across the collection horizon is
+worth more than everything else here combined — and we can show that, because we ran the arm
+that proves it and published the number even though it undercuts our own product.
+
+What the decisioning layer buys is the right to pull that lever: a diagnosis so attempts are
+not burned on instruments that can never charge, and guardrails so aggressive timing does not
+become harassment. The rest of this README is that argument, with the controls.
 
 ## The problem
 
@@ -24,6 +38,12 @@ It sits above that ladder and decides. A deterministic state machine reads the f
 checks a set of guardrails, and picks an action — retry silently, send a message, escalate to
 a human, or stop. Every decision is written to an append-only, hash-chained ledger that can be
 replayed afterwards under the policy version that applied at the time.
+
+Two things it does that the recovery number alone does not capture, and that no retry loop can
+do: it replaces dead instruments by asking for a new one, which is where 97 of this cohort's
+recoveries come from and which no silent retry can ever achieve; and it stops — on opt-out, on
+dispute, on bereavement — which a retry loop never does because it never speaks and so never
+hears an objection.
 
 A local language model writes the wording and reads inbound replies. **It never decides
 whether to contact anyone about money.**
@@ -111,25 +131,31 @@ everything else away, which separates them.
 |---|---|---|
 | A | nothing at all | 2.00% |
 | B | Razorpay's ladder, days 0,1,2,3 | 25.25% |
-| **D** | **the retry calendar and nothing else** | **80.38%** |
+| D | the calendar alone, retrying every cause | 80.38% |
+| **D'** | **the calendar alone, respecting the diagnosis** | **71.05%** |
 | C | the full engine | 67.41% |
 
-| | Net incremental |
-|---|---|
-| Spacing is worth (D vs B) | Rs 1,260,370 |
-| Decisioning is worth (C vs D) | Rs -303,215 |
+**Better timing is worth Rs 1,260,370 (+55.13 pp).** That is the finding. Razorpay's ladder
+does not fail because it is unintelligent; it fails because four attempts inside four days sit
+in one broke week of a monthly salary cycle. A retry loop with no diagnosis, no message, no
+guardrails and no model beats it by more than the entire engine does.
 
-Arm D retries on the engine's own schedule and does nothing else - no diagnosis, no message, no
-guardrails, no ledger, no model. It runs on arm C's customers, so it is a counterfactual rather
-than a randomised arm.
+**Against that, the decisioning layer costs Rs 101,326** (-3.64 pp). Published as a negative
+number, because it is one. Use D' rather than D for this comparison: the blind control also
+recovers causes that in reality need the customer to act, which the simulator lets a silent
+retry fix. That is the same gap amendment A2 declined to exploit for the engine, and using it
+against the engine would just be an inconsistent standard. It is worth Rs 201,889 of the
+difference between the two comparisons.
 
-**Read the second row honestly: it is negative.** In this simulator the decisioning layer COSTS
-recovery and buys compliance. Arm D never speaks to anyone, so it never hears an opt-out, a
-dispute or a declaration of hardship to honour - and it retries causes that in reality need the
-customer to act, which the simulator lets a silent retry fix. It is not a shippable policy; it
-is unlawful. It is here because without it, C vs B cannot say whether the money came from the
-calendar or from the intelligence, and the earlier version of this README credited the
-intelligence.
+**So why not ship D'?** Because it is not a product. It never replaces a dead instrument, which
+only a message can do and which is where 97 of this cohort's recoveries come from. It has no
+answer to an opt-out, a dispute or a bereavement, because it never speaks and so never hears
+one. And it cannot tell a card that expired in March from an account that was briefly short, so
+it burns attempts on instruments that can never be charged.
+
+The engine exists to make aggressive timing **safe to deploy**. The calendar is the lever;
+compliance is the constraint on pulling it. Those two sentences are the submission, and the
+controls above are what let us say them with a number rather than an assertion.
 <!-- /generated:readme-control -->
 
 ## What it failed to recover

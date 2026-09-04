@@ -545,6 +545,44 @@ entitled to ask about, and it is not visible from the shipped value alone.
 **Result of this run: Rs 957,156**, up from Rs 935,664.07, entirely from the hardship work.
 Arm C 66.51% -> 67.41%. Guardrail invariants zero in all three cohorts. 173 tests pass.
 
+### A11 - 4 Sept 2026 - a second control, and the submission reframed around what it says
+
+A10 added arm D and published that the decisioning layer costs recovery. This corrects an
+inconsistency in how that was measured, and changes what the README claims.
+
+**The blind control was holding itself to a lower standard than the engine.** Arm D retried
+EVERY cause, including `needs_customer_action` - payments that failed because the customer must
+re-authenticate. The simulator lets a silent retry fix those; reality does not, and saying so is
+the entire premise of the diagnosis layer. That is the same modelling gap amendment A2
+identified and deliberately declined to exploit *for* the engine. Using it *against* the engine
+is not scepticism, it is an inconsistent standard.
+
+**Arm D' now runs alongside it**, identical except that it respects the diagnosis. It is the
+comparison to use:
+
+| | Recovery | Decisioning is worth |
+|---|---|---|
+| D, blind | 80.38% | -Rs 303,215 (-12.97 pp) |
+| **D', diagnosis respected** | **71.05%** | **-Rs 101,326 (-3.64 pp)** |
+| C, the engine | 67.41% | — |
+
+So the gap is a third of what A10 reported. The direction is unchanged and still published as
+negative: in this simulator the decisioning layer costs recovery.
+
+**The submission is reframed rather than defended.** The README previously led with the engine
+and the headline rupees. It now leads with the finding - *the money is in the calendar, the
+engine is what lets you take it lawfully* - because that is what the controls say and the
+alternative is claiming something the evidence contradicts.
+
+Two things the recovery number does not capture, and which are why D' is not a product: 97 of
+this cohort's recoveries are dead instruments replaced because a message asked for one, which
+no silent retry can achieve; and D' has no answer to an opt-out, a dispute or a bereavement,
+because it never speaks and therefore never hears an objection to honour. A control that is
+unlawful to ship is a measuring instrument, not an alternative.
+
+**No headline figure changed.** Rs 957,155.53, arm C 67.41%, guardrails zero in all three
+cohorts. This amendment adds a control and rewrites prose; it does not move the primary metric.
+
 ### A9 - 4 Sept 2026 - the hash chain did not cover the fields the ledger's claims rest on
 
 Raised in the same review as A8 and deliberately held back from that fix, because folding an
