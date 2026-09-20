@@ -55,7 +55,7 @@ from recovery.engine.policy import Policy, retry_schedule            # noqa: E40
 from recovery.evaluation.baselines import INCUMBENT_RETRY_DAYS       # noqa: E402
 from recovery.ingest.webhook import EventStore, WebhookIngest        # noqa: E402
 from recovery.ledger.audit import AuditLedger                        # noqa: E402
-from recovery.llm.composer import DEFAULT_MODEL, compose             # noqa: E402
+from recovery.llm.composer import DEFAULT_MODEL, compose, warm       # noqa: E402
 from recovery.llm.copy_gate import Facts, check                      # noqa: E402
 from recovery.llm.parser import parse_reply                          # noqa: E402
 from recovery.models import (IST, Action, Channel, Customer, Debt,   # noqa: E402
@@ -186,6 +186,11 @@ def main() -> int:
         say("Ollama is not reachable on 127.0.0.1:11434 - falling back to templates.")
         say("This is reported rather than hidden; the run below is still real.")
         use_llm = False
+    if use_llm:
+        # A cold model was measured at 36s to first token. Paying that here, with a line on
+        # screen saying what is happening, beats paying it silently in the middle of scene 6.
+        print(paint(f"  loading {DEFAULT_MODEL} into memory...", DIM), end="", flush=True)
+        print(paint(f" {warm():.1f}s", DIM))
 
     policy = Policy()
     work = pathlib.Path(tempfile.mkdtemp())
@@ -243,11 +248,12 @@ def main() -> int:
     # -- 1 ------------------------------------------------------------------------------
     scene(1, "A real Razorpay webhook, through the shipped receiver")
     record, entity = razorpay_originated_event()
+    proof_file = PHASE0 / "0.4d-razorpay-originated-event.json"
     if record is None:
         say("results/phase0/0.4c-received-events.jsonl is missing; skipping the real event.")
     else:
-        proof = json.loads((PHASE0 / "0.4d-razorpay-originated-event.json")
-                           .read_text(encoding="utf-8"))["proof"]
+        proof = (json.loads(proof_file.read_text(encoding="utf-8"))["proof"] if
+                 proof_file.exists() else {"signed_by": "see results/phase0/"})
         say("Not simulated, and not replayed from a fixture written by hand. Razorpay sent")
         say("this to a laptop through a zrok tunnel, and phase 0 kept it:")
         say()
@@ -682,6 +688,11 @@ def main() -> int:
 
     # -- 13 -----------------------------------------------------------------------------
     scene(13, "What it is worth, from the artifact")
+    if not METRICS.exists():
+        say("results/metrics.json is missing - run scripts/run_batch.py to regenerate it.")
+        print(paint(f"\n{'=' * W}\n", CYAN))
+        store.close()
+        return 0
     m = json.loads(METRICS.read_text(encoding="utf-8"))
     p = m["primary_cohort_21d"]
     prim = p["primary"]
