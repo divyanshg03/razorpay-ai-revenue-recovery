@@ -706,6 +706,50 @@ def test_an_opt_out_in_hinglish_is_caught_without_a_model(reply):
     assert parse_reply(reply, TODAY, use_llm=False).intent is Intent.OPT_OUT
 
 
+@pytest.mark.parametrize("reply,expected", [
+    ("please don't stop my subscription, I will pay on the 10th", Intent.PROMISE_TO_PAY),
+    ("do not stop my plan, paying tomorrow", Intent.PROMISE_TO_PAY),
+    ("never cancel my mandate, sending the money tonight", Intent.PROMISE_TO_PAY),
+    # The scrub removes the NEGATED phrase, not the reply. A real stop still stops.
+    ("dont stop my subscription but stop messaging me", Intent.OPT_OUT),
+])
+def test_a_negated_stop_is_not_an_opt_out(reply, expected):
+    """"Don't stop my subscription" closed the file and wrote a DPDP objection event.
+
+    The customer was promising to pay. Reading a negation as its opposite is the expensive
+    direction of a false positive: it loses the money AND records an objection they never
+    raised, which then propagates to every channel.
+    """
+    assert parse_reply(reply, TODAY, use_llm=False).intent is expected
+
+
+def test_an_identity_question_alone_is_not_a_dispute():
+    """"Who is this?" froze the file permanently on a customer who was merely confused.
+
+    Most likely confused BY US: a service message with no merchant name is exactly what
+    prompts the question. It now falls through to OTHER and the ladder answers it with a
+    template that identifies the sender. An actual denial still stops everything.
+    """
+    assert parse_reply("who is this?", TODAY, use_llm=False).intent is Intent.OTHER
+    assert parse_reply("who is this? I never subscribed to this", TODAY,
+                       use_llm=False).intent is Intent.DISPUTE
+    assert parse_reply("who are you, this is not my account", TODAY,
+                       use_llm=False).intent is Intent.DISPUTE
+
+
+@pytest.mark.parametrize("reply,days_ahead", [
+    ("kal pay karunga", 1),
+    ("parso bhej dunga", 2),
+    ("agle hafte pay karunga", 7),
+])
+def test_a_hinglish_promise_is_read_and_dated(reply, days_ahead):
+    """Stops were bilingual and promises were not, so the ladder kept escalating at someone
+    who had just said when they would pay. That error costs money rather than compliance."""
+    p = parse_reply(reply, TODAY, use_llm=False)
+    assert p.intent is Intent.PROMISE_TO_PAY
+    assert p.promised_date == TODAY + dt.timedelta(days=days_ahead)
+
+
 def test_a_model_detected_opt_out_stops_contact(monkeypatch):
     """The model may stop us. Discarding its stop was the unsafe direction of the only error
     that matters here, because every paraphrased or non-English objection lands on it."""
@@ -725,6 +769,19 @@ def test_the_model_can_never_start_contact_or_lift_a_stop(monkeypatch):
     p = parse_reply("do not contact me again", TODAY, use_llm=True)
     assert p.intent is Intent.OPT_OUT and p.source == "override"
     assert p.promised_date is None
+
+
+def test_a_pinned_retry_schedule_overrides_the_derived_one_and_changes_nothing_by_default():
+    """`Policy.retry_days` exists so a regulator's cap is a POLICY, not a monkeypatch.
+
+    Measuring a configuration that is not the shipped one measures nothing, which is what
+    patching `retry_schedule` from a script would have done. The default must stay None, or
+    the published artifact silently changes underneath the frozen metric definition.
+    """
+    assert Policy().retry_days is None
+    assert retry_schedule(Policy()) == (0, 4, 8, 13, 17, 21)
+    capped = replace(Policy(), retry_days=(7, 14, 21), max_retries_per_debt=3)
+    assert retry_schedule(capped) == (7, 14, 21)
 
 
 def test_payment_state_is_re_read_before_each_action_not_once_a_day(tmp_path):

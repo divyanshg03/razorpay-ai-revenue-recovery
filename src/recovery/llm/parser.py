@@ -104,6 +104,23 @@ _CALLBACK = re.compile(
     r"reach me|come back|get back|revert)\b.{0,40}", re.I | re.S)
 
 
+#: "please don't stop my subscription, I will pay on the 10th" matched `stop` and closed the
+#: file of a customer who was promising to pay - and wrote a DPDP objection event they never
+#: raised. The negated phrase is scrubbed before the stop list runs, so the rest of the reply
+#: still counts: "don't stop my plan, but stop messaging me" is still an opt-out.
+_NEGATED_STOP = re.compile(
+    r"\b(?:do ?n[o']?t|do not|never|please do ?n[o']?t|mat)\s+"
+    r"(?:stop|cancel|close|end|block|deactivate|disconnect)\b", re.I)
+
+#: An identity question is not a dispute. It used to be, and it froze the file permanently on
+#: a customer who was merely confused - most likely BY US, since a service message with no
+#: merchant name is exactly what prompts it. It is left here rather than deleted so the
+#: decision is visible: the reply falls through to the model, then to OTHER, and the ladder
+#: continues with a template that identifies the sender. An actual denial - "not my account",
+#: "never subscribed", "wrong person", "fraud" - still matches `_DISPUTE` and still stops.
+_IDENTITY_QUERY = re.compile(r"\bwho (?:is|are) (?:this|you|u)\b\??", re.I)
+
+
 def override_intent(text: str) -> Intent | None:
     """Code outranks the model on the three intents that carry legal or human weight.
 
@@ -114,9 +131,9 @@ def override_intent(text: str) -> Intent | None:
     day 12. The bereavement wording is the more emotive of the two signals, which is exactly
     why it must not also be the more permissive one.
     """
-    if _OPT_OUT.search(text):
+    if _OPT_OUT.search(_NEGATED_STOP.sub(" ", text)):
         return Intent.OPT_OUT
-    if _DISPUTE.search(text):
+    if _DISPUTE.search(_IDENTITY_QUERY.sub(" ", text)):
         return Intent.DISPUTE
     if _HARDSHIP.search(text):
         return Intent.HARDSHIP
@@ -148,12 +165,18 @@ def resolve_date(phrase: str | None, today: dt.date) -> dt.date | None:
         return None
     p = phrase.strip().lower()
 
-    if re.search(r"\b(today|tonight|this evening|now|right now)\b", p):
+    if re.search(r"\b(today|tonight|this evening|now|right now|aaj|abhi)\b", p):
         return today
-    if re.search(r"\btomorrow\b", p):
+    # "kal" is both yesterday and tomorrow in Hindi. In a promise it can only mean tomorrow,
+    # and forward is the safe reading anyway: a resolved date is never in the past.
+    if re.search(r"\b(tomorrow|kal)\b", p):
         return today + dt.timedelta(days=1)
-    if re.search(r"\bday after tomorrow\b", p):
+    if re.search(r"\b(day after tomorrow|parso|parsu)\b", p):
         return today + dt.timedelta(days=2)
+    if re.search(r"\bagle (?:hafte|hafta|week)\b", p):
+        return today + dt.timedelta(days=7)
+    if re.search(r"\bagle (?:mahine|maheene|month)\b", p):
+        return _add_months(today, 1)
 
     m = re.search(r"\b(?:in|after) (\d+) days?\b", p)
     if m:
@@ -236,10 +259,20 @@ def _ask_llm(reply: str, model: str, timeout: float) -> dict | None:
 
 
 def _fallback_intent(text: str) -> tuple[Intent, str | None]:
-    """Keyword-only path when the LLM is unavailable. Conservative: unknown -> OTHER."""
+    """Keyword-only path when the LLM is unavailable. Conservative: unknown -> OTHER.
+
+    The Hinglish half is not symmetry for its own sake. Stops were covered here and promises
+    were not, so "kal pay karunga" read as OTHER and the ladder carried on escalating at a
+    customer who had just told us when they would pay. That error costs money rather than
+    compliance - the safer of the two directions, and still the wrong answer.
+    """
     t = text.lower()
     if re.search(r"\b(will pay|pay (tonight|tomorrow|on|by|next)|paying|salary|after|"
                  r"once i get|can pay|sending|transfer)\b", t):
+        return Intent.PROMISE_TO_PAY, text
+    if re.search(r"\b(pay kar\w*|pay kr\w*|karunga|karungi|kar dunga|kar dungi|"
+                 r"de dunga|de dungi|bhej dunga|bhej dungi|bhej deta|bhej dunga|"
+                 r"paisa aa\w*|paise aa\w*|salary aa\w*|tankhwah)\b", t):
         return Intent.PROMISE_TO_PAY, text
     return Intent.OTHER, None
 

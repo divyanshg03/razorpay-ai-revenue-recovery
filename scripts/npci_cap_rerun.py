@@ -193,8 +193,11 @@ def main() -> int:
         "generated_by": "scripts/npci_cap_rerun.py",
         "head_commit": subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=REPO,
                                       capture_output=True, text=True).stdout.strip(),
-        "working_tree_dirty": bool(subprocess.run(["git", "status", "--porcelain"], cwd=REPO,
-                                                  capture_output=True, text=True).stdout.strip()),
+        # Tracked files only: an untracked scratch file in the working directory says nothing
+        # about whether this artifact can be reproduced from `head_commit`.
+        "working_tree_dirty": bool(
+            subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=REPO,
+                           capture_output=True, text=True).stdout.strip()),
         "seed": SEED,
         "n_customers": N_CUSTOMERS,
         "window_days": WINDOW_DAYS,

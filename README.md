@@ -68,8 +68,14 @@ alone cannot give you, the guardrails firing, the ladder escalating, the message
 the copy gate rejecting non-compliant wording, replies parsed into a promise-to-pay and an
 opt-out, the five replies that break naive parsers — two of them not in English — a late
 `payment.captured` arriving as a webhook and stopping the engine mid-ladder, the hash-chained
-ledger replayed in order, and finally the measured result read live from `results/metrics.json`
-so the screen cannot drift from the artifact.
+ledger replayed in order, the measured result read live from `results/metrics.json` so the
+screen cannot drift from the artifact, and then the same cohort re-run **inside NPCI's attempt
+cap** — one attempt and three retries per mandate cycle, from
+[`results/npci-cap-rerun.json`](results/npci-cap-rerun.json). The frozen headline is measured
+on six attempts, which is over that cap; rather than argue the point, the repo measures both
+and the two artifacts disagree in an interesting way. See
+[`scripts/npci_cap_rerun.py`](scripts/npci_cap_rerun.py) for what changes and what is still
+not modelled.
 
 Every component in it is imported from `src/recovery/` exactly as the batch imports them —
 nothing is re-implemented for the demo, because a demo that re-implements the system is a demo

@@ -293,6 +293,36 @@ def test_the_demo_prints_the_artifacts_own_headline_not_a_remembered_one(demo_ou
             "the control's interval crosses zero and the demo does not say so"
 
 
+@pytest.fixture(scope="module")
+def capped():
+    return json.loads((REPO / "results" / "npci-cap-rerun.json").read_text(encoding="utf-8"))
+
+
+def test_the_capped_rerun_stays_inside_the_rule_it_names(capped):
+    """The artifact that answers "NPCI allows four attempts" must itself take four.
+
+    A companion artifact measured under rules it describes loosely is worse than no companion
+    artifact, because it invites the same question twice.
+    """
+    days = capped["schedule"]["engine_and_controls"]
+    assert len(days) == 3, f"OC-215-A allows three retries after the attempt, got {days}"
+    assert 0 not in days, "day 0 is the charge that failed, not a retry"
+    assert capped["schedule"]["incumbent"] == [1, 2, 3], "Razorpay's ladder excludes T+0"
+    assert capped["policy_overrides"]["max_retries_per_debt"] == 3
+    assert capped["window_anchored_on"] == "each debt's own failure date"
+    assert not capped["working_tree_dirty"], \
+        "regenerate it from a committed tree: head_commit cannot reproduce a dirty one"
+    assert capped["arms"]["C_engine"]["n"] > 0 and capped["arms"]["B_incumbent"]["n"] > 0
+
+
+def test_the_demo_reports_the_capped_rerun_from_the_artifact(demo_out, capped):
+    """Scene 14's numbers are read, not remembered - the same rule as the headline."""
+    assert "OC-215-A" in demo_out
+    assert f"{capped['arms']['C_engine']['recovery_rate']:.2%}" in demo_out
+    headline = capped["comparisons"]["headline__C_vs_B"]["net_incremental_total_rupees"]
+    assert f"Rs {headline:,.0f}" in demo_out
+
+
 def test_the_demo_ledger_is_dated_by_simulated_day_not_by_wall_clock(demo_out):
     """Scene 12 replays a fortnight of decisions, so it must show a fortnight of dates.
 

@@ -45,6 +45,7 @@ import pathlib
 import socket
 import sys
 import tempfile
+import textwrap
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
@@ -67,6 +68,7 @@ COLOR = False
 
 PHASE0 = REPO / "results" / "phase0"
 METRICS = REPO / "results" / "metrics.json"
+NPCI = REPO / "results" / "npci-cap-rerun.json"
 
 #: The demo debt's payment id. In production this is where debt-level reconciliation lives:
 #: one debt collects many payment ids (each retry, each link). Here it is one of each.
@@ -347,8 +349,9 @@ def main() -> int:
     say("cost model, so the extra attempts cost nothing and the comparison is not net of them.")
     say()
     say("NPCI's UPI circular OC-215-A allows one attempt and three retries per mandate cycle,")
-    say("so six is over the cap and the shipped number is measured outside it. Capped at four")
-    say("the ranking holds and the size moves; that re-run is not in results/metrics.json.")
+    say("so six is over the cap, and the frozen headline is measured outside the rule it would")
+    say("have to ship under. Scene 14 re-runs this whole cohort inside the cap rather than")
+    say("arguing about it.")
     say()
     say("The one that carries the argument is coverage. Four attempts inside four days can")
     say("only ever catch a payday that has just happened, on a cycle roughly thirty days")
@@ -741,8 +744,55 @@ def main() -> int:
         say("where retries run out, it is also what is left to collect with.")
 
     # -- 14 -----------------------------------------------------------------------------
+    scene(14, "The same cohort, inside NPCI's cap")
+    if not NPCI.exists():
+        say("results/npci-cap-rerun.json is missing - run scripts/npci_cap_rerun.py.")
+    else:
+        cap = json.loads(NPCI.read_text(encoding="utf-8"))
+        sched = cap["schedule"]
+        say("The schedule in scene 4 takes six attempts. The rule allows four, and the honest")
+        say("answer to that is a measurement rather than a paragraph: the same cohort, the")
+        say("same engine, re-run inside the cap. Three retries spread across the same horizon,")
+        say("no same-day re-debit, the incumbent on its documented ladder, and every debt")
+        say("scored on its own 21-day window.")
+        say()
+        kv("rule", cap["rule"])
+        kv("schedule", f"charge on day 0, retries on days "
+                       f"{', '.join(map(str, sched['engine_and_controls']))}   "
+                       f"incumbent {', '.join(map(str, sched['incumbent']))}")
+        kv("generated at", f"{cap['head_commit']}"
+                           f"{'  (dirty tree)' if cap['working_tree_dirty'] else '  (clean tree)'}")
+        say()
+        for key, arm in cap["arms"].items():
+            kv(f"arm {key}", f"{arm['recovery_rate']:>7.2%}   n={arm['n']:,}")
+        say()
+        capped = cap["comparisons"]
+        for key, row in capped.items():
+            if key.endswith("__C_vs_D"):
+                continue          # the blind control, kept in the artifact, not on screen
+            kv(key.split("__")[-1].replace("_", " "),
+               f"Rs {row['net_incremental_total_rupees']:,.0f}   95% CI "
+               f"[{row['ci95_total_rupees'][0]:,.0f}, {row['ci95_total_rupees'][1]:,.0f}]",
+               code=GREEN if row["excludes_zero"] else YELLOW)
+        say()
+        decisioning = capped["decisioning_is_worth__C_vs_D_diagnosed"]
+        shipped = ctrl["net_incremental_total_rupees"]
+        say("Read those two artifacts together, because they disagree and the disagreement is")
+        say("the point. With six retries the calendar does nearly all the work and decisioning")
+        say(f"measures Rs {shipped:,.0f} on an interval that crosses zero. With three, the retries run")
+        say(f"out, and decisioning is worth Rs {decisioning['net_incremental_total_rupees']:,.0f} "
+            f"on an interval that {'excludes' if decisioning['excludes_zero'] else 'crosses'} zero.")
+        say("Scarcity of attempts is what makes deciding who to contact worth anything - which")
+        say("is the regime the regulator actually puts you in.")
+        say()
+        say("Still not modelled, and each of these would move the number:")
+        for item in cap["not_modelled"]:
+            for i, line in enumerate(textwrap.wrap(item, 84)):
+                say(("- " if i == 0 else "  ") + line, indent=4, code=DIM)
+
+    # -- 15 -----------------------------------------------------------------------------
     if args.ask:
-        scene(14, "Your turn")
+        scene(15, "Your turn")
         say("Type a customer reply. The shipped parser reads it, and a scratch engine shows")
         say("what would happen next. Blank line to finish.")
         say()
