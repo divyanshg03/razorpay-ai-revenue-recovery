@@ -292,6 +292,11 @@ def render_readme_control(m: dict) -> str:
     sp = ctl["spacing_is_worth__D_vs_B"]
     fair = ctl.get("decisioning_is_worth__C_vs_D_diagnosed") or {}
     blind = ctl["decisioning_is_worth__C_vs_D"]
+    # The dead-instrument count below is READ, not remembered. It stood as the literal "97"
+    # inside this generated block, which meant `--check` could never catch it drifting - and
+    # it had already drifted: amendment A10 moved it, and the true count is recomputed here
+    # every render. A hand-typed number inside a generated block is the worst of both.
+    dead = m["primary_cohort_21d"]["subgroup_by_diagnosed_cause"]["needs_new_instrument"]
     lines = [
         "| Arm | What it does | Recovery |",
         "|---|---|---|",
@@ -311,10 +316,20 @@ def render_readme_control(m: dict) -> str:
         "it by more than the entire engine does."),
         "",
         _wrap(
-        f"**Against that, the decisioning layer costs "
-        f"{_rs(abs(fair.get('net_incremental_total_rupees', 0)))}** "
-        f"({fair.get('lift_pp', 0):+.2f} pp). Published as a negative number, because it is "
-        "one. Use D' rather than D for this comparison: the blind control also recovers "
+        f"**Against that, the decisioning layer measures "
+        f"{_rs(fair.get('net_incremental_total_rupees', 0))} "
+        f"({fair.get('lift_pp', 0):+.2f} pp), on an interval of "
+        f"{_rs(fair.get('ci95_total_rupees', [0, 0])[0])} to "
+        f"{_rs(fair.get('ci95_total_rupees', [0, 0])[1])} that "
+        + ("excludes zero.** Published as a negative number, because it is one."
+           if fair.get("excludes_zero") else
+           "CROSSES ZERO.** Published with its interval rather than as a signed headline, "
+           "because the point estimate on its own would claim a direction this run cannot "
+           "support. The defensible reading is that against a calendar which ignores "
+           "opt-outs, decisioning does not move recovery measurably - it changes what you "
+           "are allowed to do while collecting, which is the thing the control was built to "
+           "isolate and cannot price.")
+        + " Use D' rather than D for this comparison: the blind control also recovers "
         "causes that in reality need the customer to act, which the simulator lets a silent "
         "retry fix. That is the same gap amendment A2 declined to exploit for the engine, and "
         "using it against the engine would just be an inconsistent standard. It is worth "
@@ -323,8 +338,12 @@ def render_readme_control(m: dict) -> str:
         "",
         _wrap(
         "**So why not ship D'?** Because it is not a product. It never replaces a dead "
-        "instrument, which only a message can do and which is where 97 of this cohort's "
-        "recoveries come from. It has no answer to an opt-out, a dispute or a bereavement, "
+        "instrument, which only a message can do: the "
+        f"{dead['n']} debts diagnosed `needs_new_instrument` are ones D' declines to retry at "
+        f"all, and the engine recovers {round(dead['n'] * dead['recovery_rate'])} of them - a "
+        f"count read from the artifact, because the previous sentence carried a hand-typed "
+        "one that had been stale since amendment A10. It has no answer to an opt-out, a "
+        "dispute or a bereavement, "
         "because it never speaks and so never hears one. And it cannot tell a card that "
         "expired in March from an account that was briefly short, so it burns attempts on "
         "instruments that can never be charged."),

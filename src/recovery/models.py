@@ -69,7 +69,13 @@ class Actionability(str, enum.Enum):
 
 
 class StopReason(str, enum.Enum):
-    """Every one of these is enforced in code and logged. Hard stops are absolute."""
+    """Every one of these is enforced in code and logged.
+
+    PAID, OPTED_OUT and DISPUTED are absolute: once latched they are never lifted by the
+    engine. BEREAVEMENT is the exception and is a PAUSE - it lifts on the date the customer
+    named, or after the policy pause when they named none - so it must never be allowed to
+    stand in for one of the absolute three. See `parser.override_intent`.
+    """
 
     PAID = "payment_received"
     OPTED_OUT = "opt_out"

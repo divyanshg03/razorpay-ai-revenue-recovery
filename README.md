@@ -40,10 +40,10 @@ a human, or stop. Every decision is written to an append-only, hash-chained ledg
 replayed afterwards under the policy version that applied at the time.
 
 Two things it does that the recovery number alone does not capture, and that no retry loop can
-do: it replaces dead instruments by asking for a new one, which is where 97 of this cohort's
-recoveries come from and which no silent retry can ever achieve; and it stops — on opt-out, on
-dispute, on bereavement — which a retry loop never does because it never speaks and so never
-hears an objection.
+do: it replaces dead instruments by asking for a new one, which a silent retry can never
+achieve and which the control section below counts from the artifact; and it stops — on
+payment, on opt-out, on dispute — and pauses on bereavement, which a retry loop never does
+because it never speaks and so never hears an objection.
 
 A local language model writes the wording and reads inbound replies. **It never decides
 whether to contact anyone about money.**
@@ -54,12 +54,22 @@ whether to contact anyone about money.**
 python scripts/demo.py           # deterministic; no model, no credentials, no network
 python scripts/demo.py --live    # ask the local model for real wording
 python scripts/demo.py --pause   # step through scene by scene
+python scripts/demo.py --ask     # type a customer reply and watch the engine decide
 ```
 
-One failed collection, end to end: the raw error fields, the diagnosis that error code alone
-cannot give you, the guardrails firing, the ladder escalating, the message being composed, the
-copy gate rejecting non-compliant wording, a reply parsed into a promise-to-pay and then an
-opt-out, the stopping rules taking effect, and the hash-chained ledger replayed in order.
+It opens on a **real Razorpay event** — the `payment.failed` their servers sent to a laptop
+through a zrok tunnel during phase 0 — put back through the shipped webhook receiver, which
+verifies it, ignores the redelivery, and rejects the same body with one byte changed. Their own
+`error_reason` on that payload is `payment_failed`, which says nothing, and watching the
+taxonomy file it under `other` is the clearest statement of the problem this repo exists for.
+
+Then one failed collection end to end on the simulated cohort: the diagnosis that error code
+alone cannot give you, the guardrails firing, the ladder escalating, the message being composed,
+the copy gate rejecting non-compliant wording, replies parsed into a promise-to-pay and an
+opt-out, the five replies that break naive parsers — two of them not in English — a late
+`payment.captured` arriving as a webhook and stopping the engine mid-ladder, the hash-chained
+ledger replayed in order, and finally the measured result read live from `results/metrics.json`
+so the screen cannot drift from the artifact.
 
 Every component in it is imported from `src/recovery/` exactly as the batch imports them —
 nothing is re-implemented for the demo, because a demo that re-implements the system is a demo
@@ -140,15 +150,21 @@ does not fail because it is unintelligent; it fails because four attempts inside
 in one broke week of a monthly salary cycle. A retry loop with no diagnosis, no message, no
 guardrails and no model beats it by more than the entire engine does.
 
-**Against that, the decisioning layer costs Rs 101,326** (-3.64 pp). Published as a negative
-number, because it is one. Use D' rather than D for this comparison: the blind control also
-recovers causes that in reality need the customer to act, which the simulator lets a silent
-retry fix. That is the same gap amendment A2 declined to exploit for the engine, and using it
-against the engine would just be an inconsistent standard. It is worth Rs 201,889 of the
-difference between the two comparisons.
+**Against that, the decisioning layer measures Rs -101,326 (-3.64 pp), on an interval of Rs
+-224,204 to Rs 21,340 that CROSSES ZERO.** Published with its interval rather than as a signed
+headline, because the point estimate on its own would claim a direction this run cannot
+support. The defensible reading is that against a calendar which ignores opt-outs, decisioning
+does not move recovery measurably - it changes what you are allowed to do while collecting,
+which is the thing the control was built to isolate and cannot price. Use D' rather than D for
+this comparison: the blind control also recovers causes that in reality need the customer to
+act, which the simulator lets a silent retry fix. That is the same gap amendment A2 declined to
+exploit for the engine, and using it against the engine would just be an inconsistent standard.
+It is worth Rs 201,889 of the difference between the two comparisons.
 
 **So why not ship D'?** Because it is not a product. It never replaces a dead instrument, which
-only a message can do and which is where 97 of this cohort's recoveries come from. It has no
+only a message can do: the 277 debts diagnosed `needs_new_instrument` are ones D' declines to
+retry at all, and the engine recovers 100 of them - a count read from the artifact, because the
+previous sentence carried a hand-typed one that had been stale since amendment A10. It has no
 answer to an opt-out, a dispute or a bereavement, because it never speaks and so never hears
 one. And it cannot tell a card that expired in March from an account that was briefly short, so
 it burns attempts on instruments that can never be charged.

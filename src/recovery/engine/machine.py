@@ -138,11 +138,21 @@ class RecoveryEngine:
         # Re-read payment state immediately before acting, and log that the read happened.
         # Webhooks are at-least-once and unordered; this is the rule that stops us dunning
         # someone who paid ten seconds ago.
-        settled = self._is_settled(debt)
-        self.ledger.record_state_recheck(debt.debt_id, already_paid=settled,
-                                         source="payment_state_store")
+        settled: bool | None = None
 
         for channel in candidates:
+            # Per ACTION, not once per day. A capture landing between the retry and the
+            # contact that follows it has to stop the contact, and reading the state once at
+            # the top of the cycle could not see it. The read only reaches the ledger when it
+            # DISAGREES with the previous one, so a trail records every read that told us
+            # something new and a day whose state never moved still writes exactly one
+            # record - which is why this change leaves the measured ledger untouched.
+            fresh = self._is_settled(debt)
+            if fresh != settled:
+                settled = fresh
+                self.ledger.record_state_recheck(debt.debt_id, already_paid=settled,
+                                                 source="payment_state_store")
+
             decision = self._decide(debt, customer, diag, state, channel, now, settled)
             self.ledger.record_decision(
                 debt.debt_id, customer.ref, decision, diagnosis=diag.actionability.value,
