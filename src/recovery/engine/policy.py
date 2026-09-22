@@ -79,6 +79,15 @@ class Policy:
     retry_spacing_days: int = 3
     retry_horizon_days: int = 21
 
+    #: Pins the retry days instead of deriving them from the three fields above. `None` -
+    #: always, in the measured batch - means derive, so this changes nothing that has been
+    #: published. It exists because a regulator's cap is a POLICY, and expressing it by
+    #: monkeypatching `retry_schedule` from a script would mean the measured configuration
+    #: was not the shipped one. `scripts/npci_cap_rerun.py` sets it to run the cohort inside
+    #: NPCI OC-215-A, where the failed charge is the attempt and only three retries follow
+    #: it, so the first retry cannot sit on day 0 the way the derived schedule does.
+    retry_days: tuple[int, ...] | None = None
+
     # -- escalation ladder: terminates, never loops, tone never escalates --------------
     #: A customer who cannot receive a rung SKIPS to the next one they can (see
     #: machine.py `_first_reachable_rung`), so someone without WhatsApp still gets an SMS —
@@ -209,6 +218,8 @@ def retry_schedule(policy: Policy) -> tuple[int, ...]:
     `retry_spacing_days` survives as a MINIMUM, not a step: issuers throttle repeated mandate
     execution, so attempts may be spread apart but never packed closer than the floor.
     """
+    if policy.retry_days is not None:
+        return tuple(policy.retry_days)
     n, horizon, floor = (policy.max_retries_per_debt, policy.retry_horizon_days,
                          policy.retry_spacing_days)
     if n <= 0:

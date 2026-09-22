@@ -1,0 +1,115 @@
+{
+ "what_this_is": "The seeded cohort measured inside NPCI OC-215-A: one attempt plus three retries per mandate execution. A companion to results/metrics.json, NOT a replacement for it - the headline stays under the frozen metric definition, which fixes the configuration it is computed in.",
+ "generated_by": "scripts/npci_cap_rerun.py",
+ "head_commit": "1e085e5",
+ "working_tree_dirty": false,
+ "seed": 20260905,
+ "n_customers": 5000,
+ "window_days": 21,
+ "window_anchored_on": "each debt's own failure date",
+ "rule": "NPCI UPI circular OC-215-A: 1 attempt + 3 retries per mandate per cycle",
+ "schedule": {
+  "engine_and_controls": [
+   7,
+   14,
+   21
+  ],
+  "incumbent": [
+   1,
+   2,
+   3
+  ],
+  "note": "Day 0 is the charge that failed, in every arm. Razorpay's documented ladder is T+1..T+3, excluding the date of the charge."
+ },
+ "policy_overrides": {
+  "retry_days": [
+   7,
+   14,
+   21
+  ],
+  "max_retries_per_debt": 3
+ },
+ "arms": {
+  "B_incumbent": {
+   "n": 895,
+   "recovery_rate": 0.2525,
+   "recovered_rupees": 192974.0,
+   "contact_cost_rupees": 0.0
+  },
+  "C_engine": {
+   "n": 2798,
+   "recovery_rate": 0.584,
+   "recovered_rupees": 1330866.0,
+   "contact_cost_rupees": 3076.42
+  },
+  "D_calendar_blind": {
+   "n": 2798,
+   "recovery_rate": 0.584,
+   "recovered_rupees": 1320566.0,
+   "contact_cost_rupees": 0.0
+  },
+  "D_diagnosed_calendar": {
+   "n": 2798,
+   "recovery_rate": 0.5147,
+   "recovered_rupees": 1168910.0,
+   "contact_cost_rupees": 0.0
+  }
+ },
+ "comparisons": {
+  "headline__C_vs_B": {
+   "label": "engine vs Razorpay's T+1..T+3 ladder, both inside the cap",
+   "paired": false,
+   "net_incremental_per_customer_rupees": 258.94,
+   "net_incremental_total_rupees": 724503.26,
+   "ci95_total_rupees": [
+    578217.77,
+    862865.12
+   ],
+   "excludes_zero": true
+  },
+  "spacing_is_worth__D_diagnosed_vs_B": {
+   "label": "the calendar alone vs the incumbent, same three retries",
+   "paired": false,
+   "net_incremental_per_customer_rupees": 202.15,
+   "net_incremental_total_rupees": 565623.68,
+   "ci95_total_rupees": [
+    424405.28,
+    698579.0
+   ],
+   "excludes_zero": true
+  },
+  "decisioning_is_worth__C_vs_D_diagnosed": {
+   "label": "the engine vs a diagnosis-respecting calendar on its own customers",
+   "paired": true,
+   "net_incremental_per_customer_rupees": 56.78,
+   "net_incremental_total_rupees": 158879.58,
+   "ci95_total_rupees": [
+    111610.7,
+    207759.76
+   ],
+   "excludes_zero": true
+  },
+  "decisioning_is_worth__C_vs_D": {
+   "label": "the engine vs a calendar blind to the cause (flatters the control: the simulator lets a silent retry fix causes that need the customer)",
+   "paired": true,
+   "net_incremental_per_customer_rupees": 2.58,
+   "net_incremental_total_rupees": 7223.58,
+   "ci95_total_rupees": [
+    -47031.96,
+    59910.44
+   ],
+   "excludes_zero": false
+  }
+ },
+ "bootstrap": {
+  "resamples": 10000,
+  "seed": 20260920,
+  "method": "percentile; paired where the control runs on arm C's own customers, independent where it does not"
+ },
+ "not_modelled": [
+  "Peak hours. OC-215-A confines retries to non-peak windows; every action here is timed at 10:00, inside the 10:00-13:00 peak. The simulator has no time-of-day effect, so this changes none of the figures above and all of the deployment.",
+  "Pre-debit notification under the RBI e-mandate framework.",
+  "eMandate confirmation lag: charges settle synchronously here.",
+  "Every simulator limitation in src/recovery/cohort/PARAMETERS.md, inherited unchanged. These intervals are sampling noise in a model we wrote."
+ ]
+}

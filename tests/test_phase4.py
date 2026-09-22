@@ -50,7 +50,7 @@ def _outside_generated(text: str) -> str:
 
 def test_readme_has_the_generated_blocks_it_claims():
     names = {m_.group(1) for m_ in GEN.finditer(README.read_text(encoding="utf-8"))}
-    assert {"readme-headline", "readme-failures", "readme-limitations",
+    assert {"readme-headline", "readme-npci", "readme-failures", "readme-limitations",
             "readme-reproduce"} <= names, names
 
 
@@ -233,6 +233,127 @@ def test_no_engine_module_performs_network_io():
                 if n.split(".")[0] in banned:
                     offenders.append(f"{path.name}: {n}")
     assert not offenders, offenders
+
+
+@pytest.fixture(scope="module")
+def demo_out():
+    """One offline run, shared by every assertion below. Headless, no model, no colour."""
+    r = subprocess.run([sys.executable, "scripts/demo.py"],
+                       capture_output=True, text=True, cwd=REPO, timeout=300)
+    assert r.returncode == 0, r.stderr[-2000:]
+    return r.stdout
+
+
+def test_the_demo_puts_a_real_razorpay_event_through_the_shipped_receiver(demo_out):
+    """The demo's first answer to "does any of this touch Razorpay?" must be evidence.
+
+    The event is the one phase 0 captured from Razorpay's servers through a zrok tunnel, and
+    it goes through `WebhookIngest` - verified, deduplicated, and rejected when a byte of the
+    body is edited. If the fixture or the receiver stops agreeing, this fails rather than the
+    scene quietly degrading into a printed JSON blob.
+    """
+    log = (REPO / "results" / "phase0" / "0.4c-received-events.jsonl").read_text(encoding="utf-8")
+    real = [json.loads(x) for x in log.splitlines() if x.strip()]
+    razorpay_sent = [r for r in real if not r["event_id"].startswith("evt_")]
+    assert razorpay_sent, "the phase-0 log no longer contains a Razorpay-originated event"
+    event = razorpay_sent[0]
+
+    assert event["event_id"] in demo_out
+    assert "200 queued" in demo_out, "the real event was not accepted by the receiver"
+    assert "duplicate ignored" in demo_out, "at-least-once delivery is not demonstrated"
+    assert "400 invalid signature" in demo_out, "a tampered body was not rejected on screen"
+    assert "only real payment in this demo" in demo_out, \
+        "the demo must not let one real event lend credibility to the simulated cohort"
+
+
+def test_the_demo_shows_the_replies_that_used_to_break_the_parser(demo_out):
+    """The five an interviewer types first. Two of them are not in English."""
+    for reply in ("My father passed away. Stop messaging me.",
+                  "my mother died 2 days ago",
+                  "yeh messages band karo"):
+        assert reply in demo_out, f"the demo no longer shows: {reply}"
+    # The statutory stop must be the outcome on screen, not a hardship pause.
+    line = next(ln for ln in demo_out.splitlines()
+                if "stopped: opt_out" in ln)
+    assert "opt_out" in line
+
+
+def test_the_demo_prints_the_artifacts_own_headline_not_a_remembered_one(demo_out, m):
+    """The demo reads results/metrics.json at run time, so it cannot drift from the README.
+
+    A demo that prints a number from memory is the same failure the README tests exist to
+    prevent, one screen to the left of it.
+    """
+    headline = f"Rs {m['headline']['net_incremental_rupees']:,.0f}"
+    assert headline in demo_out, headline
+    control = m["primary_cohort_21d"]["spread_retry_control"][
+        "decisioning_is_worth__C_vs_D_diagnosed"]
+    if not control["excludes_zero"]:
+        assert "CROSSES ZERO" in demo_out, \
+            "the control's interval crosses zero and the demo does not say so"
+
+
+@pytest.fixture(scope="module")
+def capped():
+    return json.loads((REPO / "results" / "npci-cap-rerun.json").read_text(encoding="utf-8"))
+
+
+def test_the_capped_rerun_stays_inside_the_rule_it_names(capped):
+    """The artifact that answers "NPCI allows four attempts" must itself take four.
+
+    A companion artifact measured under rules it describes loosely is worse than no companion
+    artifact, because it invites the same question twice.
+    """
+    days = capped["schedule"]["engine_and_controls"]
+    assert len(days) == 3, f"OC-215-A allows three retries after the attempt, got {days}"
+    assert 0 not in days, "day 0 is the charge that failed, not a retry"
+    assert capped["schedule"]["incumbent"] == [1, 2, 3], "Razorpay's ladder excludes T+0"
+    assert capped["policy_overrides"]["max_retries_per_debt"] == 3
+    assert capped["window_anchored_on"] == "each debt's own failure date"
+    assert not capped["working_tree_dirty"], \
+        "regenerate it from a committed tree: head_commit cannot reproduce a dirty one"
+    assert capped["arms"]["C_engine"]["n"] > 0 and capped["arms"]["B_incumbent"]["n"] > 0
+
+
+def test_the_capped_figures_in_the_README_equal_their_artifact(readme, capped):
+    """The capped run is reported in the README, so it is held to the headline's rule: read,
+    never typed, and checked against the file it came from rather than against a renderer
+    that merely ran."""
+    block = next(g.group(2) for g in GEN.finditer(readme) if g.group(1) == "readme-npci")
+    net = capped["comparisons"]["headline__C_vs_B"]["net_incremental_total_rupees"]
+    assert f"Rs {net:,.0f}" in block, net
+    assert f"{capped['arms']['C_engine']['recovery_rate'] * 100:.2f}%" in block
+    decisioning = capped["comparisons"]["decisioning_is_worth__C_vs_D_diagnosed"]
+    word = "excludes" if decisioning["excludes_zero"] else "crosses"
+    assert f"which {word} zero" in " ".join(block.split()), \
+        "the README states a significance the artifact does not support"
+
+
+def test_the_readme_never_presents_the_capped_run_as_the_headline(readme):
+    """Beside the headline, never instead of it: the frozen definition fixes the headline's
+    configuration, and swapping in a re-run under new rules is what the freeze prevents."""
+    headline = readme.find("<!-- generated:readme-headline -->")
+    capped = readme.find("<!-- generated:readme-npci -->")
+    assert -1 not in (headline, capped) and headline < capped
+
+
+def test_the_demo_reports_the_capped_rerun_from_the_artifact(demo_out, capped):
+    """Scene 14's numbers are read, not remembered - the same rule as the headline."""
+    assert "OC-215-A" in demo_out
+    assert f"{capped['arms']['C_engine']['recovery_rate']:.2%}" in demo_out
+    headline = capped["comparisons"]["headline__C_vs_B"]["net_incremental_total_rupees"]
+    assert f"Rs {headline:,.0f}" in demo_out
+
+
+def test_the_demo_ledger_is_dated_by_simulated_day_not_by_wall_clock(demo_out):
+    """Scene 12 replays a fortnight of decisions, so it must show a fortnight of dates.
+
+    Every record used to be stamped 3 September at 10:00 plus one second per record, from a
+    virtual clock that started at day 0 - so the replay showed the customer's reply BEFORE
+    the message that drew it, on a screen whose whole subject is an ordered trail.
+    """
+    dates = set(re.findall(r"^\s+(2026-09-\d\d) \d\d:\d\d:\d\d  \w+", demo_out, re.M))
+    assert len(dates) >= 3, f"the replay is collapsed onto {dates or 'no'} date(s)"
 
 
 def test_the_demo_runs_clean_offline_and_shows_the_gate_firing():

@@ -42,9 +42,11 @@ class DebtState:
     retries_made: int = 0
     ladder_rung: int = 0
     promise_to_pay_until: dt.date | None = None
-    #: Set only when a customer in hardship NAMES a date on which contact is welcome again.
-    #: Until that date arrives the hardship stop holds; on and after it, contact resumes.
-    #: Absent a date the stop is indefinite, which is the default and the safe direction.
+    #: When contact becomes welcome again for a customer in hardship. Set from the date the
+    #: customer NAMED, and otherwise, in `machine.record_reply`, from the policy pause in
+    #: `Policy.hardship_default_resume_days`. Until that date the hardship stop holds; on and
+    #: after it, contact resumes. It is therefore a PAUSE and not an indefinite stop, which
+    #: is a policy choice and is measured: 15 days recovered less than 7 and was reverted.
     hardship_resume_on: dt.date | None = None
     hard_stopped: StopReason | None = None
     last_contact_day: dt.date | None = None
@@ -95,9 +97,11 @@ def evaluate(customer: Customer, debt: Debt, diagnosis: Diagnosis, state: DebtSt
 
     # Bereavement / hardship. POLICY CHOICE. The one case where a wrong answer is
     # unforgivable, so it is a code-level stop and never delegated to a model.
-    # Hardship holds indefinitely UNLESS the customer named a date to be contacted on. Then
-    # it holds until that date and lifts on it. `>=` rather than `==` so a missed day (a
-    # weekend, an outage) does not silently bury the file forever.
+    # Hardship holds until `hardship_resume_on` and lifts on it: the date the customer named,
+    # or the policy pause when they named none. `>=` rather than `==` so a missed day (a
+    # weekend, an outage) does not silently bury the file forever. Note this is the one stop
+    # here that expires, so an opt-out inside a hardship reply must be classified as the
+    # opt-out - which is why `parser.override_intent` tests that list first.
     hardship_holds = customer.bereaved_or_hardship and not (
         state.hardship_resume_on is not None and now.date() >= state.hardship_resume_on)
     stop = check("no_hardship_flag", not hardship_holds, StopReason.BEREAVEMENT)

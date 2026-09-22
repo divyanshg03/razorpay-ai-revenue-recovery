@@ -648,6 +648,163 @@ def test_keyword_fallback_finds_a_promise_without_the_model():
     assert p.intent is Intent.PROMISE_TO_PAY and p.promised_date == dt.date(2026, 9, 5)
 
 
+@pytest.mark.parametrize("reply", [
+    "My father passed away. Stop messaging me.",
+    "I lost my job, do not contact me again",
+    "my mother is in hospital, please remove my number",
+])
+def test_a_statutory_stop_outranks_a_hardship_pause(reply):
+    """Both keyword lists match these. The one that does NOT expire has to win.
+
+    Hardship used to be tested first, so an explicit objection wrapped in a bereavement was
+    recorded as hardship - a seven-day pause, after which the ladder resumed and reached a
+    human call. The emotive signal was also the permissive one. Reported by the pre-interview
+    audit on 19 Sept 2026 as the single sentence that breaks the compliance claim live.
+    """
+    assert parse_reply(reply, TODAY, use_llm=False).intent is Intent.OPT_OUT
+
+
+def test_a_dispute_inside_a_hardship_reply_is_still_a_dispute():
+    p = parse_reply("I already paid this, and I lost my job", TODAY, use_llm=False)
+    assert p.intent is Intent.DISPUTE
+
+
+@pytest.mark.parametrize("reply,expected", [
+    ("my mother died 2 days ago", None),                        # a number, not a date
+    ("I lost my job, I have 2 kids, please give me time", None),
+    ("my father passed away last week, I need some time", None),
+    ("I am in hospital, please contact me after the 20th", dt.date(2026, 9, 20)),
+    ("in hospital, call me after 10 days", dt.date(2026, 9, 10)),
+])
+def test_a_hardship_callback_needs_a_date_not_just_a_number(reply, expected):
+    """`resolve_date` reads any one or two digit number as a day of the month.
+
+    Handing it the whole reply therefore turned "died 2 days ago" into a callback on the 2nd,
+    which was the following day. The date now comes from the clause where the customer names
+    the callback, and a reply with no such clause falls back to the policy pause.
+    """
+    p = parse_reply(reply, TODAY, use_llm=False)
+    assert p.intent is Intent.HARDSHIP
+    assert p.promised_date == expected
+
+
+@pytest.mark.parametrize("reply", [
+    "mujhe message mat bhejo",
+    "yeh messages band karo",
+    "yeh sab band kar do",
+    "pareshan mat karo",
+    "mera number hata do",
+])
+def test_an_opt_out_in_hinglish_is_caught_without_a_model(reply):
+    """India does not reply in English, and the keyword list is the floor under the model.
+
+    llama3.1:8b labels "mujhe message mat bhejo" as `other`, so a model-only answer here is
+    not one. The `\\w*` tails are load-bearing: "mat bhej" against "mat bhejo" matched the
+    letters and then failed the closing word boundary, which is how the first version of this
+    list stopped nothing at all.
+    """
+    assert parse_reply(reply, TODAY, use_llm=False).intent is Intent.OPT_OUT
+
+
+@pytest.mark.parametrize("reply,expected", [
+    ("please don't stop my subscription, I will pay on the 10th", Intent.PROMISE_TO_PAY),
+    ("do not stop my plan, paying tomorrow", Intent.PROMISE_TO_PAY),
+    ("never cancel my mandate, sending the money tonight", Intent.PROMISE_TO_PAY),
+    # The scrub removes the NEGATED phrase, not the reply. A real stop still stops.
+    ("dont stop my subscription but stop messaging me", Intent.OPT_OUT),
+])
+def test_a_negated_stop_is_not_an_opt_out(reply, expected):
+    """"Don't stop my subscription" closed the file and wrote a DPDP objection event.
+
+    The customer was promising to pay. Reading a negation as its opposite is the expensive
+    direction of a false positive: it loses the money AND records an objection they never
+    raised, which then propagates to every channel.
+    """
+    assert parse_reply(reply, TODAY, use_llm=False).intent is expected
+
+
+def test_an_identity_question_alone_is_not_a_dispute():
+    """"Who is this?" froze the file permanently on a customer who was merely confused.
+
+    Most likely confused BY US: a service message with no merchant name is exactly what
+    prompts the question. It now falls through to OTHER and the ladder answers it with a
+    template that identifies the sender. An actual denial still stops everything.
+    """
+    assert parse_reply("who is this?", TODAY, use_llm=False).intent is Intent.OTHER
+    assert parse_reply("who is this? I never subscribed to this", TODAY,
+                       use_llm=False).intent is Intent.DISPUTE
+    assert parse_reply("who are you, this is not my account", TODAY,
+                       use_llm=False).intent is Intent.DISPUTE
+
+
+@pytest.mark.parametrize("reply,days_ahead", [
+    ("kal pay karunga", 1),
+    ("parso bhej dunga", 2),
+    ("agle hafte pay karunga", 7),
+])
+def test_a_hinglish_promise_is_read_and_dated(reply, days_ahead):
+    """Stops were bilingual and promises were not, so the ladder kept escalating at someone
+    who had just said when they would pay. That error costs money rather than compliance."""
+    p = parse_reply(reply, TODAY, use_llm=False)
+    assert p.intent is Intent.PROMISE_TO_PAY
+    assert p.promised_date == TODAY + dt.timedelta(days=days_ahead)
+
+
+def test_a_model_detected_opt_out_stops_contact(monkeypatch):
+    """The model may stop us. Discarding its stop was the unsafe direction of the only error
+    that matters here, because every paraphrased or non-English objection lands on it."""
+    monkeypatch.setattr("recovery.llm.parser._ask_llm",
+                        lambda reply, model, timeout: {"intent": "opt_out", "date_phrase": None})
+    p = parse_reply("Please cease all communication with me", TODAY, use_llm=True)
+    assert p.intent is Intent.OPT_OUT
+    assert p.source == "llm_stop", "the record must show WHO decided the stop"
+    assert p.promised_date is None, "no date may cross an opt-out"
+
+
+def test_the_model_can_never_start_contact_or_lift_a_stop(monkeypatch):
+    """The asymmetry stated in parser.py's docstring, pinned in both directions."""
+    monkeypatch.setattr("recovery.llm.parser._ask_llm",
+                        lambda reply, model, timeout: {"intent": "promise_to_pay",
+                                                       "date_phrase": "tomorrow"})
+    p = parse_reply("do not contact me again", TODAY, use_llm=True)
+    assert p.intent is Intent.OPT_OUT and p.source == "override"
+    assert p.promised_date is None
+
+
+def test_a_pinned_retry_schedule_overrides_the_derived_one_and_changes_nothing_by_default():
+    """`Policy.retry_days` exists so a regulator's cap is a POLICY, not a monkeypatch.
+
+    Measuring a configuration that is not the shipped one measures nothing, which is what
+    patching `retry_schedule` from a script would have done. The default must stay None, or
+    the published artifact silently changes underneath the frozen metric definition.
+    """
+    assert Policy().retry_days is None
+    assert retry_schedule(Policy()) == (0, 4, 8, 13, 17, 21)
+    capped = replace(Policy(), retry_days=(7, 14, 21), max_retries_per_debt=3)
+    assert retry_schedule(capped) == (7, 14, 21)
+
+
+def test_payment_state_is_re_read_before_each_action_not_once_a_day(tmp_path):
+    """"Immediately before every action" was once per debt per day, which is not the same.
+
+    A capture landing between the retry and the contact that follows it has to stop the
+    contact. Day 4 is the first day on which both are candidates, so the re-check is asked
+    twice, and the second answer is the one that matters.
+    """
+    led = AuditLedger(tmp_path / "recheck.jsonl", P.version)
+    answers = iter([False, True])          # paid between the two actions of the same cycle
+    eng = RecoveryEngine(P, led, is_settled=lambda d: next(answers))
+    decisions = eng.plan_day(debt(), customer(), at(10, day=START + dt.timedelta(days=4)))
+
+    assert len(decisions) == 2, [d.channel for d in decisions]
+    assert decisions[0].act and decisions[0].channel is Channel.RETRY
+    assert not decisions[1].act and decisions[1].stop_reason is StopReason.PAID
+
+    reads = [e for e in led.read() if e["type"] == RecordType.STATE_RECHECK.value]
+    assert [e["body"]["already_paid"] for e in reads] == [False, True], \
+        "every read that changed the answer must be in the trail"
+
+
 # ---------------------------------------------------------------------------------------
 # THE ZERO-ASSERTIONS: run the engine, then replay the ledger with independent code
 # ---------------------------------------------------------------------------------------
