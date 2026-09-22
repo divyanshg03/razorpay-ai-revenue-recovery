@@ -50,7 +50,8 @@ def _outside_generated(text: str) -> str:
 
 def test_readme_has_the_generated_blocks_it_claims():
     names = {m_.group(1) for m_ in GEN.finditer(README.read_text(encoding="utf-8"))}
-    assert {"readme-headline", "readme-npci", "readme-failures", "readme-limitations",
+    assert {"readme-npci", "readme-npci-control", "readme-npci-failures", "readme-headline",
+            "readme-control", "readme-failures", "readme-limitations",
             "readme-reproduce"} <= names, names
 
 
@@ -81,7 +82,11 @@ def test_render_check_covers_the_README_and_is_clean():
 
 
 def test_headline_in_the_README_equals_the_artifact(readme, m):
-    """Spot-check the actual number, not just that a renderer ran."""
+    """Spot-check the actual number, not just that a renderer ran.
+
+    Since amendment A12 this block is the PRE-REGISTERED six-retry result, rendered in its own
+    section below the capped headline - still checked against its artifact, because a
+    superseded figure that drifts is as wrong as a current one."""
     block = next(g.group(2) for g in GEN.finditer(readme) if g.group(1) == "readme-headline")
     expected = f"Rs {m['headline']['net_incremental_rupees']:,.0f}"
     assert expected in block, (expected, block[:400])
@@ -127,19 +132,20 @@ def test_the_simulator_disclosure_comes_before_the_headline_number(readme):
     and correct.
     """
     disclosure = readme.lower().find("cohort is simulated")
-    headline = readme.find("<!-- generated:readme-headline -->")
+    blocks = [readme.find(f"<!-- generated:{b} -->") for b in ("readme-npci", "readme-headline")]
     assert disclosure != -1, "the simulated-cohort disclosure is missing entirely"
-    assert headline != -1
-    assert disclosure < headline, \
-        "the headline figure appears above the simulated-cohort disclosure"
+    assert -1 not in blocks
+    assert disclosure < min(blocks), \
+        "a headline figure appears above the simulated-cohort disclosure"
 
 
 def test_the_failure_list_comes_before_the_architecture_section(readme):
     """What it failed to recover is part of the result, not an appendix to the design."""
-    failures = readme.find("<!-- generated:readme-failures -->")
     architecture = readme.find("## How it is built")
-    assert -1 not in (failures, architecture)
-    assert failures < architecture
+    for block in ("readme-npci-failures", "readme-failures"):
+        failures = readme.find(f"<!-- generated:{block} -->")
+        assert -1 not in (failures, architecture), block
+        assert failures < architecture, block
 
 
 # ---------------------------------------------------------------------------------------
@@ -319,22 +325,62 @@ def test_the_capped_figures_in_the_README_equal_their_artifact(readme, capped):
     """The capped run is reported in the README, so it is held to the headline's rule: read,
     never typed, and checked against the file it came from rather than against a renderer
     that merely ran."""
-    block = next(g.group(2) for g in GEN.finditer(readme) if g.group(1) == "readme-npci")
-    net = capped["comparisons"]["headline__C_vs_B"]["net_incremental_total_rupees"]
-    assert f"Rs {net:,.0f}" in block, net
-    assert f"{capped['arms']['C_engine']['recovery_rate'] * 100:.2f}%" in block
+    blocks = {g.group(1): " ".join(g.group(2).split()) for g in GEN.finditer(readme)}
+    head = capped["comparisons"]["headline__C_vs_B"]
+    assert f"Rs {head['net_incremental_total_rupees']:,.0f}" in blocks["readme-npci"]
+    assert f"{capped['arms']['C_engine']['recovery_rate'] * 100:.2f}%" in blocks["readme-npci"]
+    word = "excludes zero" if head["excludes_zero"] else "**crosses zero**"
+    assert f"The interval {word}" in blocks["readme-npci"], \
+        "the headline states a significance its artifact does not support"
+
     decisioning = capped["comparisons"]["decisioning_is_worth__C_vs_D_diagnosed"]
-    word = "excludes" if decisioning["excludes_zero"] else "crosses"
-    assert f"which {word} zero" in " ".join(block.split()), \
-        "the README states a significance the artifact does not support"
+    control = blocks["readme-npci-control"]
+    assert f"Rs {decisioning['net_incremental_total_rupees']:,.0f}" in control
+    word = "excludes" if decisioning["excludes_zero"] else "**crosses**"
+    assert f"the interval {word} zero" in control, \
+        "the decisioning claim states a significance its artifact does not support"
 
 
-def test_the_readme_never_presents_the_capped_run_as_the_headline(readme):
-    """Beside the headline, never instead of it: the frozen definition fixes the headline's
-    configuration, and swapping in a re-run under new rules is what the freeze prevents."""
-    headline = readme.find("<!-- generated:readme-headline -->")
-    capped = readme.find("<!-- generated:readme-npci -->")
-    assert -1 not in (headline, capped) and headline < capped
+def test_the_capped_failure_list_in_the_README_equals_its_artifact(readme, capped):
+    """What it failed to recover is part of the result, and the headline's failure list must
+    come from the headline's artifact - not from the six-retry run, whose shares would not
+    add up against the capped headline's recovery rate."""
+    block = next(" ".join(g.group(2).split()) for g in GEN.finditer(readme)
+                 if g.group(1) == "readme-npci-failures")
+    f = capped["C_engine_failure_list"]
+    assert f"{f['n_not_recovered']:,} of" in block
+    assert f"Rs {f['unrecovered_rupees']:,.0f}" in block
+    for count in f["standing"]["counts"].values():
+        assert f"| {count:,} |" in block, count
+
+
+def test_the_headline_moved_only_by_amendment_only_downward_and_the_original_stayed(
+        readme, m, capped):
+    """How a pre-registered headline may legitimately change, pinned four ways.
+
+    Amendment A12 moved the headline inside NPCI's attempt cap. A frozen definition exists to
+    stop exactly that kind of move being made quietly, so the move is held to the conditions
+    that make it honest rather than convenient:
+
+      - it is recorded as a dated amendment that names the artifact it switched to,
+      - it LOWERED the headline - a switch that raised it would need far more than this,
+      - the pre-registered result is still on the page, in full, not deleted or edited,
+      - and the new headline comes first, so nobody reads the superseded one as current.
+    """
+    definition = (REPO / "docs" / "metric-definition.md").read_text(encoding="utf-8")
+    assert "### A12" in definition and "npci-cap-rerun.json" in definition, \
+        "the headline changed without an amendment recording why"
+
+    new = capped["comparisons"]["headline__C_vs_B"]["net_incremental_total_rupees"]
+    old = m["headline"]["net_incremental_rupees"]
+    assert new <= old, f"the switch raised the headline ({old:,.0f} -> {new:,.0f})"
+
+    capped_at = readme.find("<!-- generated:readme-npci -->")
+    original_at = readme.find("<!-- generated:readme-headline -->")
+    assert original_at != -1, "the pre-registered result was removed from the README"
+    assert capped_at != -1 and capped_at < original_at, \
+        "the superseded headline is presented before the current one"
+    assert f"Rs {old:,.0f}" in readme, "the pre-registered figure no longer appears"
 
 
 def test_the_demo_reports_the_capped_rerun_from_the_artifact(demo_out, capped):

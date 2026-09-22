@@ -67,6 +67,7 @@ from recovery.diagnosis.taxonomy import diagnose                     # noqa: E40
 from recovery.engine.policy import Policy                            # noqa: E402
 from recovery.evaluation.assignment import SEED, assign              # noqa: E402
 from recovery.evaluation.engine_arm import run_engine                # noqa: E402
+from recovery.evaluation.metrics import failure_list                 # noqa: E402
 from recovery.ledger.audit import AuditLedger                        # noqa: E402
 from recovery.models import Actionability, Arm                       # noqa: E402
 
@@ -112,8 +113,13 @@ def calendar_arm(refs: set[str], days: tuple[int, ...], respect_diagnosis: bool)
     return recovered
 
 
-def engine_arm(refs: set[str], policy: Policy) -> tuple[dict[str, int], dict[str, int], int]:
-    """Arm C under the capped policy, scored on each debt's own window."""
+def engine_arm(refs: set[str], policy: Policy) -> tuple[dict[str, int], dict[str, int], int, dict]:
+    """Arm C under the capped policy, scored on each debt's own window.
+
+    Also returns the failure list, decomposed exactly as the frozen run's is - by the shipped
+    `metrics.failure_list` - but with every predicate anchored on the debt's own failure
+    date, which is what the frozen definition asks for and the main batch does not yet do.
+    """
     cohort = SimulatedCohort(seed=SEED, n_customers=N_CUSTOMERS, start=START)
     debts = [d for d in cohort.debts() if d.customer_ref in refs]
     customers = [c for c in cohort.customers() if c.ref in refs]
@@ -122,12 +128,57 @@ def engine_arm(refs: set[str], policy: Policy) -> tuple[dict[str, int], dict[str
     # +2 days so a debt that failed on the cohort's third day still reaches its own day 21.
     outcomes = run_engine(cohort, debts, customers, START, WINDOW_DAYS + 2, policy, ledger)
     failed_on = {d.debt_id: (d.failed_at.date() - START).days for d in debts}
-    recovered, cost = {}, {}
+    recovered, cost, scored = {}, {}, []
     for o in outcomes:
         in_window = o.recovered and 0 <= o.settled_on_day - failed_on[o.debt_id] <= WINDOW_DAYS
-        recovered[o.debt_id] = o.recovered_paise if in_window else 0
+        if o.recovered and not in_window:
+            o = replace(o, recovered_paise=0, settled_on_day=None)   # outside its own window
+        scored.append(o)
+        recovered[o.debt_id] = o.recovered_paise
         cost[o.debt_id] = o.contact_cost_paise
-    return recovered, cost, len(outcomes)
+
+    # Ground truth for the EVALUATION layer only - the engine never sees it. One debt per
+    # customer in this cohort, so a customer's window is their debt's window.
+    window = {d.customer_ref: [d.failed_at.date() + dt.timedelta(days=k)
+                               for k in range(WINDOW_DAYS + 1)] for d in debts}
+    retry_on = {d.customer_ref: {d.failed_at.date() + dt.timedelta(days=k)
+                                 for k in schedule_of(policy)} for d in debts}
+
+    def ever_funded(ref: str) -> bool:
+        return any(cohort.funds_available(ref, day) for day in window[ref])
+
+    def funded_on_a_retry_day(ref: str) -> bool:
+        return any(cohort.funds_available(ref, day) for day in window[ref] if day in retry_on[ref])
+
+    return recovered, cost, len(outcomes), failure_list(scored, ever_funded, funded_on_a_retry_day)
+
+
+def schedule_of(policy: Policy) -> tuple[int, ...]:
+    return tuple(policy.retry_days or ())
+
+
+def by_cause(recovered: dict[str, int]) -> dict[str, dict]:
+    """Arm C's recoveries per diagnosed cause - where the decisioning earns what it earns.
+
+    `needs_new_instrument` is the row that matters: a silent retry can never fix a dead
+    instrument, the diagnosis-respecting control therefore declines to retry it at all, and
+    anything recovered there came from asking the customer for a new one.
+    """
+    cohort = SimulatedCohort(seed=SEED, n_customers=N_CUSTOMERS, start=START)
+    out: dict[str, dict] = {}
+    for debt in cohort.debts():
+        if debt.debt_id not in recovered:
+            continue
+        row = out.setdefault(diagnose(debt.failure).actionability.value,
+                             {"n": 0, "recovered": 0, "recovered_rupees": 0.0})
+        row["n"] += 1
+        if recovered[debt.debt_id]:
+            row["recovered"] += 1
+            row["recovered_rupees"] += recovered[debt.debt_id] / 100
+    for row in out.values():
+        row["recovery_rate"] = round(row["recovered"] / row["n"], 4)
+        row["recovered_rupees"] = round(row["recovered_rupees"], 2)
+    return dict(sorted(out.items()))
 
 
 def _mean(values: list[int]) -> float:
@@ -163,12 +214,14 @@ def main() -> int:
                                         start=START).customers())
     refs_c = assignment.refs_in(Arm.ENGINE)
     refs_b = assignment.refs_in(Arm.INCUMBENT_LADDER)
+    refs_a = assignment.refs_in(Arm.DO_NOTHING)
 
     print(f"  schedule: charge on day 0, retries on {schedule};  incumbent {INCUMBENT_DAYS}")
+    a = calendar_arm(refs_a, (), respect_diagnosis=False)       # self-cure only
     b = calendar_arm(refs_b, INCUMBENT_DAYS, respect_diagnosis=False)
     d = calendar_arm(refs_c, schedule, respect_diagnosis=False)
     d_diag = calendar_arm(refs_c, schedule, respect_diagnosis=True)
-    c_recovered, c_cost, n_c = engine_arm(refs_c, policy)
+    c_recovered, c_cost, n_c, c_failures = engine_arm(refs_c, policy)
 
     ids = sorted(c_recovered)
     c_net = [c_recovered[i] - c_cost[i] for i in ids]
@@ -212,6 +265,7 @@ def main() -> int:
         "policy_overrides": {"retry_days": list(schedule),
                              "max_retries_per_debt": RETRIES_ALLOWED},
         "arms": {
+            "A_do_nothing": arm_block(a),
             "B_incumbent": arm_block(b),
             "C_engine": arm_block(c_recovered, c_cost),
             "D_calendar_blind": arm_block(d),
@@ -232,7 +286,21 @@ def main() -> int:
                 "label": "the engine vs a calendar blind to the cause (flatters the control: "
                          "the simulator lets a silent retry fix causes that need the customer)",
                 **compare(c_net, [d[i] for i in ids], paired=True, scale=n_c, rng=rng)},
+            # LAST, so adding it did not move the random stream under the comparisons above:
+            # their intervals are byte-identical to the previous artifact's.
+            "spacing_is_worth__D_vs_B": {
+                "label": "the blind calendar vs the incumbent (flatters the calendar: the "
+                         "simulator lets a silent retry fix causes that need the customer)",
+                **compare([d[i] for i in ids], list(b.values()), paired=False,
+                          scale=n_c, rng=rng)},
         },
+        "C_engine_by_diagnosed_cause": by_cause(c_recovered),
+        "C_engine_failure_list": {
+            "note": ("The same four-way decomposition as the frozen run, anchored on each debt's "
+                     "own window. Under the cap, bucket 3 is not a scheduling defect: it counts "
+                     "debts that had money in the window but never on one of the three retry "
+                     "days the rule allows - the price of the cap, measured."),
+            **c_failures},
         "bootstrap": {"resamples": RESAMPLES, "seed": BOOTSTRAP_SEED,
                       "method": "percentile; paired where the control runs on arm C's own "
                                 "customers, independent where it does not"},

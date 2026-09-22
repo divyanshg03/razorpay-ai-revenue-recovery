@@ -690,7 +690,7 @@ def main() -> int:
     say(f"ledger: {ledger_path}")
 
     # -- 13 -----------------------------------------------------------------------------
-    scene(13, "What it is worth, from the artifact")
+    scene(13, "The pre-registered measurement: six retries")
     if not METRICS.exists():
         say("results/metrics.json is missing - run scripts/run_batch.py to regenerate it.")
         print(paint(f"\n{'=' * W}\n", CYAN))
@@ -701,8 +701,10 @@ def main() -> int:
     prim = p["primary"]
     ctrl = p["spread_retry_control"]["decisioning_is_worth__C_vs_D_diagnosed"]
     spacing = p["spread_retry_control"]["spacing_is_worth__D_vs_B"]
-    say("Read live from results/metrics.json - the same file every figure in the README is")
-    say("generated from. Nothing on this screen is typed by hand.")
+    say("Read live from results/metrics.json - the configuration the metric was frozen")
+    say("with, six retries per failed debit. Amendment A12 moved the headline inside NPCI's")
+    say("cap (next scene) and deleted nothing: this is the pre-registered record, unedited.")
+    say("Nothing on this screen is typed by hand.")
     say()
     kv("cohort", f"{m['n_customers']:,} simulated customers, seed {p['seed']}, "
                  f"{p['window_days']}-day window")
@@ -724,7 +726,7 @@ def main() -> int:
     # Labels come from the artifact, not from this file. Arms D and D_diagnosed are one
     # suffix apart and answer different questions, so printing one under the other's name
     # would misstate what the calendar alone is worth - on the slide about exactly that.
-    kv(f"HEADLINE {arm_name(prim['treat_arm'])} vs {arm_name(prim['control_arm'])}",
+    kv(f"six retries {arm_name(prim['treat_arm'])} vs {arm_name(prim['control_arm'])}",
        money(prim), code=GREEN)
     kv(f"calendar {arm_name(spacing['treat_arm'])} vs {arm_name(spacing['control_arm'])}",
        money(spacing))
@@ -744,7 +746,7 @@ def main() -> int:
         say("where retries run out, it is also what is left to collect with.")
 
     # -- 14 -----------------------------------------------------------------------------
-    scene(14, "The same cohort, inside NPCI's cap")
+    scene(14, "The headline: the same cohort inside NPCI's cap")
     if not NPCI.exists():
         say("results/npci-cap-rerun.json is missing - run scripts/npci_cap_rerun.py.")
     else:
@@ -767,13 +769,23 @@ def main() -> int:
             kv(f"arm {key}", f"{arm['recovery_rate']:>7.2%}   n={arm['n']:,}")
         say()
         capped = cap["comparisons"]
-        for key, row in capped.items():
-            if key.endswith("__C_vs_D"):
-                continue          # the blind control, kept in the artifact, not on screen
-            kv(key.split("__")[-1].replace("_", " "),
+        # The blind-calendar comparisons stay in the artifact and off the screen: they flatter
+        # the control for a reason the README spells out, and D' is the one to read.
+        for key, label in (("headline__C_vs_B", "HEADLINE C vs B"),
+                           ("spacing_is_worth__D_diagnosed_vs_B", "calendar D' vs B"),
+                           ("decisioning_is_worth__C_vs_D_diagnosed", "decisioning C vs D'")):
+            row = capped[key]
+            kv(label,
                f"Rs {row['net_incremental_total_rupees']:,.0f}   95% CI "
                f"[{row['ci95_total_rupees'][0]:,.0f}, {row['ci95_total_rupees'][1]:,.0f}]",
                code=GREEN if row["excludes_zero"] else YELLOW)
+        failures = cap.get("C_engine_failure_list")
+        if failures:
+            price = failures["standing"]["counts"]["funded_but_never_attempted_DEFECT"]
+            kv("not recovered", f"{failures['n_not_recovered']:,} debts, "
+                                f"Rs {failures['unrecovered_rupees']:,.0f} left on the table")
+            kv("the price of the cap", f"{price:,} had money in the window, but never on a "
+                                       f"permitted retry day")
         say()
         decisioning = capped["decisioning_is_worth__C_vs_D_diagnosed"]
         shipped = ctrl["net_incremental_total_rupees"]

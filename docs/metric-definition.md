@@ -583,6 +583,58 @@ unlawful to ship is a measuring instrument, not an alternative.
 **No headline figure changed.** Rs 957,155.53, arm C 67.41%, guardrails zero in all three
 cohorts. This amendment adds a control and rewrites prose; it does not move the primary metric.
 
+### A12 - 22 Sept 2026 - the headline is now measured inside NPCI's attempt cap
+
+**A result HAD been observed** - two of them, and the new headline is the smaller. The
+superseded headline, under the configuration this document froze, was Rs 957,155.53 net
+incremental, 95% CI [Rs 807,478.70 - Rs 1,094,820.80], arm C at 67.41%, from
+`results/metrics.json` (`head_commit` 12df68c). The headline is now Rs 724,503.26, 95% CI
+[Rs 578,217.77 - Rs 862,865.12], arm C at 58.40%, from `results/npci-cap-rerun.json`
+(`head_commit` 682f343, clean tree). Both values are recorded here so the change can be audited
+in the direction that matters.
+
+**What changed.** The configuration the headline is computed under. Not the metric: net
+incremental rupees against the randomised holdout, net of contact cost, over a 21-day window, on
+the same seed, the same assignment, the same arms and the same exclusions, is untouched. The
+configuration changes are:
+
+- **Three retries after the failed charge, not six.** Placed on days 7, 14 and 21 by the same
+  spreading rule the frozen schedule used, applied after day 0 rather than from it. Expressed as
+  a policy field, `Policy.retry_days`, so the configuration measured is one the engine ships
+  with rather than a patch applied from a script.
+- **The incumbent on its documented T+1..T+3.** The frozen harness also re-debited on the day
+  of the failure, five debits where Razorpay's documentation describes four.
+- **Each debt scored on its own 21-day window.** Section 3 of this document already says "21 days
+  from the initial mandate failure, per debt"; the frozen harness anchored every arm on the
+  cohort's start date instead, which contradicted it. The capped run is the more faithful
+  implementation of this definition, not a departure from it.
+- **Self-cure checked identically in every arm**, every day, before any retry.
+
+**Why.** NPCI's UPI circular OC-215-A allows one attempt and three retries per mandate
+execution. The frozen configuration took six, so the frozen headline measured a schedule no
+deployment could run. It was found by a post-submission audit on 19 Sept 2026 that set out to
+find what a panel could target - not by searching for a better number, and the new number is
+not better: it is Rs 232,652.27 lower.
+
+**What is NOT changed, deliberately.** The six-retry result is not deleted, edited or
+re-run. `results/metrics.json` stands as generated, and the README renders it in full, in its own
+section, labelled as the pre-registered measurement. A headline switched silently would be
+exactly the move this document exists to prevent. One switched by a dated amendment, in the
+conservative direction, with the original left in view, is what this log exists to record.
+
+**What a reader should discount.** The two runs differ in four ways at once, so the difference
+between the two headlines is not purely the cost of the cap: the window and incumbent
+corrections move it too. The capped run's intervals use a percentile bootstrap, paired where a
+control runs on arm C's own customers, rather than the stratified bootstrap in section 6. Its
+retry days were derived by rule, not tuned: no other three-retry schedule was measured. One
+earlier variant was run during the audit - four retries on days 0, 7, 14 and 21 - and discarded
+because it still exceeded the cap and re-debited on the day of the failure, not because of what
+it scored.
+
+**How it is held.** `tests/test_phase4.py` asserts that the capped headline precedes the
+pre-registered one in the README, that both are present, that this amendment exists and names
+the capped artifact, and that the switch lowered the headline rather than raising it.
+
 ### A9 - 4 Sept 2026 - the hash chain did not cover the fields the ledger's claims rest on
 
 Raised in the same review as A8 and deliberately held back from that fix, because folding an

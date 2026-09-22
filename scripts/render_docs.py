@@ -46,7 +46,8 @@ NPCI = REPO / "results" / "npci-cap-rerun.json"
 #: Which generated block belongs to which file. One block may appear in several files.
 TARGETS: dict[str, tuple[str, ...]] = {
     "docs/phase-3.md": ("phase3-results",),
-    "README.md": ("readme-headline", "readme-npci", "readme-control", "readme-failures",
+    "README.md": ("readme-npci", "readme-npci-control", "readme-npci-failures",
+                  "readme-headline", "readme-control", "readme-failures",
                   "readme-limitations", "readme-reproduce"),
 }
 
@@ -184,7 +185,7 @@ def render_readme_headline(m: dict) -> str:
     return "\n".join([
         f"| | |",
         f"|---|---|",
-        f"| **Net incremental recovery** | **{_rs(h['net_incremental_rupees'])}** |",
+        f"| **Net incremental recovery, six retries** | **{_rs(h['net_incremental_rupees'])}** |",
         f"| 95% CI | {_rs(lo)} – {_rs(hi)} |",
         f"| Per treated customer | {_rs2(h['per_customer_rupees'])} |",
         f"| Compared against | {h['comparison']} |",
@@ -215,44 +216,34 @@ def render_readme_headline(m: dict) -> str:
         f"{_rs(m['shifted_parameter_cohort']['primary']['ci95_total_rupees'][1])} |",
         "",
         _wrap(
-        f"Arm A does nothing. Arm B is Razorpay's own T+0..T+3 ladder, reimplemented. Arm C "
-        f"is the engine. The headline is **C against B** - beating do-nothing proves nothing, "
-        f"since every recovery vendor beats doing nothing. {_intervals_claim(m)}"),
+        f"Arm A does nothing. Arm B is the incumbent ladder as the submission reimplemented "
+        f"it, which also re-debits on the day of the failure - five debits rather than the "
+        f"documented four. Arm C is the engine with six retries, over NPCI's cap. "
+        f"{_intervals_claim(m)}"),
     ])
 
 
-def render_readme_npci(m: dict) -> str:
-    """The same cohort inside NPCI's attempt cap, from its own artifact.
+def _ci(row: dict) -> str:
+    return f"{_rs(row['ci95_total_rupees'][0])} – {_rs(row['ci95_total_rupees'][1])}"
 
-    A separate block, from a separate artifact, placed BESIDE the headline and never instead
-    of it. The frozen definition fixes the configuration the headline is computed under;
-    re-running a pre-registered measurement under different rules and then presenting the
-    result as the headline is the exact move a freeze exists to prevent - whichever
-    direction the new number happens to point.
+
+def render_readme_npci(m: dict) -> str:
+    """The headline: the cohort measured inside NPCI's attempt cap (amendment A12).
+
+    It became the headline by a dated amendment, in the conservative direction - it is smaller
+    than the six-retry result it displaced - and that six-retry result is still rendered,
+    unedited, in its own section further down. A headline switched silently is exactly what a
+    frozen definition exists to prevent; one switched by an amendment that LOWERS the number,
+    with the original left in view, is what the amendment log exists to record.
     """
     cap = _npci()
     if cap is None:
         return "_(results/npci-cap-rerun.json is not present - run scripts/npci_cap_rerun.py)_"
-    arms, cmp_ = cap["arms"], cap["comparisons"]
+    arms, cmp_, sched, b = cap["arms"], cap["comparisons"], cap["schedule"], cap["bootstrap"]
     head = cmp_["headline__C_vs_B"]
-    dec = cmp_["decisioning_is_worth__C_vs_D_diagnosed"]
-    spacing = cmp_["spacing_is_worth__D_diagnosed_vs_B"]
-    sched = cap["schedule"]
     net = head["net_incremental_total_rupees"]
     cost = (f"Rs {arms['C_engine']['contact_cost_rupees'] / net:.4f}" if net > 0
             else "n/a - no incremental recovery")
-    shipped = (m["primary_cohort_21d"].get("spread_retry_control", {})
-               .get("decisioning_is_worth__C_vs_D_diagnosed"))
-
-    if dec["excludes_zero"] and shipped and not shipped["excludes_zero"]:
-        reading = (
-            f"With six retries the same comparison is {_rs(shipped['net_incremental_total_rupees'])} "
-            "on an interval that crosses zero. Read together, the two artifacts make one finding: "
-            "when attempts are plentiful the calendar does the work, and when the rule makes "
-            "them scarce, deciding whom to contact is what is left to collect with.")
-    else:
-        reading = ("Compare it with the six-retry control below; both intervals are reported "
-                   "as measured, whichever way they point.")
 
     def _bullets(items: list[str]) -> list[str]:
         out = []
@@ -263,35 +254,164 @@ def render_readme_npci(m: dict) -> str:
         return out
 
     return "\n".join([
-        "| Inside the cap | |",
+        "| | |",
         "|---|---|",
-        f"| **Net incremental recovery, C vs B** | **{_rs(net)}** |",
-        f"| 95% CI | {_rs(head['ci95_total_rupees'][0])} – {_rs(head['ci95_total_rupees'][1])} |",
+        f"| **Net incremental recovery** | **{_rs(net)}** |",
+        f"| 95% CI | {_ci(head)} |",
         f"| Per treated customer | {_rs2(head['net_incremental_per_customer_rupees'])} |",
-        f"| Recovery rate, B / D' / C | {_pct(arms['B_incumbent']['recovery_rate'])} / "
-        f"{_pct(arms['D_diagnosed_calendar']['recovery_rate'])} / "
-        f"{_pct(arms['C_engine']['recovery_rate'])} |",
-        f"| The calendar alone, D' vs B | {_rs(spacing['net_incremental_total_rupees'])} "
-        f"({_rs(spacing['ci95_total_rupees'][0])} – {_rs(spacing['ci95_total_rupees'][1])}) |",
+        "| Compared against | the engine (C) vs Razorpay's documented T+1..T+3 ladder (B) |",
         f"| Cost per incremental rupee | {cost} |",
+        f"| Recovery rate, A / B / C | {_pct(arms['A_do_nothing']['recovery_rate'])} / "
+        f"{_pct(arms['B_incumbent']['recovery_rate'])} / "
+        f"{_pct(arms['C_engine']['recovery_rate'])} |",
         f"| Rule | {cap['rule']} |",
-        f"| Schedule | the charge on day 0, retries on days "
+        f"| Schedule | the charge on day 0; retries on days "
         f"{', '.join(map(str, sched['engine_and_controls']))}; Razorpay's ladder on days "
         f"{', '.join(map(str, sched['incumbent']))} |",
         f"| Window | {cap['window_days']} days, anchored on {cap['window_anchored_on']} |",
+        f"| Cohort | {cap['n_customers']:,} simulated customers, seed {cap['seed']} |",
+        f"| Interval method | {b['method']}, {b['resamples']:,} resamples |",
         f"| Generated at | `{cap['head_commit']}`, "
         f"{'with uncommitted changes' if cap['working_tree_dirty'] else 'clean tree'} |",
         "",
         _wrap(
-        f"**What the decisioning layer is worth inside the cap (C vs D'): "
-        f"{_rs(dec['net_incremental_total_rupees'])}**, 95% CI "
-        f"{_rs(dec['ci95_total_rupees'][0])} – {_rs(dec['ci95_total_rupees'][1])}, which "
-        f"{'excludes' if dec['excludes_zero'] else 'crosses'} zero. {reading}"),
+        "Arm A does nothing. Arm B is Razorpay's Subscriptions ladder as documented: the "
+        "charge, then a retry on each of the three following days. Arm C is the engine, "
+        "allowed the same four debits and no more. The headline is **C against B** - beating "
+        "do-nothing proves nothing, since every recovery vendor beats doing nothing. The "
+        f"interval {'excludes zero' if head['excludes_zero'] else '**crosses zero**'}."),
         "",
         "Still not modelled, and each of these would move the figures above:",
         "",
         *_bullets(cap["not_modelled"]),
     ])
+
+
+def render_readme_npci_control(m: dict) -> str:
+    """Where the money comes from, inside the cap: the calendar, and what decisioning adds.
+
+    Every sentence that makes a claim about direction reads `excludes_zero` rather than
+    asserting it, for the reason `_intervals_claim` gives: a hard-coded significance claim
+    goes on being made after the interval it describes has moved.
+    """
+    cap = _npci()
+    if cap is None:
+        return "_(results/npci-cap-rerun.json is not present - run scripts/npci_cap_rerun.py)_"
+    arms, cmp_, sched = cap["arms"], cap["comparisons"], cap["schedule"]
+    fair = cmp_["decisioning_is_worth__C_vs_D_diagnosed"]
+    blind = cmp_["decisioning_is_worth__C_vs_D"]
+    spacing = cmp_["spacing_is_worth__D_diagnosed_vs_B"]
+    spacing_blind = cmp_.get("spacing_is_worth__D_vs_B")
+    dead = cap["C_engine_by_diagnosed_cause"]["needs_new_instrument"]
+    days = ", ".join(map(str, sched["engine_and_controls"]))
+    ladder = ", ".join(map(str, sched["incumbent"]))
+
+    if fair["excludes_zero"] and fair["net_incremental_total_rupees"] > 0:
+        adds = ("With only three retries the calendar runs out of attempts, and what is left to "
+                "collect with is deciding whom to contact, on what channel, and whom to leave "
+                "alone.")
+        verdict = ("**So the engine is two things.** It makes aggressive timing safe to deploy "
+                   "- the calendar is the lever, and compliance is the constraint on pulling it "
+                   "- and, under the rule a deployment actually faces, it collects what timing "
+                   "alone cannot reach.")
+    else:
+        adds = "This run cannot say that decisioning adds recovery inside the cap."
+        verdict = ("**So the engine is what makes aggressive timing safe to deploy.** The "
+                   "calendar is the lever; compliance is the constraint on pulling it.")
+
+    return "\n".join([
+        "| Arm | What it does | Recovery |",
+        "|---|---|---|",
+        f"| A | nothing at all | {_pct(arms['A_do_nothing']['recovery_rate'])} |",
+        f"| B | Razorpay's ladder: the charge, then days {ladder} | "
+        f"{_pct(arms['B_incumbent']['recovery_rate'])} |",
+        f"| D | the calendar alone, days {days}, retrying every cause | "
+        f"{_pct(arms['D_calendar_blind']['recovery_rate'])} |",
+        f"| **D'** | **the calendar alone, days {days}, respecting the diagnosis** | "
+        f"**{_pct(arms['D_diagnosed_calendar']['recovery_rate'])}** |",
+        f"| **C** | **the full engine** | **{_pct(arms['C_engine']['recovery_rate'])}** |",
+        "",
+        _wrap(
+        f"**Better timing is worth {_rs(spacing['net_incremental_total_rupees'])}** (D' "
+        f"against B, 95% CI {_ci(spacing)}). The same three retries, with no diagnosis, no "
+        "message and no model - moved off the broke week in which the charge failed and spread "
+        "across the salary cycle. Razorpay's ladder does not fail because it is "
+        "unintelligent; it fails because four attempts inside four days sit in one broke week "
+        "of a monthly cycle."),
+        "",
+        _wrap(
+        f"**The decisioning layer adds {_rs(fair['net_incremental_total_rupees'])} on top of "
+        f"that calendar** (C against D', paired on the same customers, 95% CI {_ci(fair)}), "
+        f"and the interval {'excludes' if fair['excludes_zero'] else '**crosses**'} zero. "
+        f"{adds}"),
+        "",
+        _wrap(
+        f"**Where that comes from.** The {dead['n']} debts diagnosed `needs_new_instrument` - "
+        "a card that expired, a mandate that no longer charges - are ones D' declines to retry "
+        "at all, because a silent retry can never charge a dead instrument; D' recovers only "
+        f"those that pay on their own. The engine recovers {dead['recovered']} of them "
+        f"({_pct(dead['recovery_rate'])}) by asking the customer for a new one, which only a "
+        "message can do. D' also has no answer to an opt-out, a dispute or a bereavement, "
+        "because it never speaks and so never hears one."),
+        "",
+        _wrap(
+        "**Why the blind calendar, D, looks as good as the engine.** It retries every cause, "
+        "including failures where the customer has to act, and scores "
+        f"{_rs(blind['net_incremental_total_rupees'])} against the engine ({_ci(blind)}, "
+        f"{'excluding' if blind['excludes_zero'] else 'crossing'} zero). It gets there only "
+        "because the simulator lets a silent retry fix causes that in reality need the "
+        "customer - the modelling gap amendment A2 declined to exploit for the engine. Using "
+        "it against the engine would be an inconsistent standard, so D' is the control to "
+        "read."
+        + (f" For the same reason D shows {_rs(spacing_blind['net_incremental_total_rupees'])} "
+           "against the incumbent, more than D'." if spacing_blind else "")),
+        "",
+        _wrap(verdict),
+    ])
+
+
+def render_readme_npci_failures(m: dict) -> str:
+    """What the engine did not recover inside the cap - decomposed as the frozen run's is,
+    by the shipped `failure_list`, with every predicate anchored on the debt's own window."""
+    cap = _npci()
+    if cap is None or "C_engine_failure_list" not in cap:
+        return "_(the capped failure list is not present - run scripts/npci_cap_rerun.py)_"
+    f = cap["C_engine_failure_list"]
+    st, rup = f["standing"]["counts"], f["standing"]["rupees"]
+    labels = {
+        "stopped_by_a_guardrail_correct":
+            "Stopped by a guardrail — **the system was right to stop**",
+        "no_money_in_the_window_unreachable":
+            "No money at any point in the debt's window — **unreachable by any retry**",
+        "funded_but_never_attempted_DEFECT":
+            "Money in the window, but never on a permitted retry day — **the price of the cap**",
+        "attempted_while_funded_still_unpaid":
+            "Retried while funded, still unpaid — the honest residual",
+    }
+    lines = [
+        _wrap(f"Inside the cap the engine did not recover {f['n_not_recovered']:,} of "
+              f"{cap['arms']['C_engine']['n']:,} debts ({_pct(f['share_not_recovered'])}), "
+              f"leaving {_rs(f['unrecovered_rupees'])} on the table. That total is four "
+              "different things:"),
+        "",
+        "| Why it was not recovered | Customers | Rupees |",
+        "|---|---|---|",
+    ]
+    for k, label in labels.items():
+        lines.append(f"| {label} | {st[k]:,} | {_rs(rup[k])} |")
+    third_is_largest = max(st, key=st.get) == "funded_but_never_attempted_DEFECT"
+    lines += ["", _wrap(
+        "Recovering the first two rows would mean breaking the opt-out, dispute and hardship "
+        "rules, or collecting from people who had no money at any point in the window."
+        + (" **The third row is the largest, and it is the argument for what to build next:** "
+           "those customers had money, just not on any of the three days the rule allows a "
+           "retry. Putting the three retries on the days money actually lands - predicted "
+           "from each customer's own debit history - is where machine learning earns its "
+           "place in this product, and the same holdout would measure it."
+           if third_is_largest else
+           " The third row counts customers who had money, but not on any of the three days "
+           "the rule allows a retry: the price of the cap, measured."))]
+    return "\n".join(lines)
 
 
 def render_readme_failures(m: dict) -> str:
@@ -309,7 +429,7 @@ def render_readme_failures(m: dict) -> str:
             "Attempted while funded, still unpaid — the honest residual",
     }
     lines = [
-        _wrap(f"The engine did not recover {f['n_not_recovered']:,} of "
+        _wrap(f"With six retries the engine did not recover {f['n_not_recovered']:,} of "
               f"{p21['arms']['C']['n']:,} debts "
               f"({_pct(f['share_not_recovered'])}), leaving "
               f"{_rs(f['unrecovered_rupees'])} on the table. That total is four different "
@@ -366,89 +486,52 @@ def render_readme_reproduce(m: dict) -> str:
 
 
 def render_readme_control(m: dict) -> str:
-    """Arms D and D'. The controls that separate the calendar from the decisioning."""
+    """Arms D and D' under the pre-registered six-retry configuration.
+
+    Kept, in its own section, because it is the result that undercut the submission's own
+    product and because amendment A12 moved the headline without deleting anything. It now
+    reads as the six-retry counterpart of the capped decomposition, and says so.
+    """
     ctl = m["primary_cohort_21d"].get("spread_retry_control")
     if not ctl:
         return "_(controls not present in this artifact)_"
     arms = m["primary_cohort_21d"]["arms"]
     sp = ctl["spacing_is_worth__D_vs_B"]
     fair = ctl.get("decisioning_is_worth__C_vs_D_diagnosed") or {}
-    blind = ctl["decisioning_is_worth__C_vs_D"]
-    # The dead-instrument count below is READ, not remembered. It stood as the literal "97"
-    # inside this generated block, which meant `--check` could never catch it drifting - and
-    # it had already drifted: amendment A10 moved it, and the true count is recomputed here
-    # every render. A hand-typed number inside a generated block is the worst of both.
+    # READ, not remembered: this count stood as a stale hand-typed literal inside this block
+    # until 20 Sept 2026, where `--check` could never see it drift.
     dead = m["primary_cohort_21d"]["subgroup_by_diagnosed_cause"]["needs_new_instrument"]
-    lines = [
+    lo, hi = fair.get("ci95_total_rupees", [0, 0])
+    return "\n".join([
         "| Arm | What it does | Recovery |",
         "|---|---|---|",
         f"| A | nothing at all | {_pct(arms['A']['recovery_rate'])} |",
-        f"| B | Razorpay's ladder, days 0,1,2,3 | {_pct(arms['B']['recovery_rate'])} |",
+        f"| B | the incumbent as reimplemented, days 0,1,2,3 | "
+        f"{_pct(arms['B']['recovery_rate'])} |",
         f"| D | the calendar alone, retrying every cause | {_pct(arms['D']['recovery_rate'])} |",
-        f"| **D'** | **the calendar alone, respecting the diagnosis** | "
-        f"**{_pct(arms['D_diagnosed']['recovery_rate'])}** |",
+        f"| D' | the calendar alone, respecting the diagnosis | "
+        f"{_pct(arms['D_diagnosed']['recovery_rate'])} |",
         f"| C | the full engine | {_pct(arms['C']['recovery_rate'])} |",
         "",
         _wrap(
-        "**Better timing is worth "
-        f"{_rs(sp['net_incremental_total_rupees'])} ({sp['lift_pp']:+.2f} pp).** That is the "
-        "finding. Razorpay's ladder does not fail because it is unintelligent; it fails "
-        "because four attempts inside four days sit in one broke week of a monthly salary "
-        "cycle. A retry loop with no diagnosis, no message, no guardrails and no model beats "
-        "it by more than the entire engine does."),
+        "**With six retries, the calendar alone beats the engine.** Timing is worth "
+        f"{_rs(sp['net_incremental_total_rupees'])} ({sp['lift_pp']:+.2f} pp, D against B), "
+        "and a retry loop with no diagnosis, no message, no guardrails and no model "
+        "out-recovers the full engine. Against the diagnosis-respecting calendar the "
+        f"decisioning layer measures {_rs(fair.get('net_incremental_total_rupees', 0))} "
+        f"({fair.get('lift_pp', 0):+.2f} pp) on an interval of {_rs(lo)} to {_rs(hi)} that "
+        + ("excludes zero." if fair.get("excludes_zero") else
+           "**crosses zero**: with attempts that plentiful, deciding whom to contact does not "
+           "move recovery measurably. It changes what you are allowed to do while collecting, "
+           "which the control was built to isolate and cannot price.")),
         "",
         _wrap(
-        f"**Against that, the decisioning layer measures "
-        f"{_rs(fair.get('net_incremental_total_rupees', 0))} "
-        f"({fair.get('lift_pp', 0):+.2f} pp), on an interval of "
-        f"{_rs(fair.get('ci95_total_rupees', [0, 0])[0])} to "
-        f"{_rs(fair.get('ci95_total_rupees', [0, 0])[1])} that "
-        + ("excludes zero.** Published as a negative number, because it is one."
-           if fair.get("excludes_zero") else
-           "CROSSES ZERO.** Published with its interval rather than as a signed headline, "
-           "because the point estimate on its own would claim a direction this run cannot "
-           "support. The defensible reading is that against a calendar which ignores "
-           "opt-outs, decisioning does not move recovery measurably - it changes what you "
-           "are allowed to do while collecting, which is the thing the control was built to "
-           "isolate and cannot price.")
-        + " Use D' rather than D for this comparison: the blind control also recovers "
-        "causes that in reality need the customer to act, which the simulator lets a silent "
-        "retry fix. That is the same gap amendment A2 declined to exploit for the engine, and "
-        "using it against the engine would just be an inconsistent standard. It is worth "
-        f"{_rs(abs(blind['net_incremental_total_rupees']) - abs(fair.get('net_incremental_total_rupees', 0)))} "
-        "of the difference between the two comparisons."),
-        "",
-        _wrap(
-        "**So why not ship D'?** Because it is not a product. It never replaces a dead "
-        "instrument, which only a message can do: the "
-        f"{dead['n']} debts diagnosed `needs_new_instrument` are ones D' declines to retry at "
-        f"all, and the engine recovers {round(dead['n'] * dead['recovery_rate'])} of them - a "
-        f"count read from the artifact, because the previous sentence carried a hand-typed "
-        "one that had been stale since amendment A10. It has no answer to an opt-out, a "
-        "dispute or a bereavement, "
-        "because it never speaks and so never hears one. And it cannot tell a card that "
-        "expired in March from an account that was briefly short, so it burns attempts on "
-        "instruments that can never be charged."),
-        "",
-        _wrap(
-        "The engine exists to make aggressive timing **safe to deploy**. The calendar is the "
-        "lever; compliance is the constraint on pulling it. Those two sentences are the "
-        "submission, and the controls above are what let us say them with a number rather "
-        "than an assertion."),
-    ]
-    cap = _npci()
-    if cap:
-        capped = cap["comparisons"]["decisioning_is_worth__C_vs_D_diagnosed"]
-        lines += ["", _wrap(
-            "**All of the above is measured with six retries.** Inside NPCI's attempt cap the "
-            f"same comparison is {_rs(capped['net_incremental_total_rupees'])} "
-            f"({_rs(capped['ci95_total_rupees'][0])} – {_rs(capped['ci95_total_rupees'][1])}), "
-            f"which {'excludes' if capped['excludes_zero'] else 'crosses'} zero - see "
-            "*Inside NPCI's attempt cap* above. The calendar remains the lever; how much the "
-            "decisioning adds depends on how many pulls of it the rules allow.")]
-    return "\n".join(lines)
-
-
+        f"The engine still recovers {round(dead['n'] * dead['recovery_rate'])} of the "
+        f"{dead['n']} dead-instrument debts that no silent retry can reach, and it is the only "
+        "arm that honours an opt-out. This is the result that made the submission lead with "
+        "*the money is in the calendar* - and the capped run is what qualified it: when the "
+        "rule makes attempts scarce, the decisioning is what is left to collect with."),
+    ])
 
 
 RENDERERS = {
@@ -456,6 +539,8 @@ RENDERERS = {
     "readme-control": render_readme_control,
     "readme-headline": render_readme_headline,
     "readme-npci": render_readme_npci,
+    "readme-npci-control": render_readme_npci_control,
+    "readme-npci-failures": render_readme_npci_failures,
     "readme-failures": render_readme_failures,
     "readme-limitations": render_readme_limitations,
     "readme-reproduce": render_readme_reproduce,
