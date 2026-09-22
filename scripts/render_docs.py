@@ -38,13 +38,21 @@ import textwrap
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 METRICS = REPO / "results" / "metrics.json"
+#: The companion artifact: the same cohort measured inside NPCI's attempt cap. Read by the
+#: blocks that report it, rather than threaded through every renderer's signature, because
+#: only two of them need it and every other block must keep rendering without it.
+NPCI = REPO / "results" / "npci-cap-rerun.json"
 
 #: Which generated block belongs to which file. One block may appear in several files.
 TARGETS: dict[str, tuple[str, ...]] = {
     "docs/phase-3.md": ("phase3-results",),
-    "README.md": ("readme-headline", "readme-control", "readme-failures",
+    "README.md": ("readme-headline", "readme-npci", "readme-control", "readme-failures",
                   "readme-limitations", "readme-reproduce"),
 }
+
+
+def _npci() -> dict | None:
+    return json.loads(NPCI.read_text(encoding="utf-8")) if NPCI.exists() else None
 
 
 def _rs(x: float) -> str:
@@ -213,6 +221,79 @@ def render_readme_headline(m: dict) -> str:
     ])
 
 
+def render_readme_npci(m: dict) -> str:
+    """The same cohort inside NPCI's attempt cap, from its own artifact.
+
+    A separate block, from a separate artifact, placed BESIDE the headline and never instead
+    of it. The frozen definition fixes the configuration the headline is computed under;
+    re-running a pre-registered measurement under different rules and then presenting the
+    result as the headline is the exact move a freeze exists to prevent - whichever
+    direction the new number happens to point.
+    """
+    cap = _npci()
+    if cap is None:
+        return "_(results/npci-cap-rerun.json is not present - run scripts/npci_cap_rerun.py)_"
+    arms, cmp_ = cap["arms"], cap["comparisons"]
+    head = cmp_["headline__C_vs_B"]
+    dec = cmp_["decisioning_is_worth__C_vs_D_diagnosed"]
+    spacing = cmp_["spacing_is_worth__D_diagnosed_vs_B"]
+    sched = cap["schedule"]
+    net = head["net_incremental_total_rupees"]
+    cost = (f"Rs {arms['C_engine']['contact_cost_rupees'] / net:.4f}" if net > 0
+            else "n/a - no incremental recovery")
+    shipped = (m["primary_cohort_21d"].get("spread_retry_control", {})
+               .get("decisioning_is_worth__C_vs_D_diagnosed"))
+
+    if dec["excludes_zero"] and shipped and not shipped["excludes_zero"]:
+        reading = (
+            f"With six retries the same comparison is {_rs(shipped['net_incremental_total_rupees'])} "
+            "on an interval that crosses zero. Read together, the two artifacts make one finding: "
+            "when attempts are plentiful the calendar does the work, and when the rule makes "
+            "them scarce, deciding whom to contact is what is left to collect with.")
+    else:
+        reading = ("Compare it with the six-retry control below; both intervals are reported "
+                   "as measured, whichever way they point.")
+
+    def _bullets(items: list[str]) -> list[str]:
+        out = []
+        for item in items:
+            wrapped = textwrap.wrap(item, width=91, break_on_hyphens=False)
+            out.append(f"- {wrapped[0]}")
+            out.extend(f"  {line}" for line in wrapped[1:])
+        return out
+
+    return "\n".join([
+        "| Inside the cap | |",
+        "|---|---|",
+        f"| **Net incremental recovery, C vs B** | **{_rs(net)}** |",
+        f"| 95% CI | {_rs(head['ci95_total_rupees'][0])} – {_rs(head['ci95_total_rupees'][1])} |",
+        f"| Per treated customer | {_rs2(head['net_incremental_per_customer_rupees'])} |",
+        f"| Recovery rate, B / D' / C | {_pct(arms['B_incumbent']['recovery_rate'])} / "
+        f"{_pct(arms['D_diagnosed_calendar']['recovery_rate'])} / "
+        f"{_pct(arms['C_engine']['recovery_rate'])} |",
+        f"| The calendar alone, D' vs B | {_rs(spacing['net_incremental_total_rupees'])} "
+        f"({_rs(spacing['ci95_total_rupees'][0])} – {_rs(spacing['ci95_total_rupees'][1])}) |",
+        f"| Cost per incremental rupee | {cost} |",
+        f"| Rule | {cap['rule']} |",
+        f"| Schedule | the charge on day 0, retries on days "
+        f"{', '.join(map(str, sched['engine_and_controls']))}; Razorpay's ladder on days "
+        f"{', '.join(map(str, sched['incumbent']))} |",
+        f"| Window | {cap['window_days']} days, anchored on {cap['window_anchored_on']} |",
+        f"| Generated at | `{cap['head_commit']}`, "
+        f"{'with uncommitted changes' if cap['working_tree_dirty'] else 'clean tree'} |",
+        "",
+        _wrap(
+        f"**What the decisioning layer is worth inside the cap (C vs D'): "
+        f"{_rs(dec['net_incremental_total_rupees'])}**, 95% CI "
+        f"{_rs(dec['ci95_total_rupees'][0])} – {_rs(dec['ci95_total_rupees'][1])}, which "
+        f"{'excludes' if dec['excludes_zero'] else 'crosses'} zero. {reading}"),
+        "",
+        "Still not modelled, and each of these would move the figures above:",
+        "",
+        *_bullets(cap["not_modelled"]),
+    ])
+
+
 def render_readme_failures(m: dict) -> str:
     p21 = m["primary_cohort_21d"]
     f = p21["failure_list"]
@@ -268,7 +349,8 @@ def render_readme_reproduce(m: dict) -> str:
     return "\n".join([
         "```bash",
         "pip install -e '.[dev]'                 # Python >= 3.11; no runtime dependencies",
-        "python scripts/run_batch.py             # regenerates results/metrics.json",
+        "python scripts/run_batch.py             # regenerates results/metrics.json (~18 min)",
+        "python scripts/npci_cap_rerun.py        # regenerates results/npci-cap-rerun.json",
         "python scripts/render_docs.py --check   # fails if any figure in the docs drifted",
         "pytest                                  # the full suite",
         "```",
@@ -354,6 +436,16 @@ def render_readme_control(m: dict) -> str:
         "submission, and the controls above are what let us say them with a number rather "
         "than an assertion."),
     ]
+    cap = _npci()
+    if cap:
+        capped = cap["comparisons"]["decisioning_is_worth__C_vs_D_diagnosed"]
+        lines += ["", _wrap(
+            "**All of the above is measured with six retries.** Inside NPCI's attempt cap the "
+            f"same comparison is {_rs(capped['net_incremental_total_rupees'])} "
+            f"({_rs(capped['ci95_total_rupees'][0])} – {_rs(capped['ci95_total_rupees'][1])}), "
+            f"which {'excludes' if capped['excludes_zero'] else 'crosses'} zero - see "
+            "*Inside NPCI's attempt cap* above. The calendar remains the lever; how much the "
+            "decisioning adds depends on how many pulls of it the rules allow.")]
     return "\n".join(lines)
 
 
@@ -363,6 +455,7 @@ RENDERERS = {
     "phase3-results": render_phase3_results,
     "readme-control": render_readme_control,
     "readme-headline": render_readme_headline,
+    "readme-npci": render_readme_npci,
     "readme-failures": render_readme_failures,
     "readme-limitations": render_readme_limitations,
     "readme-reproduce": render_readme_reproduce,

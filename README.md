@@ -2,29 +2,37 @@
 
 **Razorpay AI Buildathon, Track 03.**
 
-We built a decisioning layer for failed recurring collections, measured it against a randomised
-holdout, and then measured the one control that would tell us whether it was actually doing the
-work. It was not.
+A decisioning layer for failed recurring collections on UPI AutoPay and eMandate mandates: who
+to contact, when, on which channel, and whom to leave alone. A deterministic state machine makes
+every decision; a local language model only writes the words and reads the replies. It is
+measured against a randomised holdout and against Razorpay's documented retry ladder, on a
+simulated cohort — the reason for that comes before any number, [below](#read-this-before-the-number).
 
-> **The money is in the calendar. The engine is what lets you take it lawfully.**
+We then measured the controls that tell you whether the decisioning is doing the work — twice,
+under two sets of rules, and the two answers disagree:
 
-Razorpay retries a failed mandate four times on consecutive days. That fails not because it is
-unintelligent but because four attempts inside four days sit in a single broke week of a
-monthly salary cycle. Spreading the same kind of attempts across the collection horizon is
-worth more than everything else here combined — and we can show that, because we ran the arm
-that proves it and published the number even though it undercuts our own product.
+- **With six retries**, the frozen configuration the headline is computed under, it is not. A
+  retry loop with no diagnosis, no messages and no model does most of the recovering.
+  **The money is in the calendar; the engine is what lets you take it lawfully.**
+- **Inside NPCI's attempt cap** — one attempt and three retries per mandate cycle, the rule a
+  real deployment would ship under — the retries run out, and the decisioning layer's
+  contribution becomes measurably positive. Scarcity of attempts is what makes deciding *whom*
+  to contact worth money.
 
-What the decisioning layer buys is the right to pull that lever: a diagnosis so attempts are
-not burned on instruments that can never charge, and guardrails so aggressive timing does not
-become harassment. The rest of this README is that argument, with the controls.
+Both are published, with their intervals, because the disagreement is the finding.
 
 ## The problem
 
-Recurring collection in India succeeds between 30% and 50% of the time. When a UPI Autopay or
-eMandate charge fails, Razorpay retries it four times, on consecutive days, and then halts.
-Their own documentation is candid about what happens next:
+Recurring collection in India succeeds between 30% and 50% of the time. On Razorpay
+Subscriptions, a failed charge is retried on each of the following three days — four debits in
+all — and then the subscription halts. The documentation is candid about what happens next:
 
 > you will have to charge them manually.
+
+A merchant debiting saved tokens directly through the recurring-payments API gets no automatic
+retry at all; the documentation says to retry the debit manually. Either way, a failed debit is
+three losses for the merchant: the revenue, the customer — who did not choose to leave — and
+the effort of collecting by hand.
 
 Four attempts across four days is the whole strategy. A monthly salary cycle is thirty days
 long, so a customer whose pay lands on day nine is retried entirely during the week they had
@@ -135,6 +143,53 @@ engine. The headline is **C against B** - beating do-nothing proves nothing, sin
 recovery vendor beats doing nothing. All three intervals exclude zero.
 <!-- /generated:readme-headline -->
 
+### Inside NPCI's attempt cap
+
+The configuration above takes six attempts per failed debit. NPCI's UPI circular OC-215-A
+allows one attempt and three retries per mandate execution, so the frozen headline is measured
+outside the rule a deployment would have to ship under. The same cohort was therefore re-run
+inside the cap: three retries spread across the same horizon, no same-day re-debit, Razorpay's
+ladder on its documented T+1..T+3, every debt scored on its own 21-day window, and self-cure
+counted identically in every arm.
+
+It is a separate artifact — [`results/npci-cap-rerun.json`](results/npci-cap-rerun.json), from
+[`scripts/npci_cap_rerun.py`](scripts/npci_cap_rerun.py) — reported beside the headline rather
+than instead of it. The frozen definition fixes the configuration the headline is computed
+under, and re-running a pre-registered measurement under new rules and keeping the better story
+is precisely what a freeze exists to prevent. The cap is a policy field (`Policy.retry_days`),
+not a patch applied from a script, so the configuration measured is one the engine ships with.
+
+<!-- generated:readme-npci -->
+| Inside the cap | |
+|---|---|
+| **Net incremental recovery, C vs B** | **Rs 724,503** |
+| 95% CI | Rs 578,218 – Rs 862,865 |
+| Per treated customer | Rs 258.94 |
+| Recovery rate, B / D' / C | 25.25% / 51.47% / 58.40% |
+| The calendar alone, D' vs B | Rs 565,624 (Rs 424,405 – Rs 698,579) |
+| Cost per incremental rupee | Rs 0.0042 |
+| Rule | NPCI UPI circular OC-215-A: 1 attempt + 3 retries per mandate per cycle |
+| Schedule | the charge on day 0, retries on days 7, 14, 21; Razorpay's ladder on days 1, 2, 3 |
+| Window | 21 days, anchored on each debt's own failure date |
+| Generated at | `1e085e5`, clean tree |
+
+**What the decisioning layer is worth inside the cap (C vs D'): Rs 158,880**, 95% CI Rs 111,611
+– Rs 207,760, which excludes zero. With six retries the same comparison is Rs -101,326 on an
+interval that crosses zero. Read together, the two artifacts make one finding: when attempts
+are plentiful the calendar does the work, and when the rule makes them scarce, deciding whom to
+contact is what is left to collect with.
+
+Still not modelled, and each of these would move the figures above:
+
+- Peak hours. OC-215-A confines retries to non-peak windows; every action here is timed at
+  10:00, inside the 10:00-13:00 peak. The simulator has no time-of-day effect, so this
+  changes none of the figures above and all of the deployment.
+- Pre-debit notification under the RBI e-mandate framework.
+- eMandate confirmation lag: charges settle synchronously here.
+- Every simulator limitation in src/recovery/cohort/PARAMETERS.md, inherited unchanged. These
+  intervals are sampling noise in a model we wrote.
+<!-- /generated:readme-npci -->
+
 ## Where the money actually comes from
 
 The headline compares the engine against Razorpay's ladder, and those two differ in **two**
@@ -178,6 +233,11 @@ it burns attempts on instruments that can never be charged.
 The engine exists to make aggressive timing **safe to deploy**. The calendar is the lever;
 compliance is the constraint on pulling it. Those two sentences are the submission, and the
 controls above are what let us say them with a number rather than an assertion.
+
+**All of the above is measured with six retries.** Inside NPCI's attempt cap the same
+comparison is Rs 158,880 (Rs 111,611 – Rs 207,760), which excludes zero - see *Inside NPCI's
+attempt cap* above. The calendar remains the lever; how much the decisioning adds depends on
+how many pulls of it the rules allow.
 <!-- /generated:readme-control -->
 
 ## What it failed to recover
@@ -202,43 +262,94 @@ as outcomes, not as failures to fix.
 
 ## How it is built
 
+### The decision loop
+
 ```mermaid
 flowchart TB
-    IN["Failed charge<br/>webhook or batch"] --> DIAG
+    RZP["Razorpay<br/>payment.failed · payment.captured webhooks"] --> INGEST
+    SIM["Seeded simulator<br/>the batch's cohort source today"] -->|"a failed debit"| DIAG
+
+    subgraph EDGE ["Ingest — turns untrusted HTTP into trusted facts. Decides nothing."]
+        INGEST["Webhook receiver<br/>HMAC verify → dedup → persist → ACK inside 5 s"] --> STORE[("Event store<br/>payment state by precedence,<br/>never last-write-wins")]
+    end
+
+    STORE -->|"a failed debit"| DIAG
 
     subgraph ENGINE ["Engine — deterministic. Decides everything."]
-        DIAG["Diagnosis<br/>cause + actionability"] --> GUARD["Guardrails<br/>hard stops → soft stops → contact rules"]
-        GUARD --> RECHECK{"Re-check payment<br/>state, now"}
+        DIAG["Diagnosis<br/>cause + actionability"] --> GUARD["Guardrails<br/>hard stops → soft stops → contact rules → cost"]
+        GUARD --> RECHECK{"Re-check payment state<br/>before every action"}
         RECHECK -->|"already paid"| STOP["Stop"]
         RECHECK -->|"still owing"| SM["State machine<br/>retry · message · escalate · stop"]
+        POLICY["Policy, versioned<br/>schedule · caps · quiet hours · NPCI cap"] -.-> GUARD
+        POLICY -.-> SM
     end
 
-    SM --> RUN["Orchestration<br/>asks for words only after the decision is made"]
+    STORE -->|"payment state"| RECHECK
 
-    subgraph LLM ["Local model on Ollama — wording only. Decides nothing."]
-        COMP["Composer"] --> GATE{"Copy gate<br/>discount · urgency · scarcity · shaming"}
-        PARSE["Reply parser<br/>intent + date phrase"]
+    subgraph LLM ["Local model on Ollama — language only. Decides nothing."]
+        COMP["Composer<br/>template, or model wording"] --> GATE{"Copy gate<br/>discount · urgency · scarcity · shaming ·<br/>invented amounts, dates, links"}
+        PARSE["Reply parser<br/>keyword overrides → model → fallback"]
     end
 
-    RUN --> COMP
+    SM -->|"only after the decision"| COMP
     GATE -->|"rejected"| TPL["Deterministic template"]
-    GATE -->|"passed"| SEND["Send"]
+    GATE -->|"passed"| SEND["Send<br/>WhatsApp · SMS · human call"]
     TPL --> SEND
     REPLY["Customer reply"] --> PARSE
-    PARSE -->|"intent, as evidence"| GUARD
+    PARSE -->|"evidence: can stop contact, never start it"| GUARD
 
     SM --> LEDGER[("Append-only<br/>hash-chained ledger")]
-    SEND --> LEDGER
+    RECHECK --> LEDGER
     GATE --> LEDGER
+    SEND --> LEDGER
     STOP --> LEDGER
-    LEDGER --> INV["Replay invariants<br/>never import the engine"]
+    PARSE --> LEDGER
 ```
 
+**Read it in one direction.** The arrow into the model box leaves *after* the decision has been
+made, and nothing returns into the state machine carrying an action. A parsed reply re-enters
+the engine as **evidence** for the guardrails, and the evidence is asymmetric: it can stop
+contact, and it can never start contact, lift a stop, or supply a date.
+
+### Components
+
+| Layer | Module | What it does | The decision that shaped it |
+|---|---|---|---|
+| Ingest | `ingest/webhook.py` | Verifies the HMAC signature, deduplicates event ids, persists payment state, acknowledges inside Razorpay's five-second budget | Dedup runs *after* verification, so an unsigned caller cannot poison it; a late `failed` never overwrites a `captured` |
+| Source | `cohort/source.py`, `cohort/simulator.py` | Supplies failed debits behind one interface; today a seeded simulator | Subscriptions is gated on the test account, and the interface lets a real source replace the simulator without touching anything above it |
+| Diagnosis | `diagnosis/taxonomy.py` | Cause and actionability from the composite error key | `error_code` alone has three values; the reason, source and step carry the signal |
+| Engine | `engine/machine.py` | Plans each debt's day, records replies and outcomes, latches absolute stops | Payment state is re-read before each action, and every read that changes the answer is logged |
+| Guardrails | `engine/guardrails.py` | Hard stops → soft stops → contact rules → cost | The order is load-bearing: a statutory stop is never recorded as a cost decision (amendment A8) |
+| Policy | `engine/policy.py` | Frozen and versioned: retry schedule, caps, quiet hours, escalation ladder, costs, the NPCI cap | A regulator's rule is a policy field, not a code path |
+| Language | `llm/composer.py` | Message wording from a local model, or a deterministic template | The payment link is inserted by code; the model never writes it |
+| Language | `llm/copy_gate.py` | Rejects discounts, urgency, scarcity, shaming, and invented amounts, dates and links | The send path fails closed |
+| Language | `llm/parser.py` | Reply intent: keyword overrides, then the model, then a fallback; dates by a pure function | The model may stop contact and never start it; the keyword floor is bilingual |
+| Audit | `ledger/audit.py` | An append-only, hash-chained record of every decision, action, reply and state read | It records what the engine declined to do and why, not only what it did |
+| Evaluation | `evaluation/` | Randomised assignment, the arms and controls, the metrics, replay invariants | The invariants never import the engine, and any violation blocks publishing |
+
+### How a number reaches this page
+
+```mermaid
+flowchart LR
+    ASSIGN["Randomised assignment<br/>sha256 of seed and customer id<br/>sticky, exclusions first"] --> ARMS["Arms A · B · C<br/>do nothing · Razorpay's ladder · the engine"]
+    ARMS --> CTRL["Controls D · D'<br/>the calendar alone, on C's own customers"]
+    ARMS --> INV["Replay invariants<br/>re-derived from the ledger alone"]
+    ARMS --> MET["Net incremental rupees<br/>stratified bootstrap"]
+    CTRL --> MET
+    INV -->|"any violation blocks the write"| ART[("results/metrics.json<br/>frozen configuration")]
+    MET --> ART
+    CAP["scripts/npci_cap_rerun.py<br/>1 attempt + 3 retries"] --> ART2[("results/npci-cap-rerun.json")]
+    ART --> RENDER["scripts/render_docs.py"]
+    ART2 --> RENDER
+    RENDER --> DOCS["This README and docs/phase-3.md<br/>a test fails if any figure drifts"]
+    ART --> DEMO["scripts/demo.py<br/>reads both artifacts live"]
+    ART2 --> DEMO
+```
+
+### The commitments, and where each is enforced
+
 **A deterministic state machine owns every decision.** The model composes wording and parses
-replies. Read the diagram in one direction: the arrow into the model box leaves *after* the
-decision has already been made, and no arrow returns into the state machine carrying an
-action. A parsed reply re-enters as **evidence** for the guardrails — an opt-out stops
-contact — never as a choice about whether to dun someone.
+replies; it decides nothing about whether anyone is contacted about money.
 
 The split is structural rather than conventional, and stated exactly: the engine imports two
 names from `llm/parser` — `Intent`, an enum, and `ParsedReply`, a frozen dataclass. Both are
@@ -255,14 +366,25 @@ inherits consent, DND and time-band obligations; fabricated urgency and repeated
 two named patterns in the CCPA Dark Patterns Guidelines 2023. The gate is tested against a
 real rejection from a real model.
 
+**The model may stop contact; it may never start it.** Opt-out, dispute and hardship are
+matched by code first, in that order — a stop that never expires outranks a pause that does.
+The keyword list is bilingual, because customers reply in romanised Hinglish as often as in
+English. Where the list is silent and the model reports an opt-out or a dispute, that is
+honoured as a stop and recorded as `llm_stop`; no model output can lift a stop, begin contact,
+or supply a date. The asymmetry is the compliance rule and the prompt-injection defence at once:
+the most a hostile reply can achieve is to stop contact with its own sender.
+
 **Payment state is re-checked immediately before every action.** Razorpay's webhooks are
 at-least-once and unordered — `payment.failed` can arrive after `payment.captured` for the
-same transaction. Without the re-check, the system duns people who have already paid.
+same transaction. Without the re-check, the system duns people who have already paid. In the
+batch the state is the simulator's ground truth; in the demo it is the event store the webhook
+receiver writes, so a late `payment.captured` stops the engine mid-ladder on screen.
 
-**Stopping rules are enforced in code and logged**: contact caps, quiet hours, stop on
-promise-to-pay, on dispute, on opt-out, on payment received. Contact is confined to
-08:00–19:00 IST as a product invariant, overridable per tenant only in the narrowing
-direction.
+**Stopping rules are enforced in code and logged**: contact caps, quiet hours, silence during a
+promise-to-pay (silent retries continue), stop on dispute, on opt-out, on payment received.
+Contact is confined to 08:00–19:00 IST as a product invariant. The design lets a tenant narrow
+these rules and never widen them; that constraint is documented rather than yet validated in
+code — see [Known issues](#known-issues-found-after-submission).
 
 **The audit ledger is hash-chained and replayable**, and the invariant checks that validate a
 run never import the engine — they re-derive violations from the records alone. If any
@@ -274,7 +396,8 @@ grounds that a number from a run which broke its own stopping rules is worse tha
 <!-- generated:readme-reproduce -->
 ```bash
 pip install -e '.[dev]'                 # Python >= 3.11; no runtime dependencies
-python scripts/run_batch.py             # regenerates results/metrics.json
+python scripts/run_batch.py             # regenerates results/metrics.json (~18 min)
+python scripts/npci_cap_rerun.py        # regenerates results/npci-cap-rerun.json
 python scripts/render_docs.py --check   # fails if any figure in the docs drifted
 pytest                                  # the full suite
 ```
@@ -286,10 +409,10 @@ model is exercised in the test suite and the demo, where wording is the point; i
 this measurement, and `docs/metric-definition.md` says so.
 <!-- /generated:readme-reproduce -->
 
-Every figure in this README and in `docs/phase-3.md` is generated from
-`results/metrics.json` by `scripts/render_docs.py`. None is typed. A test runs the renderer
-in `--check` mode, so a document that disagrees with the artifact fails the build rather than
-waiting for a reader to notice.
+Every figure in this README and in `docs/phase-3.md` is generated by `scripts/render_docs.py`
+— from `results/metrics.json`, and for the capped run from `results/npci-cap-rerun.json`. None
+is typed. A test runs the renderer in `--check` mode, so a document that disagrees with an
+artifact fails the build rather than waiting for a reader to notice.
 
 ## Limitations
 
@@ -339,6 +462,61 @@ waiting for a reader to notice.
     pre-registration.
 <!-- /generated:readme-limitations -->
 
+## Known issues, found after submission
+
+An adversarial audit of this repository, run after submission, found the following. The fixed
+items are fixed with tests, and arm C replayed on the old and the new code gives identical
+outcomes and an identical ledger — so none of the fixes moved `results/metrics.json`. The open
+items are listed so that nobody has to find them.
+
+**Fixed**
+
+- A bereaved customer who also wrote "stop messaging me" was classified as hardship: a seven-day
+  pause, after which contact resumed. Opt-out and dispute now outrank hardship.
+- An opt-out the model detected, but no keyword matched, was discarded. It is now honoured as a
+  stop.
+- Romanised Hinglish opt-outs and promises ("mat bhejo", "kal pay karunga") were not read
+  without a model. They are now.
+- "Please don't stop my subscription, I will pay" was read as an opt-out, and "who is this?" as a
+  permanent dispute. Negated stops are scrubbed before matching; an identity question is no
+  longer a dispute.
+- A hardship callback was scheduled from any number in the reply, so "died 2 days ago" set a
+  callback for the following day. Dates now come only from a callback clause.
+- Payment state was re-read once per debt per day rather than before each action. It is now
+  read per action.
+- A hand-typed count sat inside a generated block, where `--check` could never see it drift. It
+  is generated now.
+- The frozen schedule exceeds NPCI's attempt cap. The capped measurement now exists, above.
+
+**Open**
+
+- **Window anchoring in the main batch.** Every arm's 21-day window starts on the cohort start
+  date rather than on each debt's own failure date, so the engine loses its final retry on
+  debts that failed later, and the baselines can retry a debt before it has failed. Re-anchoring
+  moves both the headline and the six-retry decisioning comparison, and has not yet been re-run
+  in the main batch. The capped artifact is anchored per debt.
+- **Arm B re-debits on the day of the failure** in the main batch — five debits rather than the
+  documented four. The capped artifact uses the documented T+1..T+3.
+- **No per-debt reconciliation.** A pay-link payment and a mandate retry could both succeed:
+  payment state is keyed by payment rather than by debt, and nothing locks a debit in flight.
+- **Unsourced simulator mechanics.** The funds window, contact attention and fatigue, promise
+  keeping and the reply mix are assumptions rather than cited figures, despite the opening line
+  of `PARAMETERS.md`. Mandate type is assigned at random and never read, so `card_expired` can
+  land on a UPI mandate.
+- **Rules that never bind in the batch.** The payment re-check never fires there, because the
+  harness stops planning a settled debt; the contact caps and quiet hours never bind either,
+  because every action runs at 10:00 and the ladder has three rungs. Those zero counts are true
+  by construction rather than evidence.
+- **Not modelled:** DLT content templates and WhatsApp template approval (messages are free
+  text), peak-hour timing, pre-debit notice, and eMandate confirmation lag.
+- **Policy hygiene:** a promise-to-pay silences messages with no upper bound; the quiet-hours
+  check assumes IST input; tenant overrides are not validated to narrow only; and the policy
+  version is set by hand rather than derived from the policy's contents.
+- **Provenance:** the committed `results/metrics.json` was generated with uncommitted changes on
+  top of the commit it names, and ledger chain heads differ between runs because event ids are
+  random. The contents regenerate identically; the hashes do not.
+- **No human queue.** A dispute stops contact, and nothing routes it to a person.
+
 ## Compliance posture, stated precisely
 
 - **Not** "DPDP-compliant". The substantive obligations of the Digital Personal Data
@@ -355,11 +533,33 @@ waiting for a reader to notice.
 
 | Path | What is in it |
 |---|---|
+| `src/recovery/models.py` | The shared vocabulary: debts, customers, failures, decisions, actions, stop reasons |
+| `src/recovery/ingest/` | Webhook receiver and event store: verify, deduplicate, persist payment state by precedence |
+| `src/recovery/cohort/` | The source interface, the seeded simulator, and `PARAMETERS.md` |
 | `src/recovery/diagnosis/` | Failure-cause taxonomy; classifies on cause *and* source, never on error code alone |
 | `src/recovery/engine/` | Policy, guardrails, and the state machine that decides |
 | `src/recovery/llm/` | Composer, reply parser, and the copy gate |
 | `src/recovery/ledger/` | Append-only hash-chained audit trail |
-| `src/recovery/cohort/` | The seeded simulator, and `PARAMETERS.md` sourcing every value |
-| `src/recovery/evaluation/` | Arm assignment, the frozen metric, the batch, replay invariants |
+| `src/recovery/evaluation/` | Assignment, arms and controls, metrics, the batch, replay invariants |
+| `scripts/demo.py` | The narrated end-to-end demo: `--live`, `--pause`, `--ask` |
+| `scripts/run_batch.py` | Runs the randomised experiment and writes `results/metrics.json` |
+| `scripts/npci_cap_rerun.py` | Re-runs the cohort inside NPCI's attempt cap and writes `results/npci-cap-rerun.json` |
+| `scripts/render_docs.py` | Renders every figure in the docs from the artifacts; `--check` fails on drift |
+| `scripts/preflight.py` | Pre-publish sweep for keys, phone numbers, hostnames and forbidden claims |
+| `scripts/ledger_extract.py` | A small, committable extract of the batch ledger |
+| `scripts/phase2_evidence.py` | Regenerates the Phase 2 evidence from live model runs |
+| `scripts/gate_0_7_power.py` | The sample-size check behind the metric definition |
+| `scripts/create_payment_link.py`, `capture_payment_evidence.py`, `diagnose_webhook_secret.py` | Phase 0 tooling against the Razorpay test API |
+| `scripts/webhook_daemon.ps1` and siblings | Phase 0: keeping the webhook receiver alive behind the zrok tunnel |
+| `evals/model_bakeoff.py` | The model comparison that fixed where the language model is, and is not, trusted |
+| `spikes/` | The first webhook receiver, kept as the record of what was promoted into `ingest/` |
+| `results/metrics.json` | The frozen-configuration artifact every headline figure is generated from |
+| `results/npci-cap-rerun.json` | The same cohort, measured inside NPCI's attempt cap |
+| `results/phase0/` to `results/phase3/` | Evidence per phase: API probes, the real Razorpay webhook, the model bake-off, ledger extracts |
 | `docs/metric-definition.md` | The frozen metric, and every amendment to it |
-| `results/metrics.json` | The artifact every figure above is generated from |
+| `docs/compliance-india.md` | The regulatory reading behind every guardrail |
+| `docs/razorpay-api-notes.md`, `docs/phase-0-findings.md` | What the Razorpay API does, and what it would not do on this account |
+| `docs/support-ticket-draft.md` | The Subscriptions activation request raised against the gating |
+| `docs/phase-0.md` to `docs/phase-4.md` | The build log, phase by phase |
+| `docs/local-setup.md`, `docs/pr-review-archive.md` | Running it locally, and the external reviews it answered |
+| `tests/` | The suite: engine, guardrails, parser, ledger, the frozen-metric ancestry, and the README's honesty rules |

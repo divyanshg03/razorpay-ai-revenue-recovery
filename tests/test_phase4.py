@@ -50,7 +50,7 @@ def _outside_generated(text: str) -> str:
 
 def test_readme_has_the_generated_blocks_it_claims():
     names = {m_.group(1) for m_ in GEN.finditer(README.read_text(encoding="utf-8"))}
-    assert {"readme-headline", "readme-failures", "readme-limitations",
+    assert {"readme-headline", "readme-npci", "readme-failures", "readme-limitations",
             "readme-reproduce"} <= names, names
 
 
@@ -313,6 +313,28 @@ def test_the_capped_rerun_stays_inside_the_rule_it_names(capped):
     assert not capped["working_tree_dirty"], \
         "regenerate it from a committed tree: head_commit cannot reproduce a dirty one"
     assert capped["arms"]["C_engine"]["n"] > 0 and capped["arms"]["B_incumbent"]["n"] > 0
+
+
+def test_the_capped_figures_in_the_README_equal_their_artifact(readme, capped):
+    """The capped run is reported in the README, so it is held to the headline's rule: read,
+    never typed, and checked against the file it came from rather than against a renderer
+    that merely ran."""
+    block = next(g.group(2) for g in GEN.finditer(readme) if g.group(1) == "readme-npci")
+    net = capped["comparisons"]["headline__C_vs_B"]["net_incremental_total_rupees"]
+    assert f"Rs {net:,.0f}" in block, net
+    assert f"{capped['arms']['C_engine']['recovery_rate'] * 100:.2f}%" in block
+    decisioning = capped["comparisons"]["decisioning_is_worth__C_vs_D_diagnosed"]
+    word = "excludes" if decisioning["excludes_zero"] else "crosses"
+    assert f"which {word} zero" in " ".join(block.split()), \
+        "the README states a significance the artifact does not support"
+
+
+def test_the_readme_never_presents_the_capped_run_as_the_headline(readme):
+    """Beside the headline, never instead of it: the frozen definition fixes the headline's
+    configuration, and swapping in a re-run under new rules is what the freeze prevents."""
+    headline = readme.find("<!-- generated:readme-headline -->")
+    capped = readme.find("<!-- generated:readme-npci -->")
+    assert -1 not in (headline, capped) and headline < capped
 
 
 def test_the_demo_reports_the_capped_rerun_from_the_artifact(demo_out, capped):
