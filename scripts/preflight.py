@@ -40,6 +40,10 @@ CLAIM_EXEMPT = {
     "docs/metric-definition.md",
     "docs/pr-review-archive.md",
     "README.md",                 # states the negation: 'Not "DPDP-compliant"'
+    # The README converted to HTML and nothing else; tests/test_deploy.py fails if it holds
+    # anything the README does not. The markup splits '**Not**' into tags, which is what
+    # the per-line negation detector misses.
+    "site/index.html",
     "CLAUDE.md",
 }
 
