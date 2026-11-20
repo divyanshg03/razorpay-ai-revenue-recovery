@@ -222,12 +222,32 @@ for why. The receiver's only variable is `RAZORPAY_WEBHOOK_SECRET`, set once wit
 `uprush env push --only`, and the project's `env auto` is off — the Razorpay API keys are not
 on Uprush and must not be put there.
 
-Known gaps:
+### The event store: Postgres when `DATABASE_URL` is set
 
-- **The event store is on the container's disk.** If Uprush replaces the container, the dedup
-  table goes with it, and a Razorpay retry that straddles the restart would be accepted twice.
-  Acceptable for a demo endpoint; not the persistence `webhook.py` describes. The fix is a
-  database part, which is a design change and has not been made.
-- **Razorpay still delivers to the zrok share** until the Dashboard webhook URL is changed to
-  `/webhook` on the address above. Whether Razorpay accepts the `uprush.in` domain has not been
-  tested.
+A container's disk does not outlive the container, so on the host the receiver keeps dedup
+and payment state in Postgres (`src/recovery/ingest/pg_store.py`) whenever `DATABASE_URL` is
+set, and falls back to the SQLite file when it is not. The driver, `pg8000`, is pinned in the
+`Dockerfile` and installed nowhere else; the repository still has no runtime dependencies.
+
+The database is attached on the project's dashboard page (Uprush's CLI cannot add one to an
+existing project), and Uprush injects its connection variable. The receiver's startup line
+says which store it is on — `store postgres host:port/db` or `store sqlite path` — so
+`uprush logs` shows whether the attachment took.
+
+The Postgres tests in `tests/test_deploy.py` skip unless `TEST_DATABASE_URL` is set:
+
+```bash
+docker run --rm -d --name pgtest -p 127.0.0.1::5432 -e POSTGRES_PASSWORD=test postgres:16
+TEST_DATABASE_URL=postgres://postgres:test@127.0.0.1:$(docker port pgtest 5432 | cut -d: -f2)/postgres \
+    python -m pytest tests/test_deploy.py
+```
+
+They check acceptance, dedup, precedence, a fresh process still recognising an event id, and
+reconnection after the server drops the connection.
+
+### Pointing Razorpay at it
+
+Razorpay rejects webhook URLs whose domain contains "razorpay" (see the setup steps below),
+and the Uprush address is `razorpay-revenue-recovery.sites.uprush.in`, so Razorpay cannot
+deliver to it as is. It needs a custom domain attached on the Uprush dashboard; until then
+Razorpay keeps delivering to the zrok share.

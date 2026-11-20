@@ -11,7 +11,10 @@ Configuration, all from the environment so no value is ever written into the rep
 
     RAZORPAY_WEBHOOK_SECRET   required. Must match Dashboard -> Webhooks exactly.
     PORT                      default 8080. Hosting platforms inject this.
-    EVENT_STORE               default runtime/events.sqlite3.
+    EVENT_STORE               default runtime/events.sqlite3. Ignored when DATABASE_URL is set.
+    DATABASE_URL              optional. A postgres:// URL; when set, dedup and payment state live
+                              in Postgres (`pg_store.py`) and survive the container being
+                              replaced, which the SQLite file does not.
 
 ## Two refusals at startup, each a failure this repo has already had
 
@@ -36,6 +39,7 @@ from __future__ import annotations
 import os
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import urlparse
 
 from .webhook import EVENT_ID_HEADER, SIGNATURE_HEADER, EventStore, WebhookIngest
 
@@ -95,7 +99,7 @@ def make_handler(ingest: WebhookIngest) -> type[BaseHTTPRequestHandler]:
     return Handler
 
 
-def config_from_env(env: dict[str, str]) -> tuple[str, int, str]:
+def config_from_env(env: dict[str, str]) -> tuple[str, int, str, str | None]:
     secret = env.get("RAZORPAY_WEBHOOK_SECRET", "")
     if secret != secret.strip():
         raise SystemExit("RAZORPAY_WEBHOOK_SECRET has leading or trailing whitespace; "
@@ -104,19 +108,34 @@ def config_from_env(env: dict[str, str]) -> tuple[str, int, str]:
         raise SystemExit("RAZORPAY_WEBHOOK_SECRET is not set - refusing to start")
     port = int(env.get("PORT", "8080"))
     store = env.get("EVENT_STORE", "runtime/events.sqlite3")
-    return secret, port, store
+    database_url = env.get("DATABASE_URL") or None
+    return secret, port, store, database_url
 
 
-def build_server(secret: str, port: int, store_path: str,
-                 host: str = "0.0.0.0") -> ThreadingHTTPServer:
-    ingest = WebhookIngest(secret, EventStore(store_path))
+def build_server(secret: str, port: int, store_path: str, host: str = "0.0.0.0",
+                 database_url: str | None = None) -> ThreadingHTTPServer:
+    if database_url:
+        from .pg_store import PgEventStore  # only the hosted image has the driver
+        store = PgEventStore(database_url)
+    else:
+        store = EventStore(store_path)
+    ingest = WebhookIngest(secret, store)
     return ThreadingHTTPServer((host, port), make_handler(ingest))
 
 
+def describe_store(store_path: str, database_url: str | None) -> str:
+    """For the startup line. Host and database name only, never the credentials."""
+    if not database_url:
+        return f"sqlite {store_path}"
+    u = urlparse(database_url)
+    return f"postgres {u.hostname}:{u.port or 5432}/{u.path.lstrip('/')}"
+
+
 def main() -> int:
-    secret, port, store = config_from_env(dict(os.environ))
-    server = build_server(secret, port, store)
-    sys.stderr.write(f"webhook receiver listening on :{port}, store {store}\n")
+    secret, port, store, database_url = config_from_env(dict(os.environ))
+    server = build_server(secret, port, store, database_url=database_url)
+    sys.stderr.write(f"webhook receiver listening on :{port}, store "
+                     f"{describe_store(store, database_url)}\n")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
