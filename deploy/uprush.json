@@ -1,0 +1,11 @@
+{
+  "parts": [
+    {"name": "site", "kind": "static", "folder": "site"},
+    {"name": "receiver", "kind": "web", "folder": ".", "dockerfile": "Dockerfile", "port": 8080}
+  ],
+  "main": "site",
+  "routes": [
+    {"path": "/webhook", "part": "receiver"},
+    {"path": "/healthz", "part": "receiver"}
+  ]
+}

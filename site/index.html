@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>AI Revenue Recovery — failed recurring collections</title>
+<style>
+:root { color-scheme: light dark; --fg: #1f2328; --bg: #ffffff; --muted: #59636e;
+        --line: #d1d9e0; --code: #f6f8fa; --link: #0969da; }
+@media (prefers-color-scheme: dark) {
+  :root { --fg: #e6edf3; --bg: #0d1117; --muted: #9198a1; --line: #3d444d;
+          --code: #151b23; --link: #4493f8; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+       font: 16px/1.6 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 32px 20px 80px; }
+.banner { font-size: 14px; color: var(--muted); border: 1px solid var(--line);
+          border-radius: 6px; padding: 10px 14px; margin-bottom: 24px; }
+h1, h2 { border-bottom: 1px solid var(--line); padding-bottom: .3em; }
+h1 { font-size: 2em; } h2 { font-size: 1.5em; margin-top: 2em; }
+a { color: var(--link); }
+code { font: 85% ui-monospace, SFMono-Regular, Consolas, monospace; background: var(--code);
+       padding: .15em .35em; border-radius: 4px; }
+pre { background: var(--code); padding: 14px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+pre.mermaid { background: none; text-align: center; }
+table { border-collapse: collapse; display: block; overflow-x: auto; margin: 16px 0; }
+th, td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; vertical-align: top; }
+thead th { background: var(--code); }
+blockquote { margin: 0; padding: 0 1em; color: var(--muted); border-left: 4px solid var(--line); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+</style>
+</head>
+<body>
+<main>
+<div class="banner">Generated from <a href="https://github.com/divyanshg03/razorpay-ai-revenue-recovery">the repository</a>'s README by <code>scripts/render_site.py</code>. Every figure comes from <code>results/</code>; this page has no content of its own.</div>
+<h1 id="ai-revenue-recovery--failed-recurring-collections">AI Revenue Recovery — failed recurring collections</h1>
+<p><strong>Razorpay AI Buildathon, Track 03.</strong></p>
+<p>A decisioning layer for failed recurring collections on UPI AutoPay and eMandate mandates: who to contact, when, on which channel, and whom to leave alone. A deterministic state machine makes every decision; a local language model only writes the words and reads the replies.</p>
+<p>It is measured on a seeded, simulated cohort — <a href="#read-this-before-the-number">the reason comes before any number</a> — against a randomised holdout and against Razorpay's documented retry ladder, <strong>inside NPCI's attempt cap</strong>: one attempt and three retries per mandate cycle, the rule any real deployment ships under. Three findings, each with its figures and interval below:</p>
+<ul>
+<li><strong>Timing is the lever.</strong> The same three retries, moved off the broke week in which the charge failed and spread across the salary cycle, recover far more than Razorpay's consecutive-day ladder — with no diagnosis, no message and no model.</li>
+<li><strong>Decisioning is what the lever cannot reach.</strong> With only three retries the calendar runs out of attempts. Replacing dead instruments, honouring promises and choosing whom to contact add a measurable amount on top of the calendar.</li>
+<li><strong>It stops when it should.</strong> Payment, opt-out and dispute end contact; bereavement pauses it. The rules are code, the model may stop contact but never start it, and every decision is in a hash-chained ledger.</li>
+</ul>
+<p>The pre-registered configuration — six retries, over NPCI's cap — is kept, unedited, in <a href="#the-pre-registered-measurement-six-retries">its own section</a>. With that many attempts the calendar alone does nearly all the work, and the disagreement between the two runs is part of the finding.</p>
+<h2 id="the-problem">The problem</h2>
+<p>Recurring collection in India succeeds between 30% and 50% of the time. On Razorpay Subscriptions, a failed charge is retried on each of the following three days — four debits in all — and then the subscription halts. The documentation is candid about what happens next:</p>
+<blockquote><p>you will have to charge them manually.</p></blockquote>
+<p>A merchant debiting saved tokens directly through the recurring-payments API gets no automatic retry at all; the documentation says to retry the debit manually. Either way, a failed debit is three losses for the merchant: the revenue, the customer — who did not choose to leave — and the effort of collecting by hand.</p>
+<p>Four attempts across four days is the whole strategy. A monthly salary cycle is thirty days long, so a customer whose pay lands on day nine is retried entirely during the week they had no money, then written off. Nothing in that ladder asks <em>why</em> the payment failed: a card that expired three months ago is retried on exactly the same schedule as an account that was briefly short.</p>
+<h2 id="what-this-does">What this does</h2>
+<p>It sits above that ladder and decides. A deterministic state machine reads the failure cause, checks a set of guardrails, and picks an action — retry silently, send a message, escalate to a human, or stop. Every decision is written to an append-only, hash-chained ledger that can be replayed afterwards under the policy version that applied at the time.</p>
+<p>Two things it does that no retry loop can: it replaces dead instruments by asking for a new one, which a silent retry can never achieve; and it stops — on payment, on opt-out, on dispute — and pauses on bereavement, which a retry loop never does because it never speaks and so never hears an objection.</p>
+<p>A local language model writes the wording and reads inbound replies. <strong>It never decides whether to contact anyone about money.</strong></p>
+<h2 id="watch-it-run">Watch it run</h2>
+<pre><code>python scripts/demo.py --live --pause --ask   # the full demo, stepped, with the keyboard handed over
+python scripts/demo.py                        # deterministic; no model, no credentials, no network</code></pre>
+<p>It opens on a <strong>real Razorpay event</strong> — the <code>payment.failed</code> their servers sent to a laptop through a zrok tunnel during phase 0 — put back through the shipped webhook receiver, which verifies it, ignores the redelivery, and rejects the same body with one byte changed. Their own <code>error_reason</code> on that payload is <code>payment_failed</code>, which says nothing, and watching the taxonomy file it under <code>other</code> is the clearest statement of the problem this repo exists for.</p>
+<p>Then one failed collection end to end on the simulated cohort: the diagnosis that error code alone cannot give you, the guardrails firing, the ladder escalating, the message being composed, the copy gate rejecting non-compliant wording, replies parsed into a promise-to-pay and an opt-out, the five replies that break naive parsers — two of them not in English — a late <code>payment.captured</code> arriving as a webhook and stopping the engine mid-ladder, and the hash-chained ledger replayed in order. It ends on the measured results, the pre-registered run and the capped headline, both read live from their artifacts so the screen cannot drift from them. With <code>--ask</code>, whoever is watching types a customer's reply and sees what the engine does next.</p>
+<p>Every component in it is imported from <code>src/recovery/</code> exactly as the batch imports them — nothing is re-implemented for the demo, because a demo that re-implements the system is a demo of the demo. The copy-gate probes each declare the rule they are meant to trip, and the run prints whether the gate agreed; a test fails the build if they ever disagree.</p>
+<hr>
+<h2 id="read-this-before-the-number">Read this before the number</h2>
+<p><strong>The cohort is simulated, and that is a real limitation rather than a disclaimer.</strong> Subscriptions is gated on this Razorpay test account: <code>/v1/plans</code> and <code>/v1/subscriptions</code> return 401 while ten other endpoints return 200 with the same key. Without it there is no <code>auth_attempts</code> counter, no observable retry ladder, and no way to make a live charge fail on demand. So the failed-charge cohort is <strong>generated by a seeded simulator</strong>, and the incumbent ladder is <strong>reimplemented from documentation rather than observed</strong>.</p>
+<p>Randomisation removes selection bias <em>within</em> the simulation. It cannot validate the simulation. Every figure below is a statement about a model we wrote, and the full list of what that costs is in <a href="#limitations">Limitations</a> — which is worth reading before the table, not after.</p>
+<p>The evidence for the gating, and the support ticket raised against it, are in <a href="https://github.com/divyanshg03/razorpay-ai-revenue-recovery/blob/main/docs/phase-0-findings.md"><code>docs/phase-0-findings.md</code></a>.</p>
+<h2 id="what-it-recovered">What it recovered</h2>
+<p>Measured against a randomised holdout, net of contact cost. The metric — net incremental rupees against the holdout — was frozen before any engine code existed; git ancestry proves the order, and a test checks the ancestry rather than asserting it.</p>
+<p>The configuration it is computed under was amended once, by <a href="https://github.com/divyanshg03/razorpay-ai-revenue-recovery/blob/main/docs/metric-definition.md#a12---22-sept-2026---the-headline-is-now-measured-inside-npcis-attempt-cap">amendment A12</a>: the frozen schedule took six attempts per failed debit, which is over NPCI's cap, so the headline is now measured inside the cap, from <a href="https://github.com/divyanshg03/razorpay-ai-revenue-recovery/blob/main/results/npci-cap-rerun.json"><code>results/npci-cap-rerun.json</code></a>. The amendment <em>lowered</em> the headline, and the six-retry result is kept below, unedited.</p>
+<table>
+<thead><tr><th></th><th></th></tr></thead>
+<tbody>
+<tr><td><strong>Net incremental recovery</strong></td><td><strong>Rs 724,503</strong></td></tr>
+<tr><td>95% CI</td><td>Rs 578,218 – Rs 862,865</td></tr>
+<tr><td>Per treated customer</td><td>Rs 258.94</td></tr>
+<tr><td>Compared against</td><td>the engine (C) vs Razorpay's documented T+1..T+3 ladder (B)</td></tr>
+<tr><td>Cost per incremental rupee</td><td>Rs 0.0042</td></tr>
+<tr><td>Recovery rate, A / B / C</td><td>2.00% / 25.25% / 58.40%</td></tr>
+<tr><td>Rule</td><td>NPCI UPI circular OC-215-A: 1 attempt + 3 retries per mandate per cycle</td></tr>
+<tr><td>Schedule</td><td>the charge on day 0; retries on days 7, 14, 21; Razorpay's ladder on days 1, 2, 3</td></tr>
+<tr><td>Window</td><td>21 days, anchored on each debt's own failure date</td></tr>
+<tr><td>Cohort</td><td>5,000 simulated customers, seed 20260905</td></tr>
+<tr><td>Interval method</td><td>percentile; paired where the control runs on arm C's own customers, independent where it does not, 10,000 resamples</td></tr>
+<tr><td>Generated at</td><td><code>682f343</code>, clean tree</td></tr>
+</tbody>
+</table>
+<p>Arm A does nothing. Arm B is Razorpay's Subscriptions ladder as documented: the charge, then a retry on each of the three following days. Arm C is the engine, allowed the same four debits and no more. The headline is <strong>C against B</strong> - beating do-nothing proves nothing, since every recovery vendor beats doing nothing. The interval excludes zero.</p>
+<p>Still not modelled, and each of these would move the figures above:</p>
+<ul>
+<li>Peak hours. OC-215-A confines retries to non-peak windows; every action here is timed at 10:00, inside the 10:00-13:00 peak. The simulator has no time-of-day effect, so this changes none of the figures above and all of the deployment.</li>
+<li>Pre-debit notification under the RBI e-mandate framework.</li>
+<li>eMandate confirmation lag: charges settle synchronously here.</li>
+<li>Every simulator limitation in src/recovery/cohort/PARAMETERS.md, inherited unchanged. These intervals are sampling noise in a model we wrote.</li>
+</ul>
+<h2 id="where-the-money-comes-from">Where the money comes from</h2>
+<p>The headline compares the engine against Razorpay's ladder, and those two differ in two ways at once: the retry calendar, and the whole decisioning layer. That comparison alone cannot say which of them produced the recovery. Arms D and D' hold the calendar fixed and strip everything else away, on arm C's own customers, which separates them.</p>
+<table>
+<thead><tr><th>Arm</th><th>What it does</th><th>Recovery</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>nothing at all</td><td>2.00%</td></tr>
+<tr><td>B</td><td>Razorpay's ladder: the charge, then days 1, 2, 3</td><td>25.25%</td></tr>
+<tr><td>D</td><td>the calendar alone, days 7, 14, 21, retrying every cause</td><td>58.40%</td></tr>
+<tr><td><strong>D'</strong></td><td><strong>the calendar alone, days 7, 14, 21, respecting the diagnosis</strong></td><td><strong>51.47%</strong></td></tr>
+<tr><td><strong>C</strong></td><td><strong>the full engine</strong></td><td><strong>58.40%</strong></td></tr>
+</tbody>
+</table>
+<p><strong>Better timing is worth Rs 565,624</strong> (D' against B, 95% CI Rs 424,405 – Rs 698,579). The same three retries, with no diagnosis, no message and no model - moved off the broke week in which the charge failed and spread across the salary cycle. Razorpay's ladder does not fail because it is unintelligent; it fails because four attempts inside four days sit in one broke week of a monthly cycle.</p>
+<p><strong>The decisioning layer adds Rs 158,880 on top of that calendar</strong> (C against D', paired on the same customers, 95% CI Rs 111,611 – Rs 207,760), and the interval excludes zero. With only three retries the calendar runs out of attempts, and what is left to collect with is deciding whom to contact, on what channel, and whom to leave alone.</p>
+<p><strong>Where that comes from.</strong> The 277 debts diagnosed <code>needs_new_instrument</code> - a card that expired, a mandate that no longer charges - are ones D' declines to retry at all, because a silent retry can never charge a dead instrument; D' recovers only those that pay on their own. The engine recovers 93 of them (33.57%) by asking the customer for a new one, which only a message can do. D' also has no answer to an opt-out, a dispute or a bereavement, because it never speaks and so never hears one.</p>
+<p><strong>Why the blind calendar, D, looks as good as the engine.</strong> It retries every cause, including failures where the customer has to act, and scores Rs 7,224 against the engine (Rs -47,032 – Rs 59,910, crossing zero). It gets there only because the simulator lets a silent retry fix causes that in reality need the customer - the modelling gap amendment A2 declined to exploit for the engine. Using it against the engine would be an inconsistent standard, so D' is the control to read. For the same reason D shows Rs 717,280 against the incumbent, more than D'.</p>
+<p><strong>So the engine is two things.</strong> It makes aggressive timing safe to deploy - the calendar is the lever, and compliance is the constraint on pulling it - and, under the rule a deployment actually faces, it collects what timing alone cannot reach.</p>
+<h2 id="what-it-failed-to-recover">What it failed to recover</h2>
+<p>A recovery system that reports only its wins is a marketing asset, not an engineering one.</p>
+<p>Inside the cap the engine did not recover 1,164 of 2,798 debts (41.60%), leaving Rs 956,036 on the table. That total is four different things:</p>
+<table>
+<thead><tr><th>Why it was not recovered</th><th>Customers</th><th>Rupees</th></tr></thead>
+<tbody>
+<tr><td>Stopped by a guardrail — <strong>the system was right to stop</strong></td><td>215</td><td>Rs 201,785</td></tr>
+<tr><td>No money at any point in the debt's window — <strong>unreachable by any retry</strong></td><td>235</td><td>Rs 178,765</td></tr>
+<tr><td>Money in the window, but never on a permitted retry day — <strong>the price of the cap</strong></td><td>485</td><td>Rs 413,065</td></tr>
+<tr><td>Retried while funded, still unpaid — the honest residual</td><td>229</td><td>Rs 162,421</td></tr>
+</tbody>
+</table>
+<p>Recovering the first two rows would mean breaking the opt-out, dispute and hardship rules, or collecting from people who had no money at any point in the window. <strong>The third row is the largest, and it is the argument for what to build next:</strong> those customers had money, just not on any of the three days the rule allows a retry. Putting the three retries on the days money actually lands - predicted from each customer's own debit history - is where machine learning earns its place in this product, and the same holdout would measure it.</p>
+<h2 id="the-pre-registered-measurement-six-retries">The pre-registered measurement: six retries</h2>
+<p>This is the configuration the metric definition was frozen with, and the result the submission was first judged on. It is kept here in full, generated from <code>results/metrics.json</code>, because amendment A12 moved the headline without deleting anything — and a pre-registered result that disappears when a better-argued one arrives was never really pre-registered.</p>
+<p>It differs from the headline above in three ways: six retries rather than three; a window anchored on the cohort's start date rather than on each debt's own failure date; and an incumbent that also re-debits on the day of the failure. The first is over NPCI's cap. The other two are harness defects, listed under <a href="#known-issues-found-after-submission">known issues</a>.</p>
+<h3 id="recovery-with-six-retries">Recovery, with six retries</h3>
+<table>
+<thead><tr><th></th><th></th></tr></thead>
+<tbody>
+<tr><td><strong>Net incremental recovery, six retries</strong></td><td><strong>Rs 957,156</strong></td></tr>
+<tr><td>95% CI</td><td>Rs 807,479 – Rs 1,094,821</td></tr>
+<tr><td>Per treated customer</td><td>Rs 342.09</td></tr>
+<tr><td>Compared against</td><td>engine (C) vs Razorpay's T+0..T+3 ladder (B)</td></tr>
+<tr><td>Cost per incremental rupee</td><td>Rs 0.0026</td></tr>
+<tr><td>Recovery rate, A / B / C</td><td>2.00% / 25.25% / 67.41%</td></tr>
+<tr><td>Cohort</td><td>5,000 simulated customers, seed 20260905</td></tr>
+<tr><td>Interval method</td><td>percentile, stratified by arm, 10,000 resamples</td></tr>
+<tr><td>Metric frozen at</td><td><code>8d14dbe</code>, ancestry verified: true</td></tr>
+</tbody>
+</table>
+<p>All three pre-registered readouts, not just the largest. The 21-day window is the primary; the other two were declared in the frozen definition before any result existed and are reported whatever they say:</p>
+<table>
+<thead><tr><th>Readout</th><th>Net incremental</th><th>95% CI</th></tr></thead>
+<tbody>
+<tr><td><strong>21-day (primary)</strong></td><td><strong>Rs 957,156</strong></td><td>Rs 807,479 – Rs 1,094,821</td></tr>
+<tr><td>14-day (secondary)</td><td>Rs 491,301</td><td>Rs 348,590 – Rs 625,406</td></tr>
+<tr><td>Shifted-parameter cohort</td><td>Rs 424,913</td><td>Rs 276,849 – Rs 568,238</td></tr>
+</tbody>
+</table>
+<p>Arm A does nothing. Arm B is the incumbent ladder as the submission reimplemented it, which also re-debits on the day of the failure - five debits rather than the documented four. Arm C is the engine with six retries, over NPCI's cap. All three intervals exclude zero.</p>
+<h3 id="where-the-money-came-from-with-six-retries">Where the money came from, with six retries</h3>
+<table>
+<thead><tr><th>Arm</th><th>What it does</th><th>Recovery</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>nothing at all</td><td>2.00%</td></tr>
+<tr><td>B</td><td>the incumbent as reimplemented, days 0,1,2,3</td><td>25.25%</td></tr>
+<tr><td>D</td><td>the calendar alone, retrying every cause</td><td>80.38%</td></tr>
+<tr><td>D'</td><td>the calendar alone, respecting the diagnosis</td><td>71.05%</td></tr>
+<tr><td>C</td><td>the full engine</td><td>67.41%</td></tr>
+</tbody>
+</table>
+<p><strong>With six retries, the calendar alone beats the engine.</strong> Timing is worth Rs 1,260,370 (+55.13 pp, D against B), and a retry loop with no diagnosis, no message, no guardrails and no model out-recovers the full engine. Against the diagnosis-respecting calendar the decisioning layer measures Rs -101,326 (-3.64 pp) on an interval of Rs -224,204 to Rs 21,340 that <strong>crosses zero</strong>: with attempts that plentiful, deciding whom to contact does not move recovery measurably. It changes what you are allowed to do while collecting, which the control was built to isolate and cannot price.</p>
+<p>The engine still recovers 100 of the 277 dead-instrument debts that no silent retry can reach, and it is the only arm that honours an opt-out. This is the result that made the submission lead with <em>the money is in the calendar</em> - and the capped run is what qualified it: when the rule makes attempts scarce, the decisioning is what is left to collect with.</p>
+<h3 id="what-it-failed-to-recover-with-six-retries">What it failed to recover, with six retries</h3>
+<p>With six retries the engine did not recover 912 of 2,798 debts (32.59%), leaving Rs 722,838 on the table. That total is four different things, and only one of them is a defect:</p>
+<table>
+<thead><tr><th>Why it was not recovered</th><th>Customers</th><th>Rupees</th></tr></thead>
+<tbody>
+<tr><td>Stopped by a guardrail — <strong>the system was right to stop</strong></td><td>183</td><td>Rs 164,217</td></tr>
+<tr><td>No money in the window at all — <strong>unreachable by any policy</strong></td><td>267</td><td>Rs 200,233</td></tr>
+<tr><td>Funded, but never attempted — <strong>a defect; must stay 0</strong></td><td>0</td><td>Rs 0</td></tr>
+<tr><td>Attempted while funded, still unpaid — the honest residual</td><td>462</td><td>Rs 358,388</td></tr>
+</tbody>
+</table>
+<p>Recovering the first two rows would mean either breaking the opt-out, dispute and hardship rules, or collecting from people who had no money at any point in the window. They are reported as outcomes, not as failures to fix.</p>
+<h2 id="how-it-is-built">How it is built</h2>
+<h3 id="the-decision-loop">The decision loop</h3>
+<pre class="mermaid">flowchart TB
+    RZP[&quot;Razorpay&lt;br/&gt;payment.failed · payment.captured webhooks&quot;] --&gt; INGEST
+    SIM[&quot;Seeded simulator&lt;br/&gt;the batch&#x27;s cohort source today&quot;] --&gt;|&quot;a failed debit&quot;| DIAG
+
+    subgraph EDGE [&quot;Ingest — turns untrusted HTTP into trusted facts. Decides nothing.&quot;]
+        INGEST[&quot;Webhook receiver&lt;br/&gt;HMAC verify → dedup → persist → ACK inside 5 s&quot;] --&gt; STORE[(&quot;Event store&lt;br/&gt;payment state by precedence,&lt;br/&gt;never last-write-wins&quot;)]
+    end
+
+    STORE --&gt;|&quot;a failed debit&quot;| DIAG
+
+    subgraph ENGINE [&quot;Engine — deterministic. Decides everything.&quot;]
+        DIAG[&quot;Diagnosis&lt;br/&gt;cause + actionability&quot;] --&gt; GUARD[&quot;Guardrails&lt;br/&gt;hard stops → soft stops → contact rules → cost&quot;]
+        GUARD --&gt; RECHECK{&quot;Re-check payment state&lt;br/&gt;before every action&quot;}
+        RECHECK --&gt;|&quot;already paid&quot;| STOP[&quot;Stop&quot;]
+        RECHECK --&gt;|&quot;still owing&quot;| SM[&quot;State machine&lt;br/&gt;retry · message · escalate · stop&quot;]
+        POLICY[&quot;Policy, versioned&lt;br/&gt;schedule · caps · quiet hours · NPCI cap&quot;] -.-&gt; GUARD
+        POLICY -.-&gt; SM
+    end
+
+    STORE --&gt;|&quot;payment state&quot;| RECHECK
+
+    subgraph LLM [&quot;Local model on Ollama — language only. Decides nothing.&quot;]
+        COMP[&quot;Composer&lt;br/&gt;template, or model wording&quot;] --&gt; GATE{&quot;Copy gate&lt;br/&gt;discount · urgency · scarcity · shaming ·&lt;br/&gt;invented amounts, dates, links&quot;}
+        PARSE[&quot;Reply parser&lt;br/&gt;keyword overrides → model → fallback&quot;]
+    end
+
+    SM --&gt;|&quot;only after the decision&quot;| COMP
+    GATE --&gt;|&quot;rejected&quot;| TPL[&quot;Deterministic template&quot;]
+    GATE --&gt;|&quot;passed&quot;| SEND[&quot;Send&lt;br/&gt;WhatsApp · SMS · human call&quot;]
+    TPL --&gt; SEND
+    REPLY[&quot;Customer reply&quot;] --&gt; PARSE
+    PARSE --&gt;|&quot;evidence: can stop contact, never start it&quot;| GUARD
+
+    SM --&gt; LEDGER[(&quot;Append-only&lt;br/&gt;hash-chained ledger&quot;)]
+    RECHECK --&gt; LEDGER
+    GATE --&gt; LEDGER
+    SEND --&gt; LEDGER
+    STOP --&gt; LEDGER
+    PARSE --&gt; LEDGER</pre>
+<p><strong>Read it in one direction.</strong> The arrow into the model box leaves <em>after</em> the decision has been made, and nothing returns into the state machine carrying an action. A parsed reply re-enters the engine as <strong>evidence</strong> for the guardrails, and the evidence is asymmetric: it can stop contact, and it can never start contact, lift a stop, or supply a date.</p>
+<h3 id="components">Components</h3>
+<table>
+<thead><tr><th>Layer</th><th>Module</th><th>What it does</th><th>The decision that shaped it</th></tr></thead>
+<tbody>
+<tr><td>Ingest</td><td><code>ingest/webhook.py</code></td><td>Verifies the HMAC signature, deduplicates event ids, persists payment state, acknowledges inside Razorpay's five-second budget</td><td>Dedup runs <em>after</em> verification, so an unsigned caller cannot poison it; a late <code>failed</code> never overwrites a <code>captured</code></td></tr>
+<tr><td>Source</td><td><code>cohort/source.py</code>, <code>cohort/simulator.py</code></td><td>Supplies failed debits behind one interface; today a seeded simulator</td><td>Subscriptions is gated on the test account, and the interface lets a real source replace the simulator without touching anything above it</td></tr>
+<tr><td>Diagnosis</td><td><code>diagnosis/taxonomy.py</code></td><td>Cause and actionability from the composite error key</td><td><code>error_code</code> alone has three values; the reason, source and step carry the signal</td></tr>
+<tr><td>Engine</td><td><code>engine/machine.py</code></td><td>Plans each debt's day, records replies and outcomes, latches absolute stops</td><td>Payment state is re-read before each action, and every read that changes the answer is logged</td></tr>
+<tr><td>Guardrails</td><td><code>engine/guardrails.py</code></td><td>Hard stops → soft stops → contact rules → cost</td><td>The order is load-bearing: a statutory stop is never recorded as a cost decision (amendment A8)</td></tr>
+<tr><td>Policy</td><td><code>engine/policy.py</code></td><td>Frozen and versioned: retry schedule, caps, quiet hours, escalation ladder, costs, the NPCI cap</td><td>A regulator's rule is a policy field, not a code path</td></tr>
+<tr><td>Language</td><td><code>llm/composer.py</code></td><td>Message wording from a local model, or a deterministic template</td><td>The payment link is inserted by code; the model never writes it</td></tr>
+<tr><td>Language</td><td><code>llm/copy_gate.py</code></td><td>Rejects discounts, urgency, scarcity, shaming, and invented amounts, dates and links</td><td>The send path fails closed</td></tr>
+<tr><td>Language</td><td><code>llm/parser.py</code></td><td>Reply intent: keyword overrides, then the model, then a fallback; dates by a pure function</td><td>The model may stop contact and never start it; the keyword floor is bilingual</td></tr>
+<tr><td>Audit</td><td><code>ledger/audit.py</code></td><td>An append-only, hash-chained record of every decision, action, reply and state read</td><td>It records what the engine declined to do and why, not only what it did</td></tr>
+<tr><td>Evaluation</td><td><code>evaluation/</code></td><td>Randomised assignment, the arms and controls, the metrics, replay invariants</td><td>The invariants never import the engine, and any violation blocks publishing</td></tr>
+</tbody>
+</table>
+<h3 id="how-a-number-reaches-this-page">How a number reaches this page</h3>
+<pre class="mermaid">flowchart LR
+    ASSIGN[&quot;Randomised assignment&lt;br/&gt;sha256 of seed and customer id&lt;br/&gt;sticky, exclusions first&quot;] --&gt; ARMS[&quot;Arms A · B · C&lt;br/&gt;do nothing · Razorpay&#x27;s ladder · the engine&quot;]
+    ARMS --&gt; CTRL[&quot;Controls D · D&#x27;&lt;br/&gt;the calendar alone, on C&#x27;s own customers&quot;]
+    ARMS --&gt; INV[&quot;Replay invariants&lt;br/&gt;re-derived from the ledger alone&quot;]
+    ARMS --&gt; MET[&quot;Net incremental rupees&lt;br/&gt;stratified bootstrap&quot;]
+    CTRL --&gt; MET
+    INV --&gt;|&quot;any violation blocks the write&quot;| ART[(&quot;results/metrics.json&lt;br/&gt;frozen configuration&quot;)]
+    MET --&gt; ART
+    CAP[&quot;scripts/npci_cap_rerun.py&lt;br/&gt;1 attempt + 3 retries&quot;] --&gt; ART2[(&quot;results/npci-cap-rerun.json&quot;)]
+    ART --&gt; RENDER[&quot;scripts/render_docs.py&quot;]
+    ART2 --&gt; RENDER
+    RENDER --&gt; DOCS[&quot;This README and docs/phase-3.md&lt;br/&gt;a test fails if any figure drifts&quot;]
+    ART --&gt; DEMO[&quot;scripts/demo.py&lt;br/&gt;reads both artifacts live&quot;]
+    ART2 --&gt; DEMO</pre>
+<h3 id="the-commitments-and-where-each-is-enforced">The commitments, and where each is enforced</h3>
+<p><strong>A deterministic state machine owns every decision.</strong> The model composes wording and parses replies; it decides nothing about whether anyone is contacted about money.</p>
+<p>The split is structural rather than conventional, and stated exactly: the engine imports two names from <code>llm/parser</code> — <code>Intent</code>, an enum, and <code>ParsedReply</code>, a frozen dataclass. Both are vocabulary for describing a reply that has <em>already</em> been parsed. It imports no function that reaches a model, and nothing under <code>engine/</code> performs an HTTP call. So there is no call path from a decision to a language model, which is the property that matters and is narrower than "no import at all". A test enumerates the permitted names and fails if the engine ever imports one that can invoke something.</p>
+<p><strong>The model may stop contact; it may never start it.</strong> Opt-out, dispute and hardship are matched by code first, in that order — a stop that never expires outranks a pause that does. The keyword list is bilingual, because customers reply in romanised Hinglish as often as in English. Where the list is silent and the model reports an opt-out or a dispute, that is honoured as a stop and recorded as <code>llm_stop</code>; no model output can lift a stop, begin contact, or supply a date. The asymmetry is the compliance rule and the prompt-injection defence at once: the most a hostile reply can achieve is to stop contact with its own sender.</p>
+<p><strong>The copy gate is demonstrated, not asserted.</strong> Generated wording is rejected if it introduces a discount, urgency, scarcity, or shaming. This is not a tone preference. Under TRAI's mixed-content rule such wording converts a service message into a promotional one and inherits consent, DND and time-band obligations; fabricated urgency and repeated nudging are two named patterns in the CCPA Dark Patterns Guidelines 2023. The gate is tested against a real rejection from a real model.</p>
+<p><strong>Payment state is re-checked immediately before every action.</strong> Razorpay's webhooks are at-least-once and unordered — <code>payment.failed</code> can arrive after <code>payment.captured</code> for the same transaction. Without the re-check, the system duns people who have already paid. In the batch the state is the simulator's ground truth; in the demo it is the event store the webhook receiver writes, so a late <code>payment.captured</code> stops the engine mid-ladder on screen.</p>
+<p><strong>Stopping rules are enforced in code and logged</strong>: contact caps, quiet hours, silence during a promise-to-pay (silent retries continue), stop on dispute, on opt-out, on payment received. Contact is confined to 08:00–19:00 IST as a product invariant. The design lets a tenant narrow these rules and never widen them; that constraint is documented rather than yet validated in code — see <a href="#known-issues-found-after-submission">known issues</a>.</p>
+<p><strong>The audit ledger is hash-chained and replayable</strong>, and the invariant checks that validate a run never import the engine — they re-derive violations from the records alone. If any invariant is non-zero the batch <strong>refuses to write</strong> <code>results/metrics.json</code> at all, on the grounds that a number from a run which broke its own stopping rules is worse than no number.</p>
+<h2 id="reproducing-the-result">Reproducing the result</h2>
+<pre><code>pip install -e &#x27;.[dev]&#x27;                 # Python &gt;= 3.11; no runtime dependencies
+python scripts/run_batch.py             # regenerates results/metrics.json (~18 min)
+python scripts/npci_cap_rerun.py        # regenerates results/npci-cap-rerun.json
+python scripts/render_docs.py --check   # fails if any figure in the docs drifted
+pytest                                  # the full suite</code></pre>
+<p>The batch is offline and deterministic: no Razorpay credentials, no network, and no Ollama. It regenerates <code>results/metrics.json</code> byte-for-byte from seed 20260905 on 5,000 customers, with the sole exception of <code>head_commit</code>, which records the commit it was generated at. The local model is exercised in the test suite and the demo, where wording is the point; it cannot affect this measurement, and <code>docs/metric-definition.md</code> says so.</p>
+<p>Every figure in this README and in <code>docs/phase-3.md</code> is generated by <code>scripts/render_docs.py</code> — the headline and its sections from <code>results/npci-cap-rerun.json</code>, the pre-registered section from <code>results/metrics.json</code>. None is typed. A test runs the renderer in <code>--check</code> mode, so a document that disagrees with an artifact fails the build rather than waiting for a reader to notice.</p>
+<h2 id="limitations">Limitations</h2>
+<ol>
+<li>Outcomes are simulated: Subscriptions is gated on this Razorpay test account (docs/phase-0-findings.md), so the failed-charge cohort is generated, not observed. Randomisation removes selection bias WITHIN the simulation; it cannot validate the simulation.</li>
+<li>Significance is cheap here - N is a free parameter on a simulator. The CIs express precision inside the simulation only, not evidence about the real world.</li>
+<li>We wrote the response model. Its parameters trace to cited public figures (src/recovery/cohort/PARAMETERS.md), the engine never sees them, and evaluation runs on shifted parameters - that reduces the problem, it does not eliminate it.</li>
+<li>Contact costs are published list prices, not invoices, taken at the expensive end of each range. The WhatsApp rate could not be read at source.</li>
+<li>MDR is excluded: it scales incremental recovery by (1 - mdr) and cannot change its sign or the ranking of arms.</li>
+<li>Customer annoyance is unpriced, deliberately - no defensible number could be sourced, so it is handled as hard constraints rather than a tradeable term.</li>
+<li>The incumbent baseline is reimplemented from Razorpay's documentation, not observed: gate 0.3 was voided when Subscriptions turned out to be gated.</li>
+<li>In-batch composition uses deterministic templates. The simulator has no notion of wording, so the LLM cannot affect this measurement; it is exercised live in the test suite and results/phase2/.</li>
+<li>The weakest subgroup is needs_customer_action, and it was deliberately NOT fixed. The engine never silently retries it, while it does retry a dead instrument once a contact has gone out. Making those symmetric is a one-line change that would raise the headline - but the simulator gates the instrument case on a flag only a contact can set and gates this case on nothing, so the gain would measure a modelling gap rather than recovered money. Repairing that gap instead would strip recovery from the incumbent baseline, which retries blindly and contacts nobody. Both were declined; see amendment A2.</li>
+<li>The pre-registered prediction for this phase did not hold. The plan said a randomised holdout would produce a SMALLER lift than the un-held-out Phase 2 sanity run; the measured lift is larger. The cause is identified rather than guessed - both the sanity run and the first Phase 3 run were measuring an engine whose retry schedule stopped six days short of its declared 21-day horizon (amendment A1). The prediction is left unedited in docs/phase-3.md, because a pre-registration revised after the result is not a pre-registration.</li>
+</ol>
+<h2 id="known-issues-found-after-submission">Known issues, found after submission</h2>
+<p>An adversarial audit of this repository, run after submission, found the following. The fixed items are fixed with tests, and arm C replayed on the old and the new code gives identical outcomes and an identical ledger — so none of the fixes moved <code>results/metrics.json</code>. The open items are listed so that nobody has to find them.</p>
+<p><strong>Fixed</strong></p>
+<ul>
+<li>A bereaved customer who also wrote "stop messaging me" was classified as hardship: a seven-day pause, after which contact resumed. Opt-out and dispute now outrank hardship.</li>
+<li>An opt-out the model detected, but no keyword matched, was discarded. It is now honoured as a stop.</li>
+<li>Romanised Hinglish opt-outs and promises ("mat bhejo", "kal pay karunga") were not read without a model. They are now.</li>
+<li>"Please don't stop my subscription, I will pay" was read as an opt-out, and "who is this?" as a permanent dispute. Negated stops are scrubbed before matching; an identity question is no longer a dispute.</li>
+<li>A hardship callback was scheduled from any number in the reply, so "died 2 days ago" set a callback for the following day. Dates now come only from a callback clause.</li>
+<li>Payment state was re-read once per debt per day rather than before each action. It is now read per action.</li>
+<li>A hand-typed count sat inside a generated block, where <code>--check</code> could never see it drift. It is generated now.</li>
+<li>The frozen schedule exceeded NPCI's attempt cap. The headline is now measured inside it, by amendment A12, and the six-retry result is kept as the pre-registered record.</li>
+</ul>
+<p><strong>Open</strong></p>
+<ul>
+<li><strong>Window anchoring in the pre-registered run.</strong> <code>run_batch.py</code> starts every arm's 21-day window on the cohort start date rather than on each debt's own failure date, so the engine loses its final retry on debts that failed later, and the baselines can retry a debt before it has failed. The capped headline is anchored per debt; the pre-registered run has not been re-run with the fix.</li>
+<li><strong>Arm B re-debits on the day of the failure</strong> in the pre-registered run — five debits rather than the documented four. The capped headline uses the documented T+1..T+3.</li>
+<li><strong>No per-debt reconciliation.</strong> A pay-link payment and a mandate retry could both succeed: payment state is keyed by payment rather than by debt, and nothing locks a debit in flight.</li>
+<li><strong>Unsourced simulator mechanics.</strong> The funds window, contact attention and fatigue, promise keeping and the reply mix are assumptions rather than cited figures, despite the opening line of <code>PARAMETERS.md</code>. Mandate type is assigned at random and never read, so <code>card_expired</code> can land on a UPI mandate.</li>
+<li><strong>Rules that never bind in the batch.</strong> The payment re-check never fires there, because the harness stops planning a settled debt; the contact caps and quiet hours never bind either, because every action runs at 10:00 and the ladder has three rungs. Those zero counts are true by construction rather than evidence.</li>
+<li><strong>Not modelled:</strong> DLT content templates and WhatsApp template approval (messages are free text), peak-hour timing, pre-debit notice, and eMandate confirmation lag.</li>
+<li><strong>Policy hygiene:</strong> a promise-to-pay silences messages with no upper bound; the quiet-hours check assumes IST input; tenant overrides are not validated to narrow only; and the policy version is set by hand rather than derived from the policy's contents.</li>
+<li><strong>Provenance:</strong> the committed <code>results/metrics.json</code> was generated with uncommitted changes on top of the commit it names, and ledger chain heads differ between runs because event ids are random. The contents regenerate identically; the hashes do not.</li>
+<li><strong>No human queue.</strong> A dispute stops contact, and nothing routes it to a person.</li>
+</ul>
+<h2 id="compliance-posture-stated-precisely">Compliance posture, stated precisely</h2>
+<ul>
+<li><strong>Not</strong> "DPDP-compliant". The substantive obligations of the Digital Personal Data Protection Act commence <strong>14 May 2027</strong>. The honest claim is that this is <em>designed for</em> that date from day one.</li>
+<li>The contact-frequency cap is a <strong>labelled policy choice</strong>, not a regulatory number. RBI's guidance says only that recovery agents must not "excessively" call; it names no figure. The seven-in-seven-days rule is US Regulation F and has no force in India.</li>
+<li>Quiet hours bind RBI-regulated entities rather than plain merchants. They are enforced here regardless, because it is the de-facto standard and makes the product sellable to a lender unchanged.</li>
+<li>NPCI's UPI circular OC-215-A caps mandate execution at one attempt and three retries per cycle. The headline is measured inside that cap; peak-hour timing and pre-debit notice are not yet modelled.</li>
+</ul>
+<h2 id="repository-map">Repository map</h2>
+<table>
+<thead><tr><th>Path</th><th>What is in it</th></tr></thead>
+<tbody>
+<tr><td><code>src/recovery/models.py</code></td><td>The shared vocabulary: debts, customers, failures, decisions, actions, stop reasons</td></tr>
+<tr><td><code>src/recovery/ingest/</code></td><td>Webhook receiver and event store: verify, deduplicate, persist payment state by precedence</td></tr>
+<tr><td><code>src/recovery/cohort/</code></td><td>The source interface, the seeded simulator, and <code>PARAMETERS.md</code></td></tr>
+<tr><td><code>src/recovery/diagnosis/</code></td><td>Failure-cause taxonomy; classifies on cause <em>and</em> source, never on error code alone</td></tr>
+<tr><td><code>src/recovery/engine/</code></td><td>Policy, guardrails, and the state machine that decides</td></tr>
+<tr><td><code>src/recovery/llm/</code></td><td>Composer, reply parser, and the copy gate</td></tr>
+<tr><td><code>src/recovery/ledger/</code></td><td>Append-only hash-chained audit trail</td></tr>
+<tr><td><code>src/recovery/evaluation/</code></td><td>Assignment, arms and controls, metrics, the batch, replay invariants</td></tr>
+<tr><td><code>scripts/demo.py</code></td><td>The narrated end-to-end demo: <code>--live</code>, <code>--pause</code>, <code>--ask</code></td></tr>
+<tr><td><code>scripts/npci_cap_rerun.py</code></td><td>Measures the cohort inside NPCI's attempt cap and writes the headline artifact</td></tr>
+<tr><td><code>scripts/run_batch.py</code></td><td>Runs the pre-registered six-retry experiment and writes <code>results/metrics.json</code></td></tr>
+<tr><td><code>scripts/render_docs.py</code></td><td>Renders every figure in the docs from the artifacts; <code>--check</code> fails on drift</td></tr>
+<tr><td><code>scripts/preflight.py</code></td><td>Pre-publish sweep for keys, phone numbers, hostnames and forbidden claims</td></tr>
+<tr><td><code>scripts/ledger_extract.py</code></td><td>A small, committable extract of the batch ledger</td></tr>
+<tr><td><code>scripts/phase2_evidence.py</code></td><td>Regenerates the Phase 2 evidence from live model runs</td></tr>
+<tr><td><code>scripts/gate_0_7_power.py</code></td><td>The sample-size check behind the metric definition</td></tr>
+<tr><td><code>scripts/create_payment_link.py</code>, <code>capture_payment_evidence.py</code>, <code>diagnose_webhook_secret.py</code></td><td>Phase 0 tooling against the Razorpay test API</td></tr>
+<tr><td><code>scripts/webhook_daemon.ps1</code> and siblings</td><td>Phase 0: keeping the webhook receiver alive behind the zrok tunnel</td></tr>
+<tr><td><code>evals/model_bakeoff.py</code></td><td>The model comparison that fixed where the language model is, and is not, trusted</td></tr>
+<tr><td><code>spikes/</code></td><td>The first webhook receiver, kept as the record of what was promoted into <code>ingest/</code></td></tr>
+<tr><td><code>results/npci-cap-rerun.json</code></td><td>The headline artifact: the cohort inside NPCI's attempt cap, with its controls and failure list</td></tr>
+<tr><td><code>results/metrics.json</code></td><td>The pre-registered six-retry artifact</td></tr>
+<tr><td><code>results/phase0/</code> to <code>results/phase3/</code></td><td>Evidence per phase: API probes, the real Razorpay webhook, the model bake-off, ledger extracts</td></tr>
+<tr><td><code>docs/metric-definition.md</code></td><td>The frozen metric, and every amendment to it, including A12</td></tr>
+<tr><td><code>docs/compliance-india.md</code></td><td>The regulatory reading behind every guardrail</td></tr>
+<tr><td><code>docs/razorpay-api-notes.md</code>, <code>docs/phase-0-findings.md</code></td><td>What the Razorpay API does, and what it would not do on this account</td></tr>
+<tr><td><code>docs/support-ticket-draft.md</code></td><td>The Subscriptions activation request raised against the gating</td></tr>
+<tr><td><code>docs/phase-0.md</code> to <code>docs/phase-4.md</code></td><td>The build log, phase by phase</td></tr>
+<tr><td><code>docs/local-setup.md</code>, <code>docs/pr-review-archive.md</code></td><td>Running it locally, and the external reviews it answered</td></tr>
+<tr><td><code>tests/</code></td><td>The suite: engine, guardrails, parser, ledger, the frozen-metric ancestry, and the README's honesty rules</td></tr>
+</tbody>
+</table>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+</body>
+</html>

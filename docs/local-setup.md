@@ -204,3 +204,30 @@ gate table in `docs/phase-0-findings.md`; corrected 4 Sept 2026.)*
   "razorpay", and delivers only to public URLs — which is what the zrok share is for.
 - **The Razorpay support ticket** in `docs/support-ticket-draft.md` needs a logged-in dashboard
   session.
+
+## The hosted copy — Uprush, since 20 Nov 2026
+
+The results page and the webhook receiver also run on Uprush, at
+`https://razorpay-revenue-recovery.sites.uprush.in`:
+
+| Path | Part | What answers |
+|---|---|---|
+| `/` | `site` (static) | `site/index.html` — the README, converted by `scripts/render_site.py` |
+| `POST /webhook` | `receiver` (Dockerfile) | `src/recovery/ingest/server.py` around the shipped `WebhookIngest` |
+| `GET /healthz` | `receiver` | `ok`; creates no event |
+
+Deploy with `powershell -ExecutionPolicy Bypass -File deploy\deploy.ps1`. It uploads a
+`git archive` of a commit, never this folder, and passes `--no-env`; see the script's header
+for why. The receiver's only variable is `RAZORPAY_WEBHOOK_SECRET`, set once with
+`uprush env push --only`, and the project's `env auto` is off — the Razorpay API keys are not
+on Uprush and must not be put there.
+
+Known gaps:
+
+- **The event store is on the container's disk.** If Uprush replaces the container, the dedup
+  table goes with it, and a Razorpay retry that straddles the restart would be accepted twice.
+  Acceptable for a demo endpoint; not the persistence `webhook.py` describes. The fix is a
+  database part, which is a design change and has not been made.
+- **Razorpay still delivers to the zrok share** until the Dashboard webhook URL is changed to
+  `/webhook` on the address above. Whether Razorpay accepts the `uprush.in` domain has not been
+  tested.
