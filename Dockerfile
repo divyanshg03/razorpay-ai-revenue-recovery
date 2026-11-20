@@ -1,8 +1,14 @@
-# The hosted webhook receiver. Stdlib only, so the image is the interpreter plus src/.
+# The hosted webhook receiver: the interpreter, src/, and one pinned pure-Python driver.
 # Configuration comes from the environment at run time; see src/recovery/ingest/server.py.
 FROM python:3.13-slim
 
 WORKDIR /app
+
+# Postgres driver for pg_store.py, used when DATABASE_URL is set. Installed only here:
+# the repository itself still has no runtime dependencies. Pinned, so a rebuild cannot
+# silently pick up a different driver.
+RUN pip install --no-cache-dir pg8000==1.31.6
+
 COPY src/ ./src/
 
 ENV PYTHONPATH=/app/src \
