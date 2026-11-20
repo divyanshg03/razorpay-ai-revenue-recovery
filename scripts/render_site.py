@@ -212,6 +212,8 @@ def render(md: str) -> str:
         "<head>",
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
+        # An empty inline icon: otherwise every visit requests /favicon.ico and logs a 404.
+        '<link rel="icon" href="data:,">',
         f"<title>{html.escape(title)}</title>",
         f"<style>{STYLE}</style>",
         "</head>",
