@@ -1,0 +1,5 @@
+# Only src/ is copied into the image. Ignore everything else so a build from a local folder
+# can never carry a secret into a build context, even if the Dockerfile changes later.
+*
+!src/
+src/**/__pycache__
