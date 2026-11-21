@@ -208,7 +208,10 @@ gate table in `docs/phase-0-findings.md`; corrected 4 Sept 2026.)*
 ## The hosted copy — Uprush, since 20 Nov 2026
 
 The results page and the webhook receiver also run on Uprush, at
-`https://razorpay-revenue-recovery.sites.uprush.in`:
+`https://revenue-recovery.sites.uprush.in`. The project is still named
+`razorpay-revenue-recovery` (that is what `--project` takes); only its address changed, on
+21 Nov 2026, and the old `razorpay-revenue-recovery.sites.uprush.in` now answers with a 308
+redirect to the new one:
 
 | Path | Part | What answers |
 |---|---|---|
@@ -255,7 +258,21 @@ reconnection after the server drops the connection.
 
 ### Pointing Razorpay at it
 
-Razorpay rejects webhook URLs whose domain contains "razorpay" (see the setup steps below),
-and the Uprush address is `razorpay-revenue-recovery.sites.uprush.in`, so Razorpay cannot
-deliver to it as is. It needs a custom domain attached on the Uprush dashboard; until then
-Razorpay keeps delivering to the zrok share.
+Razorpay rejects webhook URLs whose domain contains "razorpay" (see the setup steps below).
+The first Uprush address, `razorpay-revenue-recovery.sites.uprush.in`, did; the project's
+address was changed to `revenue-recovery.sites.uprush.in` for that reason. Point Razorpay at
+the new address itself, not the old one: its redirect is a 308, and a webhook sender cannot be
+relied on to follow it.
+
+In the Razorpay Dashboard: Test mode → Account & Settings → Webhooks. Edit the existing zrok
+webhook rather than adding a second one; two webhooks would send every event twice, to two
+stores that do not share dedup.
+
+- **URL:** `https://revenue-recovery.sites.uprush.in/webhook`
+- **Secret:** the same value as `RAZORPAY_WEBHOOK_SECRET` in `.env`, and on Uprush
+- **Events:** `payment.failed`, `payment.captured`, `payment.authorized`
+- **OTP**, if asked: `754081` in test mode
+
+Then create a test payment with `python scripts/create_payment_link.py`. The delivery is
+checked by its effect on the store, not by logs (`uprush logs` does not show the container's
+output; see above). Until this webhook is added, Razorpay keeps delivering to the zrok share.
