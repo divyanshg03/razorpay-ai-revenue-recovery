@@ -208,7 +208,10 @@ gate table in `docs/phase-0-findings.md`; corrected 4 Sept 2026.)*
 ## The hosted copy — Uprush, since 20 Nov 2026
 
 The results page and the webhook receiver also run on Uprush, at
-`https://razorpay-revenue-recovery.sites.uprush.in`:
+`https://revenue-recovery.sites.uprush.in`. The project is still named
+`razorpay-revenue-recovery` (that is what `--project` takes); only its address changed, on
+21 Nov 2026, and the old `razorpay-revenue-recovery.sites.uprush.in` now answers with a 308
+redirect to the new one:
 
 | Path | Part | What answers |
 |---|---|---|
@@ -229,10 +232,18 @@ and payment state in Postgres (`src/recovery/ingest/pg_store.py`) whenever `DATA
 set, and falls back to the SQLite file when it is not. The driver, `pg8000`, is pinned in the
 `Dockerfile` and installed nowhere else; the repository still has no runtime dependencies.
 
-The database is attached on the project's dashboard page (Uprush's CLI cannot add one to an
-existing project), and Uprush injects its connection variable. The receiver's startup line
-says which store it is on — `store postgres host:port/db` or `store sqlite path` — so
-`uprush logs` shows whether the attachment took.
+**Attached 21 Nov 2026.** The database was added on the project's dashboard page (Uprush's
+CLI cannot add one to an existing project) and is recorded in `deploy/uprush.json` as
+`"databases": ["postgres"]`. Uprush injects `DATABASE_URL` (plus `PGHOST`, `PGPORT`,
+`PGUSER`, `PGPASSWORD`, `PGDATABASE`); the deploy's build log lists them under "Databases
+connected".
+
+The receiver's startup line says which store it is on (`store postgres host:port/db` or
+`store sqlite path`), but `uprush logs` returns the build log, not the container's output, so
+the line is not visible from the CLI. The attachment was checked by behaviour instead: a signed
+self-test delivery was accepted, the project was redeployed (a new container), and the same
+event id was then answered `duplicate ignored` while a fresh id was still `queued`. A SQLite
+file inside the container cannot do that.
 
 The Postgres tests in `tests/test_deploy.py` skip unless `TEST_DATABASE_URL` is set:
 
@@ -247,7 +258,21 @@ reconnection after the server drops the connection.
 
 ### Pointing Razorpay at it
 
-Razorpay rejects webhook URLs whose domain contains "razorpay" (see the setup steps below),
-and the Uprush address is `razorpay-revenue-recovery.sites.uprush.in`, so Razorpay cannot
-deliver to it as is. It needs a custom domain attached on the Uprush dashboard; until then
-Razorpay keeps delivering to the zrok share.
+Razorpay rejects webhook URLs whose domain contains "razorpay" (see the setup steps below).
+The first Uprush address, `razorpay-revenue-recovery.sites.uprush.in`, did; the project's
+address was changed to `revenue-recovery.sites.uprush.in` for that reason. Point Razorpay at
+the new address itself, not the old one: its redirect is a 308, and a webhook sender cannot be
+relied on to follow it.
+
+In the Razorpay Dashboard: Test mode → Account & Settings → Webhooks. Edit the existing zrok
+webhook rather than adding a second one; two webhooks would send every event twice, to two
+stores that do not share dedup.
+
+- **URL:** `https://revenue-recovery.sites.uprush.in/webhook`
+- **Secret:** the same value as `RAZORPAY_WEBHOOK_SECRET` in `.env`, and on Uprush
+- **Events:** `payment.failed`, `payment.captured`, `payment.authorized`
+- **OTP**, if asked: `754081` in test mode
+
+Then create a test payment with `python scripts/create_payment_link.py`. The delivery is
+checked by its effect on the store, not by logs (`uprush logs` does not show the container's
+output; see above). Until this webhook is added, Razorpay keeps delivering to the zrok share.
