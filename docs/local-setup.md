@@ -229,10 +229,18 @@ and payment state in Postgres (`src/recovery/ingest/pg_store.py`) whenever `DATA
 set, and falls back to the SQLite file when it is not. The driver, `pg8000`, is pinned in the
 `Dockerfile` and installed nowhere else; the repository still has no runtime dependencies.
 
-The database is attached on the project's dashboard page (Uprush's CLI cannot add one to an
-existing project), and Uprush injects its connection variable. The receiver's startup line
-says which store it is on — `store postgres host:port/db` or `store sqlite path` — so
-`uprush logs` shows whether the attachment took.
+**Attached 21 Nov 2026.** The database was added on the project's dashboard page (Uprush's
+CLI cannot add one to an existing project) and is recorded in `deploy/uprush.json` as
+`"databases": ["postgres"]`. Uprush injects `DATABASE_URL` (plus `PGHOST`, `PGPORT`,
+`PGUSER`, `PGPASSWORD`, `PGDATABASE`); the deploy's build log lists them under "Databases
+connected".
+
+The receiver's startup line says which store it is on (`store postgres host:port/db` or
+`store sqlite path`), but `uprush logs` returns the build log, not the container's output, so
+the line is not visible from the CLI. The attachment was checked by behaviour instead: a signed
+self-test delivery was accepted, the project was redeployed (a new container), and the same
+event id was then answered `duplicate ignored` while a fresh id was still `queued`. A SQLite
+file inside the container cannot do that.
 
 The Postgres tests in `tests/test_deploy.py` skip unless `TEST_DATABASE_URL` is set:
 
