@@ -7,5 +7,6 @@
   "routes": [
     {"path": "/webhook", "part": "receiver"},
     {"path": "/healthz", "part": "receiver"}
-  ]
+  ],
+  "databases": ["postgres"]
 }
